@@ -1,0 +1,30 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# Set index file
+DirectoryIndex index.php
+
+# Enable error reporting for development
+php_flag display_errors on
+php_value error_reporting E_ALL
+
+# Prevent directory listing
+Options -Indexes
+
+# Redirect all requests to index.php if file doesn't exist
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+# Set proper headers for assets
+<FilesMatch "\.(css|js|jpg|jpeg|png|gif|ico|svg|woff2?)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+
+# Prevent access to sensitive files
+<FilesMatch "(\.env|\.htaccess|composer\.json|composer\.lock)">
+    Require all denied
+</FilesMatch>
