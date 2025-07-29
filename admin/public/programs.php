@@ -10,7 +10,7 @@ Utilities::requireLogin();
 
 $pageTitle = "Programs Management";
 $breadcrumbs = [
-    ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
+    ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/public/'],
     ['title' => 'Programs Management']
 ];
 

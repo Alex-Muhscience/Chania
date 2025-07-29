@@ -43,7 +43,7 @@ try {
     // Save registration
     $stmt = $db->prepare("
         INSERT INTO event_registrations (
-            event_id, name, email, phone, organization, 
+            event_id, full_name, email, phone, organization, 
             subscribe_newsletter, ip_address
         ) VALUES (?, ?, ?, ?, ?, ?, ?)
     ");

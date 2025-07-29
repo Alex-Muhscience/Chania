@@ -60,7 +60,7 @@ try {
     
     // Get files
     $stmt = $db->prepare("
-        SELECT f.*, u.full_name as uploaded_by_name
+        SELECT f.*, u.username as uploaded_by_name
         FROM file_uploads f
         LEFT JOIN users u ON f.uploaded_by = u.id
         $whereClause

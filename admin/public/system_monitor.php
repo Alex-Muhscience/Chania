@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/Utilities.php';
@@ -62,11 +61,11 @@ try {
     // Database statistics
     $stmt = $db->query("
         SELECT 
-            (SELECT COUNT(*) FROM users WHERE deleted_at IS NULL) as total_users,
+            (SELECT COUNT(*) FROM users WHERE is_active = 1) as total_users,
             (SELECT COUNT(*) FROM programs WHERE deleted_at IS NULL) as total_programs,
-            (SELECT COUNT(*) FROM applications WHERE deleted_at IS NULL) as total_applications,
+            (SELECT COUNT(*) FROM applications) as total_applications,
             (SELECT COUNT(*) FROM events WHERE deleted_at IS NULL) as total_events,
-            (SELECT COUNT(*) FROM contacts WHERE deleted_at IS NULL) as total_contacts,
+            (SELECT COUNT(*) FROM contacts) as total_contacts,
             (SELECT COUNT(*) FROM testimonials WHERE deleted_at IS NULL) as total_testimonials,
             (SELECT COUNT(*) FROM admin_logs) as total_logs
     ");
@@ -229,7 +228,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-sm">
+                    <table class="table table-sm no-datatables">
                         <tr>
                             <td><strong>PHP Version:</strong></td>
                             <td><?= htmlspecialchars($systemInfo['php_version']) ?></td>
@@ -280,7 +279,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-sm">
+                    <table class="table table-sm no-datatables">
                         <tr>
                             <td><strong>Total Users:</strong></td>
                             <td><?= number_format($dbStats['total_users'] ?? 0) ?></td>
@@ -410,8 +409,8 @@ require_once __DIR__ . '/../includes/header.php';
                             <?php foreach ($tables as $table): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($table['table_name']) ?></td>
-                                    <td><?= number_format($table['table_rows']) ?></td>
-                                    <td><?= number_format($table['size_mb'], 2) ?></td>
+                                    <td><?= number_format($table['table_rows'] ?? 0) ?></td>
+                                    <td><?= number_format($table['size_mb'] ?? 0, 2) ?></td>
                                     <td>
                                         <button type="button" class="btn btn-outline-primary btn-sm" 
                                                 onclick="analyzeTable('<?= htmlspecialchars($table['table_name']) ?>')">

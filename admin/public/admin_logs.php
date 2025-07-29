@@ -8,10 +8,10 @@ session_start();
 // Require admin role
 Utilities::requireRole('admin');
 
-$pageTitle = "Admin Activity Logs";
+$pageTitle = "Audit & Activity Logs";
 $breadcrumbs = [
     ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
-    ['title' => 'Admin Activity Logs']
+    ['title' => 'Audit & Activity Logs']
 ];
 
 $errors = [];
@@ -25,19 +25,41 @@ $entityType = $_GET['entity_type'] ?? '';
 $severity = $_GET['severity'] ?? '';
 $dateFrom = $_GET['date_from'] ?? '';
 $dateTo = $_GET['date_to'] ?? '';
+$timeRange = $_GET['time_range'] ?? '30';
+
+// Define severity levels for filtering
+$severityLevels = ['Low', 'Medium', 'High', 'Critical'];
 $page = max(1, intval($_GET['page'] ?? 1));
 $limit = ITEMS_PER_PAGE;
 $offset = ($page - 1) * $limit;
+
+// Handle bulk actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
+    $bulkAction = $_POST['bulk_action'];
+    $selectedLogs = $_POST['selected_logs'] ?? [];
+    
+    if (!empty($selectedLogs) && $bulkAction === 'export') {
+        // Export selected logs
+        header('Location: ' . BASE_URL . '/admin/public/logs_export.php?ids=' . implode(',', $selectedLogs));
+        exit;
+    }
+}
+
+// Set default date range if not specified
+if (!$dateFrom && !$dateTo) {
+    $dateTo = date('Y-m-d');
+    $dateFrom = date('Y-m-d', strtotime("-{$timeRange} days"));
+}
 
 try {
     $db = (new Database())->connect();
 
     // Get users for filter
     $stmt = $db->query("
-        SELECT id, full_name, username 
+        SELECT id, username 
         FROM users 
-        WHERE deleted_at IS NULL 
-        ORDER BY full_name ASC
+        WHERE is_active = 1 
+        ORDER BY username ASC
     ");
     $users = $stmt->fetchAll();
 
@@ -46,7 +68,7 @@ try {
     $params = [];
 
     if ($search) {
-        $conditions[] = "(l.action LIKE ? OR l.entity_type LIKE ? OR u.full_name LIKE ?)";
+        $conditions[] = "(l.action LIKE ? OR l.entity_type LIKE ? OR u.username LIKE ?)";
         $searchTerm = "%$search%";
         $params[] = $searchTerm;
         $params[] = $searchTerm;
@@ -68,10 +90,6 @@ try {
         $params[] = $entityType;
     }
 
-    if ($severity) {
-        $conditions[] = "l.severity = ?";
-        $params[] = $severity;
-    }
 
     if ($dateFrom) {
         $conditions[] = "DATE(l.created_at) >= ?";
@@ -98,7 +116,7 @@ try {
 
     // Get logs
     $stmt = $db->prepare("
-        SELECT l.*, u.full_name as user_name, u.username
+        SELECT l.*, u.username as user_name
         FROM admin_logs l
         JOIN users u ON l.user_id = u.id
         $whereClause
@@ -144,16 +162,16 @@ try {
     ");
     $topActions = $stmt->fetchAll();
 
-    // Get severity counts
+    // Get entity type counts (replacing severity)
     $stmt = $db->query("
         SELECT 
-            severity,
+            entity_type,
             COUNT(*) as count
         FROM admin_logs
         WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-        GROUP BY severity
+        GROUP BY entity_type
     ");
-    $severityCounts = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    $entityTypeCounts = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
 } catch (PDOException $e) {
     error_log("Admin logs fetch error: " . $e->getMessage());
@@ -164,7 +182,7 @@ try {
     $stats = ['total_logs' => 0, 'active_users' => 0, 'active_days' => 0];
     $activityTrends = [];
     $topActions = [];
-    $severityCounts = [];
+    $entityTypeCounts = [];
 }
 
 require_once __DIR__ . '/../includes/header.php';
@@ -195,30 +213,24 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         </div>
 
-        <!-- Severity Distribution -->
+        <!-- Entity Type Distribution -->
         <div class="card mt-4">
             <div class="card-header">
-                <h6 class="m-0 font-weight-bold text-primary">Severity Distribution</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Entity Types</h6>
             </div>
             <div class="card-body">
-                <div class="list-group list-group-flush">
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-info-circle text-info"></i> Info</span>
-                        <span class="badge badge-info badge-pill"><?= $severityCounts['info'] ?? 0 ?></span>
+                <?php if (empty($entityTypeCounts)): ?>
+                    <p class="text-muted">No entity types recorded</p>
+                <?php else: ?>
+                    <div class="list-group list-group-flush">
+                        <?php foreach ($entityTypeCounts as $entityType => $count): ?>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="fas fa-cube text-secondary"></i> <?= htmlspecialchars($entityType ?: 'General') ?></span>
+                                <span class="badge badge-secondary badge-pill"><?= $count ?></span>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-exclamation-triangle text-warning"></i> Warning</span>
-                        <span class="badge badge-warning badge-pill"><?= $severityCounts['warning'] ?? 0 ?></span>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-times-circle text-danger"></i> Error</span>
-                        <span class="badge badge-danger badge-pill"><?= $severityCounts['error'] ?? 0 ?></span>
-                    </div>
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-exclamation-circle text-dark"></i> Critical</span>
-                        <span class="badge badge-dark badge-pill"><?= $severityCounts['critical'] ?? 0 ?></span>
-                    </div>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -268,6 +280,33 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
             </div>
 
+
+
+
+<div>
+    <!-- Custom CSS styling for badges and modals -->
+    <style>
+    .badge {
+        padding: 0.5em 0.7em;
+        font-size: 90%;
+        border-radius: 0.2em;
+    }
+    .modal-dialog {
+        max-width: 80%;
+    }
+    </style>
+</div>
+// Bulk action form
+
+<form method="POST" action="" class="form-inline mb-2">
+    <select name="bulk_action" class="form-control mr-2">
+        <option value="">Bulk actions</option>
+        <option value="export">Export</option>
+        <option value="delete">Delete</option>
+        <option value="review">Mark as Reviewed</option>
+    </select>
+    <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
+</form>
             <div class="card-body">
                 <!-- Search and Filter -->
                 <form method="GET" class="mb-4">
@@ -280,19 +319,19 @@ require_once __DIR__ . '/../includes/header.php';
                             <select name="user_id" class="form-control">
                                 <option value="">All Users</option>
                                 <?php foreach ($users as $user): ?>
-                                    <option value="<?= $user['id'] ?>" <?= $userId == $user['id'] ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($user['full_name']) ?>
+                                <option value="<?= $user['id'] ?>" <?= $userId == $user['id'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($user['username']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <select name="severity" class="form-control">
-                                <option value="">All Severity</option>
-                                <option value="info" <?= $severity === 'info' ? 'selected' : '' ?>>Info</option>
-                                <option value="warning" <?= $severity === 'warning' ? 'selected' : '' ?>>Warning</option>
-                                <option value="error" <?= $severity === 'error' ? 'selected' : '' ?>>Error</option>
-                                <option value="critical" <?= $severity === 'critical' ? 'selected' : '' ?>>Critical</option>
+                            <select name="entity_type" class="form-control">
+                                <option value="">All Entity Types</option>
+                                <option value="user" <?= $entityType === 'user' ? 'selected' : '' ?>>User</option>
+                                <option value="application" <?= $entityType === 'application' ? 'selected' : '' ?>>Application</option>
+                                <option value="program" <?= $entityType === 'program' ? 'selected' : '' ?>>Program</option>
+                                <option value="event" <?= $entityType === 'event' ? 'selected' : '' ?>>Event</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -326,7 +365,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     <th>User</th>
                                     <th>Action</th>
                                     <th>Entity</th>
-                                    <th>Severity</th>
+                                    <th>User Agent</th>
                                     <th>IP Address</th>
                                     <th>Details</th>
                                 </tr>
@@ -339,7 +378,6 @@ require_once __DIR__ . '/../includes/header.php';
                                         </td>
                                         <td>
                                             <strong><?= htmlspecialchars($log['user_name']) ?></strong>
-                                            <br><small class="text-muted">@<?= htmlspecialchars($log['username']) ?></small>
                                         </td>
                                         <td>
                                             <span class="badge badge-info"><?= htmlspecialchars($log['action']) ?></span>
@@ -348,28 +386,19 @@ require_once __DIR__ . '/../includes/header.php';
                                             <?php if ($log['entity_type']): ?>
                                                 <span class="badge badge-secondary">
                                                     <?= htmlspecialchars($log['entity_type']) ?>
-                                                    <?php if ($log['entity_id']): ?>
-                                                        #<?= $log['entity_id'] ?>
-                                                    <?php endif; ?>
                                                 </span>
                                             <?php else: ?>
                                                 <span class="text-muted">-</span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <span class="badge badge-<?=
-                                                $log['severity'] === 'critical' ? 'dark' :
-                                                ($log['severity'] === 'error' ? 'danger' :
-                                                ($log['severity'] === 'warning' ? 'warning' : 'info'))
-                                            ?>">
-                                                <?= ucfirst($log['severity']) ?>
-                                            </span>
+                                            <small class="text-muted"><?= htmlspecialchars(substr($log['user_agent'] ?? '', 0, 50)) ?><?= strlen($log['user_agent'] ?? '') > 50 ? '...' : '' ?></small>
                                         </td>
                                         <td>
                                             <small class="text-muted"><?= htmlspecialchars($log['ip_address']) ?></small>
                                         </td>
                                         <td>
-                                            <?php if ($log['old_values'] || $log['new_values']): ?>
+                                            <?php if ($log['details']): ?>
                                                 <button type="button" class="btn btn-outline-primary btn-sm"
                                                         data-toggle="modal" data-target="#logModal<?= $log['id'] ?>">
                                                     <i class="fas fa-eye"></i>
@@ -390,7 +419,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <ul class="pagination justify-content-center">
                                 <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                                     <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                                        <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>&user_id=<?= urlencode($userId) ?>&severity=<?= urlencode($severity) ?>&date_from=<?= urlencode($dateFrom) ?>&date_to=<?= urlencode($dateTo) ?>">
+                                        <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>&user_id=<?= urlencode($userId) ?>&entity_type=<?= urlencode($entityType) ?>&date_from=<?= urlencode($dateFrom) ?>&date_to=<?= urlencode($dateTo) ?>">
                                             <?= $i ?>
                                         </a>
                                     </li>
@@ -406,7 +435,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <!-- Log Details Modals -->
 <?php foreach ($logs as $log): ?>
-    <?php if ($log['old_values'] || $log['new_values']): ?>
+    <?php if ($log['details']): ?>
         <div class="modal fade" id="logModal<?= $log['id'] ?>" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
@@ -423,26 +452,19 @@ require_once __DIR__ . '/../includes/header.php';
                                 <p><strong>User:</strong> <?= htmlspecialchars($log['user_name']) ?></p>
                                 <p><strong>Action:</strong> <?= htmlspecialchars($log['action']) ?></p>
                                 <p><strong>Entity:</strong> <?= htmlspecialchars($log['entity_type'] ?? 'N/A') ?></p>
-                                <p><strong>Entity ID:</strong> <?= htmlspecialchars($log['entity_id'] ?? 'N/A') ?></p>
+                                <p><strong>Details:</strong> <?= htmlspecialchars($log['details'] ?? 'N/A') ?></p>
                                 <p><strong>Date:</strong> <?= date('M j, Y g:i A', strtotime($log['created_at'])) ?></p>
                                 <p><strong>IP Address:</strong> <?= htmlspecialchars($log['ip_address']) ?></p>
                             </div>
                             <div class="col-md-6">
                                 <h6>Technical Details</h6>
-                                <p><strong>Severity:</strong> <?= ucfirst($log['severity']) ?></p>
-                                <p><strong>Session ID:</strong> <?= htmlspecialchars($log['session_id'] ?? 'N/A') ?></p>
                                 <p><strong>User Agent:</strong> <small><?= htmlspecialchars($log['user_agent'] ?? 'N/A') ?></small></p>
                             </div>
                         </div>
 
-                        <?php if ($log['old_values']): ?>
-                            <h6>Previous Values</h6>
-                            <pre class="bg-light p-3 rounded"><?= htmlspecialchars(json_encode(json_decode($log['old_values']), JSON_PRETTY_PRINT)) ?></pre>
-                        <?php endif; ?>
-
-                        <?php if ($log['new_values']): ?>
-                            <h6>New Values</h6>
-                            <pre class="bg-light p-3 rounded"><?= htmlspecialchars(json_encode(json_decode($log['new_values']), JSON_PRETTY_PRINT)) ?></pre>
+                        <?php if ($log['details']): ?>
+                            <h6>Additional Details</h6>
+                            <pre class="bg-light p-3 rounded"><?= htmlspecialchars($log['details']) ?></pre>
                         <?php endif; ?>
                     </div>
                     <div class="modal-footer">

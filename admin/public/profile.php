@@ -73,17 +73,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Update profile if no errors
         if (empty($errors)) {
             try {
-                $stmt = $db->prepare("UPDATE users SET full_name = ?, email = ?, phone = ?, bio = ?, updated_at = NOW() WHERE id = ?");
-                $stmt->execute([$fullName, $email, $phone, $bio, $_SESSION['user_id']]);
+                // Check if full_name column exists, otherwise use available columns
+                $updateFields = "email = ?, updated_at = NOW()";
+                $updateParams = [$email];
+                
+                // Add phone and bio if they exist in the table
+                $stmt = $db->query("DESCRIBE users");
+                $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                
+                if (in_array('full_name', $columns)) {
+                    $updateFields = "full_name = ?, " . $updateFields;
+                    array_unshift($updateParams, $fullName);
+                }
+                if (in_array('phone', $columns)) {
+                    $updateFields = "phone = ?, " . $updateFields;
+                    array_unshift($updateParams, $phone);
+                }
+                if (in_array('bio', $columns)) {
+                    $updateFields = "bio = ?, " . $updateFields;
+                    array_unshift($updateParams, $bio);
+                }
+                
+                $updateParams[] = $_SESSION['user_id'];
+                
+                $stmt = $db->prepare("UPDATE users SET {$updateFields} WHERE id = ?");
+                $stmt->execute($updateParams);
 
                 $_SESSION['success'] = "Profile updated successfully.";
                 $success = true;
 
                 // Update user data
-                $user['full_name'] = $fullName;
+                if (in_array('full_name', $columns)) {
+                    $user['full_name'] = $fullName;
+                }
                 $user['email'] = $email;
-                $user['phone'] = $phone;
-                $user['bio'] = $bio;
+                if (in_array('phone', $columns)) {
+                    $user['phone'] = $phone;
+                }
+                if (in_array('bio', $columns)) {
+                    $user['bio'] = $bio;
+                }
 
             } catch (PDOException $e) {
                 error_log("Profile update error: " . $e->getMessage());

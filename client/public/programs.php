@@ -68,8 +68,13 @@ $categories = getProgramCategories($db);
                         <select name="category" class="form-select" onchange="this.form.submit()">
                             <option value="">All Categories</option>
                             <?php foreach ($categories as $cat): ?>
-                            <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo $categoryFilter === $cat ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($cat); ?>
+                            <?php 
+                                // Handle both array and string formats for backwards compatibility
+                                $catValue = is_array($cat) ? ($cat['name'] ?? $cat['id']) : $cat;
+                                $catDisplay = is_array($cat) ? ($cat['name'] ?? $catValue) : $cat;
+                            ?>
+                            <option value="<?php echo htmlspecialchars($catValue); ?>" <?php echo $categoryFilter === $catValue ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($catDisplay); ?>
                             </option>
                             <?php endforeach; ?>
                         </select>

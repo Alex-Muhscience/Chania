@@ -12,7 +12,7 @@ Utilities::requireRole('admin');
 $pageTitle = "Add User";
 $breadcrumbs = [
     ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
-    ['title' => 'Users', 'url' => BASE_URL . '/admin/users.php'],
+    ['title' => 'Users', 'url' => BASE_URL . '/admin/public/users.php'],
     ['title' => 'Add User']
 ];
 
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             $_SESSION['success'] = "User created successfully.";
-            Utilities::redirect('/admin/users.php');
+            Utilities::redirect('/admin/public/users.php');
 
         } catch (PDOException $e) {
             error_log("User creation error: " . $e->getMessage());

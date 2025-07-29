@@ -27,7 +27,7 @@ try {
     } else {
         // Multiple applications export
         if ($search) {
-            $conditions[] = "(a.full_name LIKE ? OR a.email LIKE ?)";
+            $conditions[] = "(CONCAT(a.first_name, ' ', a.last_name) LIKE ? OR a.email LIKE ?)";
             $searchTerm = "%$search%";
             $params[] = $searchTerm;
             $params[] = $searchTerm;
@@ -43,7 +43,7 @@ try {
         $whereClause = "WHERE " . implode(" AND ", $conditions);
     }
 
-    $stmt = $db->prepare("SELECT a.*, p.title as program_title FROM applications a LEFT JOIN programs p ON a.program_id = p.id $whereClause ORDER BY a.created_at DESC");
+    $stmt = $db->prepare("SELECT a.*, p.title as program_title, CONCAT(a.first_name, ' ', a.last_name) as full_name FROM applications a LEFT JOIN programs p ON a.program_id = p.id $whereClause ORDER BY a.submitted_at DESC");
     $stmt->execute($params);
     $applications = $stmt->fetchAll();
 
@@ -89,10 +89,10 @@ if ($format === 'csv') {
             $application['address'] ?? '',
             $application['program_title'] ?? '',
             ucfirst($application['status']),
-            $application['message'] ?? '',
-            $application['education'] ?? '',
-            $application['experience'] ?? '',
-            $application['created_at'],
+            $application['motivation'] ?? '',
+            $application['education_details'] ?? '',
+            $application['work_experience'] ?? '',
+            $application['submitted_at'],
             $application['updated_at'] ?? ''
         ]);
     }
@@ -172,22 +172,22 @@ function generateApplicationPDF($application) {
             <h2>Application Details</h2>
             <p><span class='label'>Program:</span> {$application['program_title']}</p>
             <p><span class='label'>Status:</span> " . ucfirst($application['status']) . "</p>
-            <p><span class='label'>Applied Date:</span> {$application['created_at']}</p>
+            <p><span class='label'>Applied Date:</span> {$application['submitted_at']}</p>
         </div>
         
         <div class='section'>
-            <h2>Message</h2>
-            <p>" . nl2br(htmlspecialchars($application['message'])) . "</p>
+            <h2>Motivation</h2>
+            <p>" . nl2br(htmlspecialchars($application['motivation'])) . "</p>
         </div>
         
         <div class='section'>
             <h2>Education</h2>
-            <p>" . nl2br(htmlspecialchars($application['education'])) . "</p>
+            <p>" . nl2br(htmlspecialchars($application['education_details'])) . "</p>
         </div>
         
         <div class='section'>
             <h2>Experience</h2>
-            <p>" . nl2br(htmlspecialchars($application['experience'])) . "</p>
+            <p>" . nl2br(htmlspecialchars($application['work_experience'])) . "</p>
         </div>
     </body>
     </html>";

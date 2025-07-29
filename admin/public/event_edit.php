@@ -39,12 +39,12 @@ try {
     $formData = [
         'title' => $event['title'],
         'description' => $event['description'],
-        'event_date' => $event['event_date'],
-        'start_time' => $event['start_time'],
-        'end_time' => $event['end_time'],
+        'event_date' => date('Y-m-d', strtotime($event['event_date'])),
+        'start_time' => date('H:i', strtotime($event['event_date'])),
+        'end_time' => $event['end_date'] ? date('H:i', strtotime($event['end_date'])) : '',
         'location' => $event['location'],
-        'max_participants' => $event['max_participants'],
-        'registration_deadline' => $event['registration_deadline'],
+        'max_attendees' => $event['max_attendees'],
+        'registration_deadline' => $event['registration_deadline'] ? date('Y-m-d\TH:i', strtotime($event['registration_deadline'])) : '',
         'is_active' => $event['is_active']
     ];
 
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'start_time' => $_POST['start_time'] ?? '',
         'end_time' => $_POST['end_time'] ?? '',
         'location' => trim($_POST['location'] ?? ''),
-        'max_participants' => intval($_POST['max_participants'] ?? 0),
+        'max_attendees' => intval($_POST['max_attendees'] ?? 0) ?: null,
         'registration_deadline' => $_POST['registration_deadline'] ?? '',
         'is_active' => isset($_POST['is_active']) ? 1 : 0
     ];
@@ -101,15 +101,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Update event if no errors
     if (empty($errors)) {
         try {
-            $stmt = $db->prepare("UPDATE events SET title = ?, description = ?, event_date = ?, start_time = ?, end_time = ?, location = ?, max_participants = ?, registration_deadline = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
+            // Combine date and time for event_date and end_date
+            $eventDateTime = $formData['event_date'] . ' ' . $formData['start_time'] . ':00';
+            $endDateTime = !empty($formData['end_time']) ? $formData['event_date'] . ' ' . $formData['end_time'] . ':00' : null;
+            
+            $stmt = $db->prepare("UPDATE events SET title = ?, description = ?, event_date = ?, end_date = ?, location = ?, max_attendees = ?, registration_deadline = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
             $stmt->execute([
                 $formData['title'],
                 $formData['description'],
-                $formData['event_date'],
-                $formData['start_time'],
-                $formData['end_time'],
+                $eventDateTime,
+                $endDateTime,
                 $formData['location'],
-                $formData['max_participants'] ?: null,
+                $formData['max_attendees'],
                 $formData['registration_deadline'] ?: null,
                 $formData['is_active'],
                 $eventId
@@ -169,14 +172,14 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="mb-3">
                                 <label for="start_time" class="form-label">Start Time *</label>
                                 <input type="time" class="form-control" id="start_time" name="start_time"
-                                       value="<?= htmlspecialchars($formData['start_time']) ?>" required>
+                                       value="<?= htmlspecialchars($formData['start_time'] ?? '') ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="end_time" class="form-label">End Time *</label>
                                 <input type="time" class="form-control" id="end_time" name="end_time"
-                                       value="<?= htmlspecialchars($formData['end_time']) ?>" required>
+                                       value="<?= htmlspecialchars($formData['end_time'] ?? '') ?>" required>
                             </div>
                         </div>
                     </div>
@@ -190,9 +193,9 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="max_participants" class="form-label">Max Participants</label>
-                                <input type="number" class="form-control" id="max_participants" name="max_participants"
-                                       value="<?= $formData['max_participants'] ?>" min="1">
+                                <label for="max_attendees" class="form-label">Max Participants</label>
+                                <input type="number" class="form-control" id="max_attendees" name="max_attendees"
+                                       value="<?= $formData['max_attendees'] ?>" min="1">
                                 <div class="form-text">Leave empty for unlimited participants</div>
                             </div>
                         </div>
@@ -200,7 +203,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="mb-3">
                                 <label for="registration_deadline" class="form-label">Registration Deadline</label>
                                 <input type="date" class="form-control" id="registration_deadline" name="registration_deadline"
-                                       value="<?= htmlspecialchars($formData['registration_deadline']) ?>">
+                                       value="<?= htmlspecialchars($formData['registration_deadline'] ?? '') ?>">
                             </div>
                         </div>
                     </div>

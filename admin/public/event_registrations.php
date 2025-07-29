@@ -78,7 +78,7 @@ try {
         FROM event_registrations er
         JOIN events e ON er.event_id = e.id
         $whereClause
-        ORDER BY er.registered_at DESC
+        ORDER BY er.registration_date DESC
         LIMIT ? OFFSET ?
     ");
     $stmt->execute([...$params, $limit, $offset]);
@@ -383,7 +383,7 @@ require_once __DIR__ . '/../includes/header.php';
                                             </td>
                                             <td>
                                                 <small class="text-muted">
-                                                    <?= date('M j, Y', strtotime($registration['registered_at'])) ?>
+                                                    <?= date('M j, Y', strtotime($registration['registration_date'])) ?>
                                                 </small>
                                             </td>
                                             <td>
@@ -496,7 +496,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     <?= ucfirst(str_replace('_', ' ', $registration['status'])) ?>
                                 </span>
                             </p>
-                            <p><strong>Registered:</strong> <?= date('M j, Y g:i A', strtotime($registration['registered_at'])) ?></p>
+                            <p><strong>Registered:</strong> <?= date('M j, Y g:i A', strtotime($registration['registration_date'])) ?></p>
                         </div>
                     </div>
 

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../Models/ApplicationModel.php';
+require_once __DIR__ . '/../../shared/Core/Utilities.php';
 
 class ApplicationService {
     private $model;
@@ -43,7 +44,22 @@ class ApplicationService {
             $sanitizedData['experience'] = htmlspecialchars(trim($data['experience']));
         }
 
-        return $this->model->submitApplication($sanitizedData);
+$result = $this->model->submitApplication($sanitizedData);
+        
+        // Log activity
+        if ($result) {
+            Utilities::logActivity([
+                'user_id' => null, // or replace with actual user ID if available
+                'action' => 'Submit Application',
+                'entity_type' => 'Application',
+                'entity_id' => $result, // retrieve the application ID from the result if available
+                'details' => json_encode($sanitizedData),
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+            ]);
+        }
+
+        return $result;
     }
 
     public function getApplicationById($id) {

@@ -43,7 +43,7 @@ try {
     $params = [];
     
     if ($search) {
-        $conditions[] = "(t.author_name LIKE ? OR t.author_title LIKE ? OR t.content LIKE ?)";
+        $conditions[] = "(t.name LIKE ? OR t.position LIKE ? OR t.testimonial LIKE ?)";
         $searchTerm = "%$search%";
         $params[] = $searchTerm;
         $params[] = $searchTerm;
@@ -70,10 +70,9 @@ try {
     
     // Get testimonials
     $stmt = $db->prepare("
-        SELECT t.*, p.title as program_title, u.full_name as created_by_name
+        SELECT t.*, p.title as program_title
         FROM testimonials t
         LEFT JOIN programs p ON t.program_id = p.id
-        LEFT JOIN users u ON t.created_by = u.id
         $whereClause
         ORDER BY t.created_at DESC
         LIMIT ? OFFSET ?
@@ -86,7 +85,7 @@ try {
         SELECT 
             COUNT(*) as total,
             SUM(CASE WHEN is_featured = 1 THEN 1 ELSE 0 END) as featured,
-            SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active,
+            SUM(CASE WHEN is_approved = 1 THEN 1 ELSE 0 END) as approved,
             AVG(rating) as avg_rating
         FROM testimonials 
         WHERE deleted_at IS NULL
@@ -99,7 +98,7 @@ try {
     $programs = [];
     $totalItems = 0;
     $totalPages = 0;
-    $stats = ['total' => 0, 'featured' => 0, 'active' => 0, 'avg_rating' => 0];
+    $stats = ['total' => 0, 'featured' => 0, 'approved' => 0, 'avg_rating' => 0];
 }
 
 // Handle form submission
@@ -139,26 +138,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($action === 'add') {
                     $stmt = $db->prepare("
                         INSERT INTO testimonials 
-                        (author_name, author_title, author_company, content, rating, program_id, 
-                         is_featured, is_active, display_order, created_by, created_at, updated_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+                        (name, position, company, testimonial, rating, program_id, 
+                         is_featured, is_approved, created_at, updated_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
                     ");
                     $stmt->execute([
                         $authorName, $authorTitle, $authorCompany, $content, $rating, 
-                        $programId, $isFeatured, $isActive, $displayOrder, $_SESSION['user_id']
+                        $programId, $isFeatured, $isActive
                     ]);
                     $testimonialId = $db->lastInsertId();
                 } else {
                     $stmt = $db->prepare("
                         UPDATE testimonials 
-                        SET author_name = ?, author_title = ?, author_company = ?, content = ?, 
-                            rating = ?, program_id = ?, is_featured = ?, is_active = ?, 
-                            display_order = ?, updated_at = NOW()
+                        SET name = ?, position = ?, company = ?, testimonial = ?, 
+                            rating = ?, program_id = ?, is_featured = ?, is_approved = ?, 
+                            updated_at = NOW()
                         WHERE id = ? AND deleted_at IS NULL
                     ");
                     $stmt->execute([
                         $authorName, $authorTitle, $authorCompany, $content, $rating, 
-                        $programId, $isFeatured, $isActive, $displayOrder, $id
+                        $programId, $isFeatured, $isActive, $id
                     ]);
                     $testimonialId = $id;
                 }
@@ -209,10 +208,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt = $db->prepare("UPDATE testimonials SET is_featured = 0 WHERE id IN ($placeholders)");
                     $stmt->execute($testimonialIds);
                 } elseif ($bulkAction === 'activate') {
-                    $stmt = $db->prepare("UPDATE testimonials SET is_active = 1 WHERE id IN ($placeholders)");
+                    $stmt = $db->prepare("UPDATE testimonials SET is_approved = 1 WHERE id IN ($placeholders)");
                     $stmt->execute($testimonialIds);
                 } elseif ($bulkAction === 'deactivate') {
-                    $stmt = $db->prepare("UPDATE testimonials SET is_active = 0 WHERE id IN ($placeholders)");
+                    $stmt = $db->prepare("UPDATE testimonials SET is_approved = 0 WHERE id IN ($placeholders)");
                     $stmt->execute($testimonialIds);
                 }
                 
@@ -244,7 +243,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             $stmt = $db->prepare("UPDATE testimonials SET is_featured = NOT is_featured WHERE id = ?");
             $stmt->execute([$testimonialId]);
         } elseif ($action === 'toggle_active') {
-            $stmt = $db->prepare("UPDATE testimonials SET is_active = NOT is_active WHERE id = ?");
+            $stmt = $db->prepare("UPDATE testimonials SET is_approved = NOT is_approved WHERE id = ?");
             $stmt->execute([$testimonialId]);
         }
         
@@ -293,8 +292,8 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="text-xs text-gray-500">Featured</div>
                     </div>
                     <div class="col-6">
-                        <div class="h4 font-weight-bold text-info"><?= number_format($stats['active']) ?></div>
-                        <div class="text-xs text-gray-500">Active</div>
+                        <div class="h4 font-weight-bold text-info"><?= number_format($stats['approved']) ?></div>
+                        <div class="text-xs text-gray-500">Approved</div>
                     </div>
                     <div class="col-6">
                         <div class="h4 font-weight-bold text-warning"><?= number_format($stats['avg_rating'], 1) ?></div>
@@ -433,11 +432,11 @@ require_once __DIR__ . '/../includes/header.php';
                                             <?php endif; ?>
 
                                             <div class="text-center mb-3">
-                                                <h6 class="mb-0"><?= htmlspecialchars($testimonial['author_name']) ?></h6>
+                                                <h6 class="mb-0"><?= htmlspecialchars($testimonial['name']) ?></h6>
                                                 <small class="text-muted">
-                                                    <?= htmlspecialchars($testimonial['author_title']) ?>
-                                                    <?php if ($testimonial['author_company']): ?>
-                                                        at <?= htmlspecialchars($testimonial['author_company']) ?>
+                                                    <?= htmlspecialchars($testimonial['position']) ?>
+                                                    <?php if ($testimonial['company']): ?>
+                                                        at <?= htmlspecialchars($testimonial['company']) ?>
                                                     <?php endif; ?>
                                                 </small>
                                             </div>
@@ -449,7 +448,7 @@ require_once __DIR__ . '/../includes/header.php';
                                             </div>
 
                                             <p class="card-text">
-                                                <small><?= Utilities::truncate($testimonial['content'], 100) ?></small>
+                                                <small><?= Utilities::truncate($testimonial['testimonial'], 100) ?></small>
                                             </p>
 
                                             <?php if ($testimonial['program_title']): ?>
@@ -462,10 +461,10 @@ require_once __DIR__ . '/../includes/header.php';
                                                 <?php if ($testimonial['is_featured']): ?>
                                                     <span class="badge badge-success">Featured</span>
                                                 <?php endif; ?>
-                                                <?php if ($testimonial['is_active']): ?>
-                                                    <span class="badge badge-primary">Active</span>
+                                                <?php if ($testimonial['is_approved']): ?>
+                                                    <span class="badge badge-primary">Approved</span>
                                                 <?php else: ?>
-                                                    <span class="badge badge-secondary">Inactive</span>
+                                                    <span class="badge badge-secondary">Not Approved</span>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -480,8 +479,8 @@ require_once __DIR__ . '/../includes/header.php';
                                                     <i class="fas fa-star"></i>
                                                 </a>
                                                 <a href="?action=toggle_active&id=<?= $testimonial['id'] ?>"
-                                                   class="btn btn-outline-<?= $testimonial['is_active'] ? 'secondary' : 'info' ?>">
-                                                    <i class="fas fa-eye<?= $testimonial['is_active'] ? '-slash' : '' ?>"></i>
+                                                   class="btn btn-outline-<?= $testimonial['is_approved'] ? 'secondary' : 'info' ?>">
+                                                    <i class="fas fa-eye<?= $testimonial['is_approved'] ? '-slash' : '' ?>"></i>
                                                 </a>
                                                 <a href="?action=delete&id=<?= $testimonial['id'] ?>"
                                                    class="btn btn-outline-danger"
@@ -538,14 +537,14 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="form-group">
                                 <label for="author_name">Author Name *</label>
                                 <input type="text" class="form-control" id="author_name" name="author_name"
-                                       value="<?= htmlspecialchars($editTestimonial['author_name'] ?? '') ?>" required>
+                                       value="<?= htmlspecialchars($editTestimonial['name'] ?? '') ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="author_title">Author Title *</label>
                                 <input type="text" class="form-control" id="author_title" name="author_title"
-                                       value="<?= htmlspecialchars($editTestimonial['author_title'] ?? '') ?>" required>
+                                       value="<?= htmlspecialchars($editTestimonial['position'] ?? '') ?>" required>
                             </div>
                         </div>
                     </div>
@@ -555,7 +554,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <div class="form-group">
                                 <label for="author_company">Author Company</label>
                                 <input type="text" class="form-control" id="author_company" name="author_company"
-                                       value="<?= htmlspecialchars($editTestimonial['author_company'] ?? '') ?>">
+                                       value="<?= htmlspecialchars($editTestimonial['company'] ?? '') ?>">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -574,7 +573,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                     <div class="form-group">
                         <label for="content">Content *</label>
-                        <textarea class="form-control" id="content" name="content" rows="4" required><?= htmlspecialchars($editTestimonial['content'] ?? '') ?></textarea>
+                        <textarea class="form-control" id="content" name="content" rows="4" required><?= htmlspecialchars($editTestimonial['testimonial'] ?? '') ?></textarea>
                     </div>
 
                     <div class="row">
@@ -624,7 +623,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="form-group">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="is_active" name="is_active"
-                                   <?= ($editTestimonial['is_active'] ?? true) ? 'checked' : '' ?>>
+                                   <?= ($editTestimonial['is_approved'] ?? true) ? 'checked' : '' ?>>
                             <label class="form-check-label" for="is_active">
                                 Active
                             </label>

@@ -1,7 +1,7 @@
 <?php
 // Fix include path to ensure config.php is included correctly regardless of execution context
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/../../Shared/Core/Database.php';
+require_once __DIR__ . '/../../shared/Core/Database.php';
 ?>
 
 <!DOCTYPE html>
@@ -221,7 +221,7 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
                     <?php
                     try {
                         $db = (new Database())->connect();
-                        $stmt = $db->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR) AND deleted_at IS NULL");
+                        $stmt = $db->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR) AND is_active = 1");
                         $newUsers = $stmt->fetchColumn();
                         if ($newUsers > 0): ?>
                             <span class="notification-badge"><?= $newUsers ?></span>
@@ -257,7 +257,7 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
                     <?php
                     try {
                         $db = (new Database())->connect();
-                        $stmt = $db->query("SELECT COUNT(*) FROM applications WHERE status = 'pending' AND deleted_at IS NULL");
+                        $stmt = $db->query("SELECT COUNT(*) FROM applications WHERE status = 'pending'");
                         $pendingApps = $stmt->fetchColumn();
                         if ($pendingApps > 0): ?>
                             <span class="notification-badge"><?= $pendingApps ?></span>
@@ -301,7 +301,7 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
                     <?php
                     try {
                         $db = (new Database())->connect();
-                        $stmt = $db->query("SELECT COUNT(*) FROM contacts WHERE is_read = 0 AND deleted_at IS NULL");
+                        $stmt = $db->query("SELECT COUNT(*) FROM contacts WHERE is_read = 0");
                         $unreadContacts = $stmt->fetchColumn();
                         if ($unreadContacts > 0): ?>
                             <span class="notification-badge"><?= $unreadContacts ?></span>
@@ -403,11 +403,11 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
                     </button>
 
                     <!-- Topbar Search -->
-                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search" method="GET" action="<?= BASE_URL ?>/admin/public/search.php">
                         <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search">
+                            <input type="text" name="q" class="form-control bg-light border-0 small" placeholder="Search users, applications, events..." aria-label="Search" value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
                             <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
+                                <button class="btn btn-primary" type="submit">
                                     <i class="fas fa-search fa-sm"></i>
                                 </button>
                             </div>
@@ -418,15 +418,15 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
                     <ul class="navbar-nav ml-auto">
                         <!-- Nav Item - Search Dropdown (Visible Only XS) -->
                         <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-search fa-fw"></i>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in">
-                                <form class="form-inline mr-auto w-100 navbar-search">
+                            <div class="dropdown-menu dropdown-menu-end p-3 shadow animated--grow-in">
+                                <form class="form-inline me-auto w-100 navbar-search" method="GET" action="<?= BASE_URL ?>/admin/public/search.php">
                                     <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for...">
+                                        <input type="text" name="q" class="form-control bg-light border-0 small" placeholder="Search users, applications, events..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
                                         <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
+                                            <button class="btn btn-primary" type="submit">
                                                 <i class="fas fa-search fa-sm"></i>
                                             </button>
                                         </div>
@@ -437,10 +437,10 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
 
                         <!-- Nav Item - Quick Actions -->
                         <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="quickActionsDropdown" role="button" data-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="quickActionsDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-plus fa-fw"></i>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" style="right: 0; left: auto; margin-right: 10px;">
                                 <h6 class="dropdown-header">Quick Actions:</h6>
                                 <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/programs.php?action=add">
                                     <i class="fas fa-graduation-cap fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -464,15 +464,15 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
 
                         <!-- Nav Item - Notifications -->
                         <li class="nav-item dropdown no-arrow mx-1">
-                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-bell fa-fw"></i>
                                 <?php
                                 try {
                                     $db = (new Database())->connect();
                                     $stmt = $db->query("
                                         SELECT 
-                                            (SELECT COUNT(*) FROM applications WHERE status = 'pending' AND deleted_at IS NULL) +
-                                            (SELECT COUNT(*) FROM contacts WHERE is_read = 0 AND deleted_at IS NULL) as total_notifications
+                                            (SELECT COUNT(*) FROM applications WHERE status = 'pending') +
+                                            (SELECT COUNT(*) FROM contacts WHERE is_read = 0) as total_notifications
                                     ");
                                     $totalNotifications = $stmt->fetchColumn();
                                     if ($totalNotifications > 0): ?>
@@ -483,7 +483,7 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
                                 }
                                 ?>
                             </a>
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                            <div class="dropdown-list dropdown-menu dropdown-menu-end shadow animated--grow-in" style="right: 0; left: auto; margin-right: 10px;">
                                 <h6 class="dropdown-header">
                                     Notifications
                                 </h6>
@@ -493,19 +493,19 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
 
                                     // Get recent notifications
                                     $stmt = $db->query("
-                                        SELECT 'application' as type, id, CONCAT(first_name, ' ', last_name) as title, created_at
+                                        SELECT 'application' as type, id, CONCAT(first_name, ' ', last_name) as title, submitted_at as created_at
                                         FROM applications 
-                                        WHERE status = 'pending' AND deleted_at IS NULL
-                                        ORDER BY created_at DESC
+                                        WHERE status = 'pending'
+                                        ORDER BY submitted_at DESC
                                         LIMIT 3
                                     ");
                                     $notifications = $stmt->fetchAll();
 
                                     $stmt = $db->query("
-                                        SELECT 'contact' as type, id, subject as title, created_at
+                                        SELECT 'contact' as type, id, subject as title, submitted_at as created_at
                                         FROM contacts 
-                                        WHERE is_read = 0 AND deleted_at IS NULL
-                                        ORDER BY created_at DESC
+                                        WHERE is_read = 0
+                                        ORDER BY submitted_at DESC
                                         LIMIT 3
                                     ");
                                     $contactNotifications = $stmt->fetchAll();
@@ -516,7 +516,7 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
                                         <div class="dropdown-item text-center small text-gray-500">No new notifications</div>
                                     <?php else:
                                         foreach ($notifications as $notification): ?>
-                                            <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/admin/<?= $notification['type'] === 'application' ? 'applications' : 'contacts' ?>.php">
+                                            <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/admin/public/<?= $notification['type'] === 'application' ? 'applications' : 'contacts' ?>.php">
                                                 <div class="mr-3">
                                                     <div class="icon-circle bg-<?= $notification['type'] === 'application' ? 'primary' : 'success' ?>">
                                                         <i class="fas fa-<?= $notification['type'] === 'application' ? 'file-alt' : 'envelope' ?> text-white"></i>
@@ -541,20 +541,20 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                    <?= htmlspecialchars($_SESSION['full_name'] ?? 'User') ?>
+                                    <?= htmlspecialchars($_SESSION['username'] ?? 'User') ?>
                                     <br><small class="text-muted"><?= ucfirst($_SESSION['role'] ?? 'User') ?></small>
                                 </span>
                                 <?php if (!empty($_SESSION['avatar_path'])): ?>
                                     <img class="img-profile rounded-circle" src="<?= BASE_URL ?>/<?= htmlspecialchars($_SESSION['avatar_path']) ?>" style="width: 40px; height: 40px; object-fit: cover;" alt="avatar">
                                 <?php else: ?>
                                     <div class="img-profile rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 16px;">
-                                        <?= strtoupper(substr($_SESSION['full_name'] ?? 'User', 0, 1)) ?>
+                                        <?= strtoupper(substr($_SESSION['username'] ?? 'User', 0, 1)) ?>
                                     </div>
                                 <?php endif; ?>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" style="right: 0; left: auto; margin-right: 10px;">
                                 <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/profile.php">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
@@ -568,7 +568,7 @@ require_once __DIR__ . '/../../Shared/Core/Database.php';
                                     Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/logout.php" data-toggle="modal" data-target="#logoutModal">
+                                <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/logout.php" data-bs-toggle="modal" data-bs-target="#logoutModal">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>

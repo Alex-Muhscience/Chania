@@ -1,0 +1,36 @@
+# Security Configuration for Uploads Directory
+
+# Prevent execution of PHP files
+<Files *.php>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Prevent access to specific file types
+<FilesMatch "\.(htaccess|htpasswd|ini|phps|log|sh)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Allow only specific file types
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|pdf|doc|docx|xls|xlsx|ppt|pptx|mp4|avi|mov|wmv)$">
+    Order deny,allow
+    Allow from all
+</FilesMatch>
+
+# Set security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Disable directory browsing
+Options -Indexes
+
+# Prevent hotlinking
+RewriteEngine On
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?localhost [NC]
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?skillsforafrica\.org [NC]
+RewriteRule \.(jpg|jpeg|png|gif|webp|pdf)$ - [NC,F,L]

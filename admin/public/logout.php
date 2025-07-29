@@ -17,6 +17,6 @@ if (ini_get("session.use_cookies")) {
 session_destroy();
 
 // Redirect to login page
-header('Location: ' . '/admin/public/login.php');
+header('Location: /chania/admin/public/login.php');
 exit;
 ?>

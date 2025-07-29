@@ -1,0 +1,21 @@
+# Security Configuration for Logs Directory
+
+# Deny all access to logs
+Order allow,deny
+Deny from all
+
+# Prevent execution of any files
+<Files *>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Additional security measures
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+Options -Indexes
+Options -ExecCGI

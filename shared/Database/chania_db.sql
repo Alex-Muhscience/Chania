@@ -1,7 +1,7 @@
 -- Production Database Schema for Chania Skills for Africa
 -- Enhanced with security, performance, and scalability features
 
--- Database creation with proper character set
+-- Database creation with a proper character set
 CREATE DATABASE IF NOT EXISTS chania_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
@@ -228,6 +228,7 @@ CREATE TABLE testimonials (
     image_path VARCHAR(255),
     video_url VARCHAR(255),
     is_featured BOOLEAN DEFAULT FALSE,
+    is_approved BOOLEAN DEFAULT FALSE,
     is_active BOOLEAN DEFAULT TRUE,
     display_order INT DEFAULT 0,
     created_by INT UNSIGNED,
@@ -236,6 +237,7 @@ CREATE TABLE testimonials (
     deleted_at TIMESTAMP NULL,
 
     INDEX idx_testimonials_featured (is_featured),
+    INDEX idx_testimonials_approved (is_approved),
     INDEX idx_testimonials_active (is_active),
     INDEX idx_testimonials_program (program_id),
     INDEX idx_testimonials_order (display_order),

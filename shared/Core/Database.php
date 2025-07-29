@@ -6,7 +6,8 @@ class Database {
     private $password = '';
     private $conn;
 
-    public function connect() {
+    public function connect(): PDO
+    {
         $this->conn = null;
 
         try {
@@ -17,9 +18,13 @@ class Database {
             );
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            // Ensure we get raw data from database without any automatic conversion
+            $this->conn->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+            $this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         } catch(PDOException $e) {
             error_log("Connection Error: " . $e->getMessage());
-            throw new Exception("Database connection failed. Please try again later.");
+            // Temporarily show actual error for debugging
+            throw new Exception("Database Error: " . $e->getMessage());
         }
 
         return $this->conn;

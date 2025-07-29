@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($success) {
-        Utilities::redirect('/admin/newsletter.php');
+        Utilities::redirect('/admin/public/newsletter.php');
     }
 }
 
@@ -184,7 +184,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
         $_SESSION['error'] = "Failed to update subscriber.";
     }
 
-    Utilities::redirect('/admin/newsletter.php');
+    Utilities::redirect('/admin/public/newsletter.php');
 }
 
 require_once __DIR__ . '/../includes/header.php';

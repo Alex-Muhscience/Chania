@@ -21,15 +21,49 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="<?= BASE_URL ?>/admin/public/logout.php">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom JavaScript -->
     <script>
         // Initialize DataTables
         $(document).ready(function() {
-            $('.table').DataTable({
-                "paging": false,
-                "info": false,
-                "searching": false,
-                "ordering": true
+            // Only initialize DataTables on tables that have proper structure (thead and tbody)
+            $('.table:not(.no-datatables)').each(function() {
+                var $table = $(this);
+                // Check if table has thead or at least th elements for proper DataTables structure
+                if ($table.find('thead').length > 0 || $table.find('th').length > 0) {
+                    try {
+                        $table.DataTable({
+                            "paging": false,
+                            "info": false,
+                            "searching": false,
+                            "ordering": true,
+                            "columnDefs": [
+                                { "orderable": false, "targets": "no-sort" }
+                            ]
+                        });
+                    } catch (e) {
+                        console.warn('Could not initialize DataTable on table:', $table, 'Error:', e);
+                    }
+                } else {
+                    // Add no-datatables class to prevent future attempts
+                    $table.addClass('no-datatables');
+                }
             });
         });
 

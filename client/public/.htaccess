@@ -19,6 +19,12 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
 
+# Security headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options SAMEORIGIN
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
 # Set proper headers for assets
 <FilesMatch "\.(css|js|jpg|jpeg|png|gif|ico|svg|woff2?)$">
     Header set Cache-Control "max-age=31536000, public"

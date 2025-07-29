@@ -1,10 +1,14 @@
-        </main>
+<?php
+require __DIR__. '/../includes/config.php';
 
-        <footer class="bg-dark text-white py-5">
+?>
+
+
+<footer class="bg-dark text-white py-5">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-4 mb-4">
-                        <img src="<?php echo BASE_URL; ?>/client/public/assets/images/logo-white.png" alt="Skills for Africa" height="40">
+                        <img src="<?php echo BASE_URL; ?>/client/public/assets/images/logo-white.png" alt=" Chania Skills for Africa" height="40">
                         <p class="mt-3">Empowering African youth with skills for the digital economy.</p>
                         <div class="social-icons">
                             <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
@@ -24,15 +28,52 @@
                         </ul>
                     </div>
                     <div class="col-lg-3 col-md-4 mb-4">
-                        <h5>Programs</h5>
+                        <h5>Popular Categories</h5>
                         <ul class="list-unstyled">
                             <?php
-                            $stmt = $db->query("SELECT id, title FROM programs LIMIT 5");
-                            while ($row = $stmt->fetch()) {
-                                echo '<li><a href="' . BASE_URL . '/client/public/program.php?id=' . $row['id'] . '" class="text-white">' . htmlspecialchars($row['title']) . '</a></li>';
+                            try {
+                                // Get popular categories based on program count
+                                $stmt = $db->query("
+                                    SELECT pc.category_id, pc.name, COUNT(p.id) as program_count 
+                                    FROM program_categories pc 
+                                    LEFT JOIN programs p ON pc.category_id = p.id 
+                                    WHERE pc.deleted_at IS NULL AND (p.is_active = 1 OR p.id IS NULL)
+                                    GROUP BY pc.category_id, pc.name 
+                                    ORDER BY program_count DESC, pc.name ASC 
+                                    LIMIT 5
+                                ");
+                                while ($row = $stmt->fetch()) {
+                                    echo '<li><a href="' . BASE_URL . '/client/public/program_categories.php?category_id=' . $row['category_id'] . '" class="text-white">' . htmlspecialchars($row['name']) . ' (' . $row['program_count'] . ')</a></li>';
+                                }
+                            } catch (PDOException $e) {
+                                error_log("Footer categories fetch error: " . $e->getMessage());
+                                // Fallback categories
+                                $fallbackCategories = [
+                                    'Technology & IT',
+                                    'Digital Marketing',
+                                    'Data Science',
+                                    'Graphic Design',
+                                    'Business Skills'
+                                ];
+                                foreach ($fallbackCategories as $category) {
+                                    echo '<li><a href="' . BASE_URL . '/client/public/programs.php" class="text-white">' . htmlspecialchars($category) . '</a></li>';
+                                }
                             }
                             ?>
                         </ul>
+                    </div>
+                    <div class="col-lg-3 col-md-4 mb-4">
+                        <h5>Newsletter</h5>
+                        <p class="small">Stay updated with our latest programs and events!</p>
+                        <form id="newsletter-form" class="mt-3">
+                            <div class="mb-3">
+                                <input type="email" class="form-control" id="newsletter-email" placeholder="Enter your email" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-paper-plane me-1"></i> Subscribe
+                            </button>
+                        </form>
+                        <div id="newsletter-message" class="mt-2"></div>
                     </div>
                     <div class="col-lg-3 col-md-4 mb-4">
                         <h5>Contact Us</h5>
@@ -61,3 +102,11 @@
         
         <!-- Custom JS -->
         <script src="<?php echo BASE_URL; ?>/client/public/assets/js/main.js"></script>
+        
+        <!-- Initialize page animations -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.add('page-enter-active');
+            });
+        </script>
+

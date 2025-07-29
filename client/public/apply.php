@@ -83,7 +83,7 @@ $programs = $db->query("SELECT id, title FROM programs ORDER BY title")->fetchAl
 
                             <div class="mb-4 form-check">
                                 <input type="checkbox" class="form-check-input" id="agreeTerms" name="agree_terms" required>
-                                <label class="form-check-label" for="agreeTerms">I agree to the <a href="<?php echo BASE_URL; ?>/terms.php">Terms and Conditions</a> and <a href="<?php echo BASE_URL; ?>/privacy.php">Privacy Policy</a> *</label>
+                                <label class="form-check-label" for="agreeTerms">I agree to the <a href="<?php echo BASE_URL; ?>/client/public/terms.php">Terms and Conditions</a> and <a href="<?php echo BASE_URL; ?>/client/public/privacy.php">Privacy Policy</a> *</label>
                                 <div class="invalid-feedback">You must agree to the terms before submitting.</div>
                             </div>
 
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
 
         // Submit via AJAX
-        fetch('<?php echo BASE_URL; ?>/client/src/Services/submit_application.php', {
+        fetch('<?php echo BASE_URL; ?>/api/submit-application.php', {
             method: 'POST',
             body: formData
         })

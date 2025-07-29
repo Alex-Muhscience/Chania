@@ -30,11 +30,11 @@ try {
         $category = 'general';
         if (strpos($setting['setting_key'], 'email_') === 0) {
             $category = 'email';
-        } elseif (strpos($setting['setting_key'], 'social_') === 0 || in_array($setting['setting_key'], ['facebook_url', 'twitter_url', 'linkedin_url', 'instagram_url'])) {
+        } elseif (strpos($setting['setting_key'], 'social_') === 0 || in_array($setting['setting_key'], ['facebook_url', 'twitter_url', 'linkedin_url', 'instagram_url', 'youtube_url', 'social_sharing'])) {
             $category = 'social';
-        } elseif (in_array($setting['setting_key'], ['max_file_size', 'allowed_file_types'])) {
+        } elseif (in_array($setting['setting_key'], ['max_file_size', 'allowed_file_types', 'upload_path', 'file_cleanup_days'])) {
             $category = 'files';
-        } elseif (in_array($setting['setting_key'], ['maintenance_mode', 'google_analytics_id'])) {
+        } elseif (in_array($setting['setting_key'], ['maintenance_mode', 'google_analytics_id', 'registration_enabled', 'auto_approve_users', 'session_timeout', 'backup_frequency'])) {
             $category = 'system';
         }
 
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         json_decode($value);
                         if (json_last_error() !== JSON_ERROR_NONE) {
                             $errors[] = "Invalid JSON format for {$key}";
-                            continue;
+                            continue 2;
                         }
                         break;
                     default:
@@ -118,21 +118,21 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
                 <div class="card-body p-0">
                     <div class="nav nav-pills flex-column" id="v-pills-tab" role="tablist">
-                        <a class="nav-link active" id="general-tab" data-toggle="pill" href="#general" role="tab">
+                        <button class="nav-link active" id="general-tab" data-bs-toggle="pill" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">
                             <i class="fas fa-cog"></i> General
-                        </a>
-                        <a class="nav-link" id="email-tab" data-toggle="pill" href="#email" role="tab">
+                        </button>
+                        <button class="nav-link" id="email-tab" data-bs-toggle="pill" data-bs-target="#email" type="button" role="tab" aria-controls="email" aria-selected="false">
                             <i class="fas fa-envelope"></i> Email
-                        </a>
-                        <a class="nav-link" id="social-tab" data-toggle="pill" href="#social" role="tab">
+                        </button>
+                        <button class="nav-link" id="social-tab" data-bs-toggle="pill" data-bs-target="#social" type="button" role="tab" aria-controls="social" aria-selected="false">
                             <i class="fas fa-share-alt"></i> Social Media
-                        </a>
-                        <a class="nav-link" id="files-tab" data-toggle="pill" href="#files" role="tab">
+                        </button>
+                        <button class="nav-link" id="files-tab" data-bs-toggle="pill" data-bs-target="#files" type="button" role="tab" aria-controls="files" aria-selected="false">
                             <i class="fas fa-file"></i> File Management
-                        </a>
-                        <a class="nav-link" id="system-tab" data-toggle="pill" href="#system" role="tab">
+                        </button>
+                        <button class="nav-link" id="system-tab" data-bs-toggle="pill" data-bs-target="#system" type="button" role="tab" aria-controls="system" aria-selected="false">
                             <i class="fas fa-server"></i> System
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -251,10 +251,22 @@ require_once __DIR__ . '/../includes/header.php';
                                             <label for="<?= $setting['setting_key'] ?>">
                                                 <?= ucwords(str_replace('_', ' ', $setting['setting_key'])) ?>
                                             </label>
-                                            <input type="url" class="form-control"
-                                                   id="<?= $setting['setting_key'] ?>"
-                                                   name="settings[<?= $setting['setting_key'] ?>]"
-                                                   value="<?= htmlspecialchars($setting['setting_value']) ?>">
+                                            <?php if ($setting['setting_type'] === 'boolean'): ?>
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input"
+                                                           id="<?= $setting['setting_key'] ?>"
+                                                           name="settings[<?= $setting['setting_key'] ?>]"
+                                                           value="1" <?= $setting['setting_value'] === 'true' ? 'checked' : '' ?>>
+                                                    <label class="form-check-label" for="<?= $setting['setting_key'] ?>">
+                                                        Enable
+                                                    </label>
+                                                </div>
+                                            <?php else: ?>
+                                                <input type="url" class="form-control"
+                                                       id="<?= $setting['setting_key'] ?>"
+                                                       name="settings[<?= $setting['setting_key'] ?>]"
+                                                       value="<?= htmlspecialchars($setting['setting_value']) ?>">
+                                            <?php endif; ?>
                                             <?php if ($setting['description']): ?>
                                                 <small class="form-text text-muted"><?= htmlspecialchars($setting['description']) ?></small>
                                             <?php endif; ?>
@@ -357,5 +369,51 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     </div>
 </div>
+
+<!-- Custom JavaScript for tab navigation -->
+<script>
+$(document).ready(function() {
+    // Handle hash-based tab navigation
+    function activateTabFromHash() {
+        var hash = window.location.hash;
+        if (hash) {
+            var tabId = hash.substring(1); // Remove the # symbol
+            var tabButton = $('#' + tabId + '-tab');
+            var tabPane = $('#' + tabId);
+            
+            if (tabButton.length && tabPane.length) {
+                // Remove active classes from all tabs
+                $('.nav-link').removeClass('active').attr('aria-selected', 'false');
+                $('.tab-pane').removeClass('show active');
+                
+                // Activate the target tab
+                tabButton.addClass('active').attr('aria-selected', 'true');
+                tabPane.addClass('show active');
+            }
+        }
+    }
+    
+    // Activate tab on page load
+    activateTabFromHash();
+    
+    // Handle hash changes (back/forward navigation)
+    $(window).on('hashchange', function() {
+        activateTabFromHash();
+    });
+    
+    // Update hash when tab is clicked
+    $('[data-bs-toggle="pill"]').on('click', function() {
+        var target = $(this).data('bs-target');
+        if (target) {
+            window.location.hash = target;
+        }
+    });
+    
+    // Handle social media input types for boolean settings
+    $('input[id="social_sharing"]').on('change', function() {
+        console.log('Social sharing toggled:', this.checked);
+    });
+});
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

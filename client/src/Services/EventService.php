@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../Models/EventModel.php';
+require_once __DIR__ . '/../../shared/Core/Utilities.php';
 
 class EventService {
     private $model;
@@ -34,7 +35,7 @@ class EventService {
     }
 
     public function registerForEvent($eventId, $data) {
-        return $this->model->registerForEvent(
+$result = $this->model->registerForEvent(
             $eventId,
             $data['name'],
             $data['email'],
@@ -42,6 +43,21 @@ class EventService {
             $data['organization'] ?? null,
             isset($data['newsletter'])
         );
+
+        // Log activity
+        if ($result) {
+            Utilities::logActivity([
+                'user_id' => null, // or replace with actual user ID if available
+                'action' => 'Register for Event',
+                'entity_type' => 'Event Registration',
+                'entity_id' => $eventId,
+                'details' => json_encode($data),
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+            ]);
+        }
+
+        return $result;
     }
 }
 ?>

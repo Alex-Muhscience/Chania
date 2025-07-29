@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Get application data
 try {
     $db = (new Database())->connect();
-    $stmt = $db->prepare("SELECT a.*, p.title as program_title FROM applications a LEFT JOIN programs p ON a.program_id = p.id WHERE a.id = ?");
+    $stmt = $db->prepare("SELECT a.*, p.title as program_title, CONCAT(a.first_name, ' ', a.last_name) as full_name FROM applications a LEFT JOIN programs p ON a.program_id = p.id WHERE a.id = ?");
     $stmt->execute([$applicationId]);
     $application = $stmt->fetch();
 
@@ -78,7 +78,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <table class="table table-borderless">
                             <tr>
                                 <td><strong>Full Name:</strong></td>
-                                <td><?= htmlspecialchars($application['full_name']) ?></td>
+                                <td><?= htmlspecialchars($application['full_name'] ?? '') ?></td>
                             </tr>
                             <tr>
                                 <td><strong>Email:</strong></td>
@@ -115,7 +115,7 @@ require_once __DIR__ . '/../includes/header.php';
                             </tr>
                             <tr>
                                 <td><strong>Applied Date:</strong></td>
-                                <td><?= date('M j, Y g:i A', strtotime($application['created_at'])) ?></td>
+                                <td><?= $application['submitted_at'] ? date('M j, Y g:i A', strtotime($application['submitted_at'])) : 'N/A' ?></td>
                             </tr>
                             <tr>
                                 <td><strong>Last Updated:</strong></td>
@@ -125,29 +125,29 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
 
-                <?php if (!empty($application['message'])): ?>
+                <?php if (!empty($application['motivation'])): ?>
                     <div class="mt-4">
-                        <h6>Message</h6>
+                        <h6>Motivation</h6>
                         <div class="bg-light p-3 rounded">
-                            <?= nl2br(htmlspecialchars($application['message'])) ?>
+                            <?= nl2br(htmlspecialchars($application['motivation'])) ?>
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <?php if (!empty($application['education'])): ?>
+                <?php if (!empty($application['education_details'])): ?>
                     <div class="mt-4">
                         <h6>Education Background</h6>
                         <div class="bg-light p-3 rounded">
-                            <?= nl2br(htmlspecialchars($application['education'])) ?>
+                            <?= nl2br(htmlspecialchars($application['education_details'])) ?>
                         </div>
                     </div>
                 <?php endif; ?>
 
-                <?php if (!empty($application['experience'])): ?>
+                <?php if (!empty($application['work_experience'])): ?>
                     <div class="mt-4">
                         <h6>Experience</h6>
                         <div class="bg-light p-3 rounded">
-                            <?= nl2br(htmlspecialchars($application['experience'])) ?>
+                            <?= nl2br(htmlspecialchars($application['work_experience'])) ?>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -204,7 +204,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="timeline-marker bg-primary"></div>
                         <div class="timeline-content">
                             <h6>Application Submitted</h6>
-                            <p class="text-muted small"><?= date('M j, Y g:i A', strtotime($application['created_at'])) ?></p>
+                            <p class="text-muted small"><?= $application['submitted_at'] ? date('M j, Y g:i A', strtotime($application['submitted_at'])) : 'N/A' ?></p>
                         </div>
                     </div>
 

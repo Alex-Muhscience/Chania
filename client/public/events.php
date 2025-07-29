@@ -19,7 +19,7 @@ $totalPages = ceil($totalEvents / $limit);
 $events = $db->query("
     SELECT * FROM events 
     ORDER BY event_date DESC
-    LIMIT $limit OFFSET $offset
+    LIMIT $offset, $limit
 ")->fetchAll();
 ?>
 
@@ -71,7 +71,7 @@ $events = $db->query("
                     </div>
                     <div class="card-footer bg-white border-0 pt-0">
                         <div class="d-grid">
-                            <a href="<?php echo BASE_URL; ?>/client/public/event.php?id=<?php echo $event['id']; ?>" class="btn btn-outline-primary">View Details</a>
+                            <a href="<?php echo BASE_URL; ?>/client/public/event.php?slug=<?php echo urlencode($event['slug']); ?>" class="btn btn-outline-primary">View Details</a>
                         </div>
                     </div>
                 </div>

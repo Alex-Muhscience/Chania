@@ -67,7 +67,7 @@ try {
     $conditions = [];
 
     if ($search) {
-        $conditions[] = "(full_name LIKE ? OR email LIKE ?)";
+        $conditions[] = "(CONCAT(first_name, ' ', last_name) LIKE ? OR email LIKE ?)";
         $searchTerm = "%$search%";
         $params[] = $searchTerm;
         $params[] = $searchTerm;
@@ -88,7 +88,7 @@ try {
     $totalApplications = $countStmt->fetchColumn();
 
     // Get applications
-    $stmt = $db->prepare("SELECT a.*, p.title as program_title FROM applications a LEFT JOIN programs p ON a.program_id = p.id $whereClause ORDER BY a.created_at DESC LIMIT $limit OFFSET $offset");
+    $stmt = $db->prepare("SELECT a.*, p.title as program_title, CONCAT(a.first_name, ' ', a.last_name) as full_name FROM applications a LEFT JOIN programs p ON a.program_id = p.id $whereClause ORDER BY a.submitted_at DESC LIMIT $limit OFFSET $offset");
     $stmt->execute($params);
     $applications = $stmt->fetchAll();
 
@@ -147,7 +147,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         <?php else: ?>
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-striped no-datatables">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -163,7 +163,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <?php foreach ($applications as $application): ?>
                             <tr>
                                 <td><?= $application['id'] ?></td>
-                                <td><?= htmlspecialchars($application['full_name']) ?></td>
+                                <td><?= htmlspecialchars($application['full_name'] ?? '') ?></td>
                                 <td><?= htmlspecialchars($application['email']) ?></td>
                                 <td><?= htmlspecialchars($application['program_title'] ?? 'N/A') ?></td>
                                 <td>
@@ -171,7 +171,7 @@ require_once __DIR__ . '/../includes/header.php';
                                         <?= ucfirst($application['status']) ?>
                                     </span>
                                 </td>
-                                <td><?= date('M j, Y', strtotime($application['created_at'])) ?></td>
+                                <td><?= date('M j, Y', strtotime($application['submitted_at'])) ?></td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <a href="<?= BASE_URL ?>/admin/public/application_view.php?id=<?= $application['id'] ?>"

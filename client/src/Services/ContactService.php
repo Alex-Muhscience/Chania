@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../shared/Core/Utilities.php';
 class ContactService {
     private $db;
 
@@ -34,13 +35,26 @@ class ContactService {
             VALUES (?, ?, ?, ?, ?)
         ");
 
-        return $stmt->execute([
+$result = $stmt->execute([
             $sanitizedData['name'],
             $sanitizedData['email'],
             $sanitizedData['subject'],
             $sanitizedData['message'],
             $_SERVER['REMOTE_ADDR']
         ]);
-    }
+
+        // Log activity
+        if ($result) {
+            Utilities::logActivity([
+                'user_id' => null, // or replace with actual user ID if available
+                'action' => 'Submit Contact Form',
+                'entity_type' => 'Contact',
+                'details' => json_encode($sanitizedData),
+                'ip_address' => $_SERVER['REMOTE_ADDR'],
+                'user_agent' => $_SERVER['HTTP_USER_AGENT'],
+            ]);
+        }
+
+        return $result;
 }
 ?>

@@ -19,28 +19,28 @@ try {
     // Get comprehensive statistics
     $stmt = $db->query("
         SELECT 
-            (SELECT COUNT(*) FROM users WHERE deleted_at IS NULL) as total_users,
-            (SELECT COUNT(*) FROM users WHERE deleted_at IS NULL AND role = 'admin') as admin_users,
-            (SELECT COUNT(*) FROM users WHERE deleted_at IS NULL AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_users_month,
+            (SELECT COUNT(*) FROM users WHERE is_active = 1) as total_users,
+            (SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1) as admin_users,
+            (SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND is_active = 1) as new_users_month,
             (SELECT COUNT(*) FROM programs WHERE deleted_at IS NULL) as total_programs,
             (SELECT COUNT(*) FROM programs WHERE deleted_at IS NULL AND is_active = 1) as active_programs,
-            (SELECT COUNT(*) FROM applications WHERE deleted_at IS NULL) as total_applications,
-            (SELECT COUNT(*) FROM applications WHERE deleted_at IS NULL AND status = 'pending') as pending_applications,
-            (SELECT COUNT(*) FROM applications WHERE deleted_at IS NULL AND status = 'approved') as approved_applications,
-            (SELECT COUNT(*) FROM applications WHERE deleted_at IS NULL AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_applications_month,
+            (SELECT COUNT(*) FROM applications) as total_applications,
+            (SELECT COUNT(*) FROM applications WHERE status = 'pending') as pending_applications,
+            (SELECT COUNT(*) FROM applications WHERE status = 'approved') as approved_applications,
+            (SELECT COUNT(*) FROM applications WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_applications_month,
             (SELECT COUNT(*) FROM events WHERE deleted_at IS NULL) as total_events,
-            (SELECT COUNT(*) FROM events WHERE deleted_at IS NULL AND event_date >= CURDATE()) as upcoming_events,
+            (SELECT COUNT(*) FROM events WHERE deleted_at IS NULL AND event_date >= NOW()) as upcoming_events,
             (SELECT COUNT(*) FROM event_registrations) as total_registrations,
             (SELECT COUNT(*) FROM event_registrations WHERE status = 'confirmed') as confirmed_registrations,
-            (SELECT COUNT(*) FROM contacts WHERE deleted_at IS NULL) as total_contacts,
-            (SELECT COUNT(*) FROM contacts WHERE deleted_at IS NULL AND is_read = 0) as unread_contacts,
-            (SELECT COUNT(*) FROM contacts WHERE deleted_at IS NULL AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_contacts_month,
-            (SELECT COUNT(*) FROM testimonials WHERE deleted_at IS NULL) as total_testimonials,
-            (SELECT COUNT(*) FROM testimonials WHERE deleted_at IS NULL AND is_featured = 1) as featured_testimonials,
+            (SELECT COUNT(*) FROM contacts) as total_contacts,
+            (SELECT COUNT(*) FROM contacts WHERE is_read = 0) as unread_contacts,
+            (SELECT COUNT(*) FROM contacts WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_contacts_month,
+(SELECT COUNT(*) FROM testimonials) as total_testimonials,
+            (SELECT COUNT(*) FROM testimonials WHERE is_featured = 1) as featured_testimonials,
             (SELECT COUNT(*) FROM newsletter_subscribers WHERE status = 'subscribed') as newsletter_subscribers,
             (SELECT COUNT(*) FROM newsletter_subscribers WHERE status = 'subscribed' AND subscribed_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_subscribers_month,
-            (SELECT COUNT(*) FROM file_uploads WHERE deleted_at IS NULL) as total_files,
-            (SELECT ROUND(SUM(file_size) / 1024 / 1024, 2) FROM file_uploads WHERE deleted_at IS NULL) as total_file_size_mb,
+            (SELECT COUNT(*) FROM file_uploads) as total_files,
+            (SELECT ROUND(SUM(file_size) / 1024 / 1024, 2) FROM file_uploads) as total_file_size_mb,
             (SELECT COUNT(*) FROM admin_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)) as activities_today,
             (SELECT COUNT(*) FROM admin_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as activities_week
     ");
@@ -48,7 +48,7 @@ try {
 
     // Get recent activities
     $stmt = $db->query("
-        SELECT l.*, u.full_name as user_name, u.avatar_path
+        SELECT l.*, u.username as user_name
         FROM admin_logs l
         JOIN users u ON l.user_id = u.id
         ORDER BY l.created_at DESC
@@ -58,12 +58,10 @@ try {
 
     // Get recent applications
     $stmt = $db->query("
-        SELECT a.*, p.title as program_title, u.full_name as user_name
+        SELECT a.*, p.title as program_title
         FROM applications a
         JOIN programs p ON a.program_id = p.id
-        LEFT JOIN users u ON a.user_id = u.id
-        WHERE a.deleted_at IS NULL
-        ORDER BY a.created_at DESC
+        ORDER BY a.submitted_at DESC
         LIMIT 5
     ");
     $recentApplications = $stmt->fetchAll();
@@ -72,8 +70,7 @@ try {
     $stmt = $db->query("
         SELECT *
         FROM contacts
-        WHERE deleted_at IS NULL
-        ORDER BY created_at DESC
+        ORDER BY submitted_at DESC
         LIMIT 5
     ");
     $recentContacts = $stmt->fetchAll();
@@ -83,7 +80,7 @@ try {
         SELECT e.*, COUNT(er.id) as registration_count
         FROM events e
         LEFT JOIN event_registrations er ON e.id = er.event_id
-        WHERE e.event_date >= CURDATE() AND e.is_active = 1 AND e.deleted_at IS NULL
+        WHERE e.event_date >= CURDATE() AND e.is_active = 1
         GROUP BY e.id
         ORDER BY e.event_date ASC
         LIMIT 5
@@ -93,12 +90,11 @@ try {
     // Get application trends (last 30 days)
     $stmt = $db->query("
         SELECT 
-            DATE(created_at) as date,
+            DATE(submitted_at) as date,
             COUNT(*) as count
         FROM applications
-        WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-        AND deleted_at IS NULL
-        GROUP BY DATE(created_at)
+        WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        GROUP BY DATE(submitted_at)
         ORDER BY date ASC
     ");
     $applicationTrends = $stmt->fetchAll();
@@ -109,7 +105,6 @@ try {
             status,
             COUNT(*) as count
         FROM applications
-        WHERE deleted_at IS NULL
         GROUP BY status
     ");
     $applicationStatusData = $stmt->fetchAll();
@@ -121,7 +116,7 @@ try {
             COUNT(*) as count
         FROM users
         WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-        AND deleted_at IS NULL
+        AND is_active = 1
         GROUP BY DATE_FORMAT(created_at, '%Y-%m')
         ORDER BY month ASC
     ");
@@ -158,7 +153,7 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
     <div class="d-none d-sm-inline-block">
-        <a href="<?= BASE_URL ?>/admin/system_monitor.php" class="btn btn-sm btn-primary shadow-sm">
+        <a href="<?= BASE_URL ?>/admin/public/system_monitor.php" class="btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-chart-line fa-sm text-white-50"></i> System Monitor
         </a>
     </div>
@@ -358,8 +353,8 @@ require_once __DIR__ . '/../includes/header.php';
                         <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
-                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/applications.php">View All Applications</a>
-                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/applications_export.php">Export Data</a>
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/applications.php">View All Applications</a>
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/application_export.php">Export Data</a>
                     </div>
                 </div>
             </div>
@@ -404,7 +399,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Recent Applications</h6>
-                <a href="<?= BASE_URL ?>/admin/applications.php" class="btn btn-primary btn-sm">
+                <a href="<?= BASE_URL ?>/admin/public/applications.php" class="btn btn-primary btn-sm">
                     View All <i class="fas fa-arrow-right fa-sm"></i>
                 </a>
             </div>
@@ -429,24 +424,22 @@ require_once __DIR__ . '/../includes/header.php';
                                 <?php foreach ($recentApplications as $application): ?>
                                     <tr>
                                         <td>
-                                            <strong><?= htmlspecialchars($application['first_name'] . ' ' . $application['last_name']) ?></strong>
-                                            <?php if ($application['user_name']): ?>
-                                                <br><small class="text-muted"><?= htmlspecialchars($application['user_name']) ?></small>
-                                            <?php endif; ?>
+                                            <strong><?= $application['first_name'] . ' ' . $application['last_name'] ?></strong>
+                                            <br><small class="text-muted"><?= $application['email'] ?></small>
                                         </td>
                                         <td>
-                                            <small><?= htmlspecialchars($application['program_title']) ?></small>
+                                            <small><?= $application['program_title'] ?></small>
                                         </td>
                                         <td>
                                             <span class="badge badge-<?=
                                                 $application['status'] === 'approved' ? 'success' :
                                                 ($application['status'] === 'pending' ? 'warning' : 'danger')
                                             ?>">
-                                                <?= ucfirst($application['status']) ?>
+                                            <?= $application['status'] ?>
                                             </span>
                                         </td>
                                         <td>
-                                            <small><?= date('M j', strtotime($application['created_at'])) ?></small>
+                                            <small><?= $application['submitted_at'] ?></small>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -463,7 +456,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Recent Contacts</h6>
-                <a href="<?= BASE_URL ?>/admin/contacts.php" class="btn btn-primary btn-sm">
+                <a href="<?= BASE_URL ?>/admin/public/contacts.php" class="btn btn-primary btn-sm">
                     View All <i class="fas fa-arrow-right fa-sm"></i>
                 </a>
             </div>
@@ -488,11 +481,11 @@ require_once __DIR__ . '/../includes/header.php';
                                 <?php foreach ($recentContacts as $contact): ?>
                                     <tr>
                                         <td>
-                                            <strong><?= htmlspecialchars($contact['full_name']) ?></strong>
-                                            <br><small class="text-muted"><?= htmlspecialchars($contact['email']) ?></small>
+                                            <strong><?= $contact['name'] ?></strong>
+                                            <br><small class="text-muted"><?= $contact['email'] ?></small>
                                         </td>
                                         <td>
-                                            <small><?= Utilities::truncate($contact['subject'], 30) ?></small>
+                                            <small><?= $contact['subject'] ?></small>
                                         </td>
                                         <td>
                                             <span class="badge badge-<?= $contact['is_read'] ? 'success' : 'warning' ?>">
@@ -500,7 +493,7 @@ require_once __DIR__ . '/../includes/header.php';
                                             </span>
                                         </td>
                                         <td>
-                                            <small><?= date('M j', strtotime($contact['created_at'])) ?></small>
+                                            <small><?= $contact['submitted_at'] ?></small>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -520,7 +513,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Upcoming Events</h6>
-                <a href="<?= BASE_URL ?>/admin/events.php" class="btn btn-primary btn-sm">
+                <a href="<?= BASE_URL ?>/admin/public/events.php" class="btn btn-primary btn-sm">
                     View All <i class="fas fa-arrow-right fa-sm"></i>
                 </a>
             </div>
@@ -534,13 +527,13 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php foreach ($upcomingEvents as $event): ?>
                         <div class="d-flex align-items-center mb-3">
                             <div class="calendar-icon bg-primary text-white rounded text-center mr-3" style="width: 50px; height: 50px; line-height: 50px;">
-                                <div style="font-size: 12px; line-height: 1;"><?= date('M', strtotime($event['event_date'])) ?></div>
-                                <div style="font-size: 16px; font-weight: bold; line-height: 1;"><?= date('j', strtotime($event['event_date'])) ?></div>
+                                <div style="font-size: 12px; line-height: 1;"><?= substr($event['event_date'], 5, 2) ?></div>
+                                <div style="font-size: 16px; font-weight: bold; line-height: 1;"><?= substr($event['event_date'], 8, 2) ?></div>
                             </div>
                             <div class="flex-grow-1">
-                                <h6 class="mb-0"><?= htmlspecialchars($event['title']) ?></h6>
+                                            <h6 class="mb-0"><?= $event['title'] ?></h6>
                                 <small class="text-muted">
-                                    <?= date('M j, Y g:i A', strtotime($event['event_date'])) ?>
+                                    <?= $event['event_date'] ?>
                                     <br><?= $event['registration_count'] ?> registrations
                                 </small>
                             </div>
@@ -556,7 +549,7 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Recent Activity</h6>
-                <a href="<?= BASE_URL ?>/admin/admin_logs.php" class="btn btn-primary btn-sm">
+                <a href="<?= BASE_URL ?>/admin/public/admin_logs.php" class="btn btn-primary btn-sm">
                     View All <i class="fas fa-arrow-right fa-sm"></i>
                 </a>
             </div>
@@ -571,23 +564,18 @@ require_once __DIR__ . '/../includes/header.php';
                         <?php foreach ($recentActivities as $activity): ?>
                             <div class="d-flex align-items-center mb-3">
                                 <div class="avatar-circle bg-secondary text-white rounded-circle mr-3" style="width: 35px; height: 35px; line-height: 35px; text-align: center; font-size: 14px;">
-                                    <?php if ($activity['avatar_path']): ?>
-                                        <img src="<?= BASE_URL ?>/<?= $activity['avatar_path'] ?>"
-                                             class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;">
-                                    <?php else: ?>
-                                        <?= strtoupper(substr($activity['user_name'], 0, 1)) ?>
-                                    <?php endif; ?>
+                                    <?= strtoupper(substr($activity['user_name'], 0, 1)) ?>
                                 </div>
                                 <div class="flex-grow-1">
                                     <div class="small">
-                                        <strong><?= htmlspecialchars($activity['user_name']) ?></strong>
-                                        <span class="text-muted"><?= strtolower(str_replace('_', ' ', $activity['action'])) ?></span>
+                                        <strong><?= $activity['user_name'] ?></strong>
+                                        <span class="text-muted"><?= $activity['action'] ?></span>
                                         <?php if ($activity['entity_type']): ?>
                                             <span class="badge badge-secondary"><?= $activity['entity_type'] ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <div class="text-muted small">
-                                        <?= Utilities::timeAgo($activity['created_at']) ?>
+                                        <?= $activity['created_at'] ?>
                                     </div>
                                 </div>
                             </div>
