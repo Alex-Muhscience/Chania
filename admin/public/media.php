@@ -133,7 +133,7 @@ if ($_POST['action'] ?? '' === 'bulk_delete' && !empty($_POST['selected_items'])
                 <?php else: ?>
                                 <form id="bulk-action-form" method="POST">
                                     <input type="hidden" name="action" value="bulk_delete">
-                                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                                    <table class="table table-bordered table-hover" id="mediaTable" width="100%" cellspacing="0">
                                         <thead class="thead-light">
                                             <tr>
                                                 <th style="width: 30px;">
