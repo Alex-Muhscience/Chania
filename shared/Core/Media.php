@@ -89,14 +89,145 @@ class Media {
         return $stmt->fetchAll();
     }
 
-    public function search($term) {
-        $stmt = $this->db->prepare("
-            SELECT * FROM media_library 
-            WHERE original_name LIKE ? OR file_name LIKE ? 
-            ORDER BY created_at DESC
-        ");
-        $stmt->execute(['%' . $term . '%', '%' . $term . '%']);
+    public function search($term, $filter = 'all', $sort = 'newest', $limit = 20, $offset = 0) {
+        $sql = "SELECT * FROM media_library WHERE (original_name LIKE ? OR file_name LIKE ?)";
+        $params = ['%' . $term . '%', '%' . $term . '%'];
+        
+        // Add filter conditions
+        if ($filter !== 'all') {
+            switch ($filter) {
+                case 'images':
+                    $sql .= " AND mime_type LIKE 'image/%'";
+                    break;
+                case 'documents':
+                    $sql .= " AND (mime_type LIKE 'application/%' OR mime_type LIKE 'text/%')";
+                    break;
+                case 'videos':
+                    $sql .= " AND mime_type LIKE 'video/%'";
+                    break;
+            }
+        }
+        
+        // Add sorting
+        switch ($sort) {
+            case 'oldest':
+                $sql .= " ORDER BY created_at ASC";
+                break;
+            case 'name':
+                $sql .= " ORDER BY original_name ASC";
+                break;
+            case 'size':
+                $sql .= " ORDER BY file_size DESC";
+                break;
+            default: // newest
+                $sql .= " ORDER BY created_at DESC";
+        }
+        
+        $sql .= " LIMIT ? OFFSET ?";
+        $params[] = $limit;
+        $params[] = $offset;
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+    
+    public function getSearchCount($term, $filter = 'all') {
+        $sql = "SELECT COUNT(*) FROM media_library WHERE (original_name LIKE ? OR file_name LIKE ?)";
+        $params = ['%' . $term . '%', '%' . $term . '%'];
+        
+        if ($filter !== 'all') {
+            switch ($filter) {
+                case 'images':
+                    $sql .= " AND mime_type LIKE 'image/%'";
+                    break;
+                case 'documents':
+                    $sql .= " AND (mime_type LIKE 'application/%' OR mime_type LIKE 'text/%')";
+                    break;
+                case 'videos':
+                    $sql .= " AND mime_type LIKE 'video/%'";
+                    break;
+            }
+        }
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchColumn();
+    }
+    
+    public function getFiltered($filter = 'all', $sort = 'newest', $limit = 20, $offset = 0) {
+        $sql = "SELECT * FROM media_library";
+        $params = [];
+        
+        // Add filter conditions
+        if ($filter !== 'all') {
+            switch ($filter) {
+                case 'images':
+                    $sql .= " WHERE mime_type LIKE 'image/%'";
+                    break;
+                case 'documents':
+                    $sql .= " WHERE (mime_type LIKE 'application/%' OR mime_type LIKE 'text/%')";
+                    break;
+                case 'videos':
+                    $sql .= " WHERE mime_type LIKE 'video/%'";
+                    break;
+            }
+        }
+        
+        // Add sorting
+        switch ($sort) {
+            case 'oldest':
+                $sql .= " ORDER BY created_at ASC";
+                break;
+            case 'name':
+                $sql .= " ORDER BY original_name ASC";
+                break;
+            case 'size':
+                $sql .= " ORDER BY file_size DESC";
+                break;
+            default: // newest
+                $sql .= " ORDER BY created_at DESC";
+        }
+        
+        $sql .= " LIMIT ? OFFSET ?";
+        $params[] = $limit;
+        $params[] = $offset;
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+    
+    public function getFilteredCount($filter = 'all') {
+        $sql = "SELECT COUNT(*) FROM media_library";
+        
+        if ($filter !== 'all') {
+            switch ($filter) {
+                case 'images':
+                    $sql .= " WHERE mime_type LIKE 'image/%'";
+                    break;
+                case 'documents':
+                    $sql .= " WHERE (mime_type LIKE 'application/%' OR mime_type LIKE 'text/%')";
+                    break;
+                case 'videos':
+                    $sql .= " WHERE mime_type LIKE 'video/%'";
+                    break;
+            }
+        }
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+    
+    public function formatFileSize($bytes) {
+        if ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        } else {
+            return $bytes . ' bytes';
+        }
     }
 }
 
