@@ -395,6 +395,39 @@ CREATE TABLE IF NOT EXISTS `system_settings` (
   UNIQUE KEY `unique_key` (`setting_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Partners table
+CREATE TABLE IF NOT EXISTS `partners` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` char(36) NOT NULL DEFAULT (UUID()),
+  `name` varchar(100) NOT NULL,
+  `logo_path` varchar(255) DEFAULT NULL,
+  `website_url` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_uuid` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Team Members table
+CREATE TABLE IF NOT EXISTS `team_members` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` char(36) NOT NULL DEFAULT (UUID()),
+  `full_name` varchar(100) NOT NULL,
+  `position` varchar(100) NOT NULL,
+  `bio` text DEFAULT NULL,
+  `image_path` varchar(255) DEFAULT NULL,
+  `social_links` longtext DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_uuid` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET foreign_key_checks = 1;
 
 -- Insert default admin user (password: admin123!)

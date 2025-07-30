@@ -153,9 +153,59 @@ require_once __DIR__ . '/../includes/header.php';
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
     <div class="d-none d-sm-inline-block">
-        <a href="<?= BASE_URL ?>/admin/public/system_monitor.php" class="btn btn-sm btn-primary shadow-sm">
+        <a href="<?= BASE_URL ?>/admin/public/system_monitor.php" class="btn btn-sm btn-primary shadow-sm mr-2">
             <i class="fas fa-chart-line fa-sm text-white-50"></i> System Monitor
         </a>
+        <a href="<?= BASE_URL ?>/admin/public/settings.php" class="btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-cog fa-sm text-white-50"></i> Settings
+        </a>
+    </div>
+</div>
+
+<!-- Quick Actions Row -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Quick Actions</div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <a href="users.php?action=add" class="btn btn-outline-primary btn-sm btn-block">
+                                    <i class="fas fa-user-plus"></i> Add User
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="programs.php?action=add" class="btn btn-outline-success btn-sm btn-block">
+                                    <i class="fas fa-graduation-cap"></i> Add Program
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="events.php?action=add" class="btn btn-outline-warning btn-sm btn-block">
+                                    <i class="fas fa-calendar-alt"></i> Add Event
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="partner_add.php" class="btn btn-outline-info btn-sm btn-block">
+                                    <i class="fas fa-handshake"></i> Add Partner
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="team_member_add.php" class="btn btn-outline-secondary btn-sm btn-block">
+                                    <i class="fas fa-users-cog"></i> Add Team Member
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="files.php" class="btn btn-outline-dark btn-sm btn-block">
+                                    <i class="fas fa-folder"></i> File Manager
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -2,6 +2,10 @@
 // Fix include path to ensure config.php is included correctly regardless of execution context
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../../shared/Core/Database.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 
 <!DOCTYPE html>
@@ -337,6 +341,30 @@ require_once __DIR__ . '/../../shared/Core/Database.php';
                 </a>
             </li>
 
+            <!-- Nav Item - Partners -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'partners.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/partners.php">
+                    <i class="fas fa-fw fa-handshake"></i>
+                    <span>Partners</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Team Members -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'team_members.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/team_members.php">
+                    <i class="fas fa-fw fa-users-cog"></i>
+                    <span>Team Members</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Media Library -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'media.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/media.php">
+                    <i class="fas fa-fw fa-photo-video"></i>
+                    <span>Media Library</span>
+                </a>
+            </li>
+
             <!-- Nav Item - Files -->
             <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'files.php' ? 'active' : '' ?>">
                 <a class="nav-link" href="<?= BASE_URL ?>/admin/public/files.php">
@@ -362,7 +390,7 @@ require_once __DIR__ . '/../../shared/Core/Database.php';
             </li>
 
             <!-- Nav Item - System Monitor (Admin Only) -->
-            <?php if ($_SESSION['role'] === 'admin'): ?>
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                 <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'system_monitor.php' ? 'active' : '' ?>">
                     <a class="nav-link" href="<?= BASE_URL ?>/admin/public/system_monitor.php">
                         <i class="fas fa-fw fa-chart-line"></i>
@@ -372,7 +400,7 @@ require_once __DIR__ . '/../../shared/Core/Database.php';
             <?php endif; ?>
 
             <!-- Nav Item - Activity Logs (Admin Only) -->
-            <?php if ($_SESSION['role'] === 'admin'): ?>
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                 <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'admin_logs.php' ? 'active' : '' ?>">
                     <a class="nav-link" href="<?= BASE_URL ?>/admin/public/admin_logs.php">
                         <i class="fas fa-fw fa-clipboard-list"></i>
@@ -453,6 +481,14 @@ require_once __DIR__ . '/../../shared/Core/Database.php';
                                 <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/users.php?action=add">
                                     <i class="fas fa-user-plus fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Add User
+                                </a>
+                                <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/partners.php?action=add">
+                                    <i class="fas fa-handshake fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Add Partner
+                                </a>
+                                <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/team_members.php?action=add">
+                                    <i class="fas fa-users-cog fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Add Team Member
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/system_monitor.php">

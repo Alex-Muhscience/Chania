@@ -1,4 +1,132 @@
 <?php
+$pageTitle = 'Site Settings';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../../shared/Core/Database.php';
+require_once __DIR__ . '/../../shared/Core/Settings.php';
+require_once __DIR__ . '/../../shared/Core/Utilities.php';
+
+// Require authentication
+Utilities::requireRole('admin');
+
+$groupedSettings = Settings::getAllGrouped();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $settingsToUpdate = [];
+    
+    // Handle file uploads
+    if (isset($_FILES) && !empty($_FILES)) {
+        foreach ($_FILES as $key => $file) {
+            if ($file['error'] === UPLOAD_ERR_OK) {
+                $upload_dir = '../../uploads/settings/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+                
+                $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $filename = $key . '.' . $file_extension;
+                $filepath = 'uploads/settings/' . $filename;
+                
+                if (move_uploaded_file($file['tmp_name'], $upload_dir . $filename)) {
+                    $settingsToUpdate[$key] = $filepath;
+                } else {
+                    header('Location: settings.php?error=Failed to upload ' . $key);
+                    exit;
+                }
+            }
+        }
+    }
+    
+    // Handle regular post data
+    foreach ($_POST as $key => $value) {
+        // Skip file upload keys
+        if (!isset($_FILES[$key])) {
+            $settingsToUpdate[$key] = $value;
+        }
+    }
+    
+    // Handle boolean checkboxes
+    foreach ($groupedSettings as $group => $settings) {
+        foreach ($settings as $setting) {
+            if ($setting['setting_type'] === 'boolean' && !isset($settingsToUpdate[$setting['setting_key']])) {
+                $settingsToUpdate[$setting['setting_key']] = '0';
+            }
+        }
+    }
+    
+    if (Settings::updateMultiple($settingsToUpdate)) {
+        header('Location: settings.php?updated=1');
+    } else {
+        header('Location: settings.php?error=Failed to update settings');
+    }
+    exit;
+}
+
+$message = '';
+if (isset($_GET['updated'])) {
+    $message = '<div class="alert alert-success">Settings updated successfully!</div>';
+} elseif (isset($_GET['error'])) {
+    $message = '<div class="alert alert-danger">Error: ' . htmlspecialchars($_GET['error']) . '</div>';
+}
+
+require_once __DIR__ . '/../includes/header.php';
+?>
+
+<div class="container-fluid">
+    <?= $message ?>
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Site Settings</h1>
+    </div>
+    
+    <form action="" method="POST" enctype="multipart/form-data">
+        <?php foreach ($groupedSettings as $group => $settings): ?>
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary"><?= ucfirst($group) ?> Settings</h6>
+                </div>
+                <div class="card-body">
+                    <?php foreach ($settings as $setting): ?>
+                        <div class="form-group">
+                            <label for="<?= $setting['setting_key'] ?>"><?= htmlspecialchars($setting['setting_label']) ?></label>
+                            <?php switch ($setting['setting_type']):
+                                case 'textarea': ?>
+                                    <textarea class="form-control" id="<?= $setting['setting_key'] ?>" name="<?= $setting['setting_key'] ?>" rows="4"><?= htmlspecialchars($setting['setting_value'] ?? '') ?></textarea>
+                                    <?php break;
+                                case 'file': ?>
+                                    <?php if (!empty($setting['setting_value'])): ?>
+                                        <div class="mb-2">
+                                            <img src="../../<?= htmlspecialchars($setting['setting_value']) ?>" alt="<?= htmlspecialchars($setting['setting_label']) ?>" style="max-width: 150px; max-height: 150px;" class="img-thumbnail">
+                                        </div>
+                                    <?php endif; ?>
+                                    <input type="file" class="form-control-file" id="<?= $setting['setting_key'] ?>" name="<?= $setting['setting_key'] ?>" accept="image/*">
+                                    <?php break;
+                                case 'boolean': ?>
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" id="<?= $setting['setting_key'] ?>" name="<?= $setting['setting_key'] ?>" value="1" <?= $setting['setting_value'] ? 'checked' : '' ?>>
+                                        <label class="custom-control-label" for="<?= $setting['setting_key'] ?>"></label>
+                                    </div>
+                                    <?php break;
+                                case 'number': ?>
+                                    <input type="number" class="form-control" id="<?= $setting['setting_key'] ?>" name="<?= $setting['setting_key'] ?>" value="<?= htmlspecialchars($setting['setting_value'] ?? '') ?>">
+                                    <?php break;
+                                default: ?>
+                                    <input type="<?= $setting['setting_type'] ?>" class="form-control" id="<?= $setting['setting_key'] ?>" name="<?= $setting['setting_key'] ?>" value="<?= htmlspecialchars($setting['setting_value'] ?? '') ?>">
+                            <?php endswitch; ?>
+                            <small class="form-text text-muted"><?= htmlspecialchars($setting['setting_description']) ?></small>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+        </div>
+    </form>
+</div>
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+<?php
 require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/Utilities.php';
 require_once __DIR__ . '/../includes/config.php';

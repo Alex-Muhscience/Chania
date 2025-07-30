@@ -5,59 +5,53 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b6599f4-8808-486a-8bf0-b254c7901790" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/chania.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.php-preview-router.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/includes/footer.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/footer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/includes/header.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/header.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/admin_logs.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/admin_logs.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/application_export.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/application_export.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/application_view.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/application_view.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/applications.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/applications.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/contacts.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/contacts.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/event_edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/event_edit.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/event_registrations.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/event_registrations.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/files.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/files.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/index.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/logout.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/logout.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/newsletter.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/newsletter.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/profile.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/profile.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/program_add.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/program_add.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/program_edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/program_edit.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/programs.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/programs.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/settings.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/settings.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/system_monitor.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/system_monitor.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/testimonials.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/testimonials.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/user_add.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/user_add.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/user_edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/user_edit.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/includes/config.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/footer.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/includes/footer.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/includes/functions.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/header.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/includes/header.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/.htaccess" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/.htaccess" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/about.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/about.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/apply.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/apply.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/css/style.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/assets/js/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/contact.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/contact.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/event.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/event.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/events.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/events.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/index.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/program.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/program.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/programs.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/programs.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Models/ProgramModel.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/Models/ProgramModel.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/ApplicationService.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/Services/ApplicationService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/ContactService.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/Services/ContactService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/EventService.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/Services/EventService.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/register_event.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/Services/register_event.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/submit_application.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/Services/submit_application.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/Core/Database.php" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Core/Database.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/Core/Utilities.php" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Core/Utilities.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/Database/chania_db.sql" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Database/chania_db.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/test.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin_diagnostic.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin_test.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/submit-application.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_admin_logs.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_admin_logs_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_db.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_events_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_schema.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_tables.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/check_users_table.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/api/submit_application.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/create_missing_tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tests/create_missing_tables.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/schema.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database_health_check.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug_admin_logs.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug_database.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/fix_admin_logs_notifications.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/fix_admin_logs_notifications.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fix_admin_logs_user_id.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/fix_admin_logs_user_id.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fix_event_notifications.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/fix_event_notifications.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/insert_sample_data.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/error.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/program_categories_simple.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tests/program_categories_simple.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/recreate_users.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tests/recreate_users.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sample_data.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sample_data_inserts.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/Database/sample_data.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/Database/sample_data_inserts.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/system_check.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/temp_describe.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_admin_final.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_admin_routes.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_comprehensive.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_connection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_dashboard.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_dashboard_raw_data.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_db_connection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_logging.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_login_flow.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_newsletter_stats.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_password.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_session.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_system_monitor.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_web_functionality.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/verify_password.php" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,6 +160,7 @@
       <recent name="C:\xampp\htdocs\chania\client\public\assets\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\xampp\htdocs\chania\tests" />
       <recent name="C:\xampp\htdocs\chania\admin\public\assets\css" />
       <recent name="C:\xampp\htdocs\chania\admin\public" />
     </key>
