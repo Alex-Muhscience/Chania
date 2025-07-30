@@ -30,32 +30,56 @@ $mediaItems = $media->getAll();
                 <a href="#" class="btn btn-primary btn-sm float-right" data-toggle="modal" data-target="#uploadModal">Upload New Media</a>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>File</th>
-                                <th>File Name</th>
-                                <th>File Type</th>
-                                <th>Uploaded On</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($mediaItems as $item) : ?>
+                <?php if (empty($mediaItems)): ?>
+                    <div class="text-center py-5">
+                        <i class="fas fa-photo-video fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No media files found</h5>
+                        <p class="text-muted">Upload your first media file to get started.</p>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">
+                            <i class="fas fa-upload"></i> Upload Media
+                        </button>
+                    </div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
                                 <tr>
-                                    <td><img src="<?= $item['file_path'] ?>" alt="<?= $item['file_name'] ?>" width="100"></td>
-                                    <td><?= $item['file_name'] ?></td>
-                                    <td><?= $item['file_type'] ?></td>
-                                    <td><?= $item['uploaded_at'] ?></td>
-                                    <td>
-                                        <a href="<?= BASE_URL ?>/admin/actions/delete_media.php?id=<?= $item['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this media?')">Delete</a>
-                                    </td>
+                                    <th>Thumbnail</th>
+                                    <th>Original Name</th>
+                                    <th>File Type</th>
+                                    <th>Uploaded On</th>
+                                    <th>Actions</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($mediaItems as $item) : ?>
+                                    <tr>
+                                        <td>
+                                            <?php if (strpos($item['mime_type'], 'image/') === 0): ?>
+                                                <img src="<?= BASE_URL ?><?= $item['file_path'] ?>" alt="<?= $item['original_name'] ?>" width="80" height="60" style="object-fit: cover; border-radius: 4px;">
+                                            <?php else: ?>
+                                                <div class="text-center" style="width: 80px; height: 60px; line-height: 60px; background: #f8f9fa; border-radius: 4px;">
+                                                    <i class="fas fa-file fa-2x text-muted"></i>
+                                                </div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($item['original_name']) ?></td>
+                                        <td><span class="badge badge-secondary"><?= $item['file_type'] ?></span></td>
+                                        <td><?= date('M j, Y g:i A', strtotime($item['created_at'])) ?></td>
+                                        <td>
+                                            <a href="<?= BASE_URL ?><?= $item['file_path'] ?>" class="btn btn-info btn-sm" target="_blank" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="<?= BASE_URL ?>/admin/actions/delete_media.php?id=<?= $item['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this media?')" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

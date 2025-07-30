@@ -8,7 +8,7 @@ class Media {
     }
 
     public function getAll() {
-        $stmt = $this->db->prepare("SELECT * FROM media_library ORDER BY uploaded_at DESC");
+        $stmt = $this->db->prepare("SELECT * FROM media_library ORDER BY created_at DESC");
         $stmt->execute();
         return $stmt->fetchAll();
     }
@@ -46,15 +46,20 @@ class Media {
 
         if (move_uploaded_file($file['tmp_name'], $filePath)) {
             $stmt = $this->db->prepare("
-                INSERT INTO media_library (file_name, file_path, file_type, file_size, uploaded_at) 
-                VALUES (?, ?, ?, ?, NOW())
+                INSERT INTO media_library (original_name, file_name, file_path, file_type, mime_type, file_size, uploaded_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             ");
+            
+            $uploadedBy = $_SESSION['user_id'] ?? 1; // Default to user ID 1 if not logged in
             
             $stmt->execute([
                 $file['name'],
+                $fileName,
                 $relativePath,
                 $file['type'],
-                $file['size']
+                $file['type'],
+                $file['size'],
+                $uploadedBy
             ]);
 
             return $this->db->lastInsertId();
@@ -79,7 +84,7 @@ class Media {
     }
 
     public function getByType($type) {
-        $stmt = $this->db->prepare("SELECT * FROM media_library WHERE file_type LIKE ? ORDER BY uploaded_at DESC");
+        $stmt = $this->db->prepare("SELECT * FROM media_library WHERE file_type LIKE ? ORDER BY created_at DESC");
         $stmt->execute([$type . '%']);
         return $stmt->fetchAll();
     }
@@ -87,10 +92,10 @@ class Media {
     public function search($term) {
         $stmt = $this->db->prepare("
             SELECT * FROM media_library 
-            WHERE file_name LIKE ? 
-            ORDER BY uploaded_at DESC
+            WHERE original_name LIKE ? OR file_name LIKE ? 
+            ORDER BY created_at DESC
         ");
-        $stmt->execute(['%' . $term . '%']);
+        $stmt->execute(['%' . $term . '%', '%' . $term . '%']);
         return $stmt->fetchAll();
     }
 }
