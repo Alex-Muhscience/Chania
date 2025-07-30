@@ -358,6 +358,14 @@ if (session_status() === PHP_SESSION_NONE) {
                 </a>
             </li>
 
+            <!-- Nav Item - Pages -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'pages.php' || basename($_SERVER['PHP_SELF']) === 'page_edit.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/pages.php">
+                    <i class="fas fa-fw fa-file-alt"></i>
+                    <span>Pages</span>
+                </a>
+            </li>
+
             <!-- Nav Item - Media Library -->
             <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'media.php' ? 'active' : '' ?>">
                 <a class="nav-link" href="<?= BASE_URL ?>/admin/public/media.php">
