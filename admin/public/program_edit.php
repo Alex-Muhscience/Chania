@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/Utilities.php';
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../classes/ProgramCategory.php';
 
 session_start();
 
@@ -44,8 +45,13 @@ try {
         'start_date' => $program['start_date'],
         'end_date' => $program['end_date'],
         'max_participants' => $program['max_participants'],
-        'is_active' => $program['is_active']
+        'is_active' => $program['is_active'],
+        'category_id' => $program['category_id'] ?? null
     ];
+
+    // Get all categories
+    $programCategory = new ProgramCategory($db);
+    $categories = $programCategory->getAll();
 
 } catch (PDOException $e) {
     error_log("Program fetch error: " . $e->getMessage());
@@ -62,7 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'start_date' => $_POST['start_date'] ?? '',
         'end_date' => $_POST['end_date'] ?? '',
         'max_participants' => intval($_POST['max_participants'] ?? 0),
-        'is_active' => isset($_POST['is_active']) ? 1 : 0
+        'is_active' => isset($_POST['is_active']) ? 1 : 0,
+        'category_id' => $_POST['category_id'] ?: null
     ];
 
     // Validation
@@ -91,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Update program if no errors
     if (empty($errors)) {
         try {
-            $stmt = $db->prepare("UPDATE programs SET title = ?, description = ?, duration = ?, fee = ?, start_date = ?, end_date = ?, max_participants = ?, is_active = ?, updated_at = NOW() WHERE id = ?");
+            $stmt = $db->prepare("UPDATE programs SET title = ?, description = ?, duration = ?, fee = ?, start_date = ?, end_date = ?, max_participants = ?, is_active = ?, category_id = ?, updated_at = NOW() WHERE id = ?");
             $stmt->execute([
                 $formData['title'],
                 $formData['description'],
@@ -101,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $formData['end_date'] ?: null,
                 $formData['max_participants'] ?: null,
                 $formData['is_active'],
+                $formData['category_id'],
                 $programId
             ]);
 
@@ -144,6 +152,19 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="mb-3">
                         <label for="description" class="form-label">Description *</label>
                         <textarea class="form-control" id="description" name="description" rows="4" required><?= htmlspecialchars($formData['description']) ?></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Category</label>
+                        <select class="form-control" id="category_id" name="category_id">
+                            <option value="">Select a category (optional)</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= $category['id'] ?>" <?= $formData['category_id'] == $category['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($category['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="form-text">Assign this program to a category for better organization.</div>
                     </div>
 
                     <div class="row">

@@ -122,6 +122,35 @@ try {
     ");
     $userRegistrationTrends = $stmt->fetchAll();
 
+    // Get event attendance trends
+    $stmt = $db->query("
+        SELECT 
+            DATE_FORMAT(e.event_date, '%Y-%m') as month,
+            COUNT(DISTINCT er.id) as registrations,
+            COUNT(DISTINCT e.id) as events
+        FROM events e
+        LEFT JOIN event_registrations er ON e.id = er.event_id
+        WHERE e.event_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        GROUP BY DATE_FORMAT(e.event_date, '%Y-%m')
+        ORDER BY month ASC
+    ");
+    $eventAttendanceTrends = $stmt->fetchAll();
+
+    // Get program enrollment statistics
+    $stmt = $db->query("
+        SELECT 
+            p.title as program_name,
+            COUNT(a.id) as applications,
+            COUNT(CASE WHEN a.status = 'approved' THEN 1 END) as approved
+        FROM programs p
+        LEFT JOIN applications a ON p.id = a.program_id
+        WHERE p.deleted_at IS NULL AND p.is_active = 1
+        GROUP BY p.id, p.title
+        ORDER BY applications DESC
+        LIMIT 10
+    ");
+    $programEnrollmentData = $stmt->fetchAll();
+
     // Get system health metrics
     $memoryUsage = memory_get_usage(true);
     $peakMemoryUsage = memory_get_peak_usage(true);
@@ -141,6 +170,8 @@ try {
     $applicationTrends = [];
     $applicationStatusData = [];
     $userRegistrationTrends = [];
+    $eventAttendanceTrends = [];
+    $programEnrollmentData = [];
     $memoryUsage = 0;
     $peakMemoryUsage = 0;
     $dbConnectionTime = 0;
@@ -250,6 +281,9 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="col-auto">
                         <i class="fas fa-file-alt fa-2x text-gray-300"></i>
                     </div>
+                </div>
+                <div class="progress mt-2">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: <?= $stats['total_applications'] > 0 ? ($stats['pending_applications'] / $stats['total_applications']) * 100 : 0 ?>%" aria-valuenow="<?= $stats['pending_applications'] ?>" aria-valuemin="0" aria-valuemax="<?= $stats['total_applications'] ?>"></div>
                 </div>
             </div>
         </div>
@@ -436,6 +470,80 @@ require_once __DIR__ . '/../includes/header.php';
                             <?= ucfirst($status['status']) ?>: <?= $status['count'] ?>
                         </span>
                     <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Row - Additional Analytics Charts -->
+<div class="row">
+    <!-- User Registration Trends Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">User Registrations (Last 12 Months)</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="userDropdownMenuLink" data-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/users.php">View All Users</a>
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/user_export.php">Export Data</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="userRegistrationsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Attendance Trends Chart -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Event Attendance (Last 12 Months)</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="eventDropdownMenuLink" data-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/events.php">View All Events</a>
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/event_export.php">Export Data</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="eventAttendanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Row - Program Enrollment Chart -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Program Enrollment Statistics</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="programDropdownMenuLink" data-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/programs.php">View All Programs</a>
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/program_export.php">Export Data</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-bar">
+                    <canvas id="programEnrollmentChart"></canvas>
                 </div>
             </div>
         </div>
@@ -716,6 +824,164 @@ const applicationsChart = new Chart(applicationsCtx, {
         },
         scales: {
             y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// User registration trends chart (BAR CHART)
+const userRegistrationsCtx = document.getElementById('userRegistrationsChart').getContext('2d');
+const userRegistrationsChart = new Chart(userRegistrationsCtx, {
+    type: 'bar',
+    data: {
+        labels: <?= json_encode(array_column($userRegistrationTrends, 'month')) ?>,
+        datasets: [{
+            label: 'New Users',
+            data: <?= json_encode(array_column($userRegistrationTrends, 'count')) ?>,
+            backgroundColor: [
+                'rgba(78, 115, 223, 0.8)',
+                'rgba(28, 200, 138, 0.8)',
+                'rgba(255, 193, 7, 0.8)',
+                'rgba(231, 74, 59, 0.8)',
+                'rgba(54, 185, 204, 0.8)',
+                'rgba(133, 135, 150, 0.8)',
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)',
+                'rgba(255, 159, 64, 0.8)',
+                'rgba(199, 199, 199, 0.8)',
+                'rgba(83, 102, 255, 0.8)'
+            ],
+            borderColor: [
+                'rgb(78, 115, 223)',
+                'rgb(28, 200, 138)',
+                'rgb(255, 193, 7)',
+                'rgb(231, 74, 59)',
+                'rgb(54, 185, 204)',
+                'rgb(133, 135, 150)',
+                'rgb(255, 99, 132)',
+                'rgb(75, 192, 192)',
+                'rgb(153, 102, 255)',
+                'rgb(255, 159, 64)',
+                'rgb(199, 199, 199)',
+                'rgb(83, 102, 255)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top'
+            },
+            title: {
+                display: true,
+                text: 'Monthly User Registrations'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// Event attendance trends chart
+const eventAttendanceCtx = document.getElementById('eventAttendanceChart').getContext('2d');
+const eventAttendanceChart = new Chart(eventAttendanceCtx, {
+    type: 'line',
+    data: {
+        labels: <?= json_encode(array_column($eventAttendanceTrends, 'month')) ?>,
+        datasets: [
+            {
+                label: 'Registrations',
+                data: <?= json_encode(array_column($eventAttendanceTrends, 'registrations')) ?>,
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                tension: 0.3,
+                fill: true,
+                yAxisID: 'y'
+            },
+            {
+                label: 'Events',
+                data: <?= json_encode(array_column($eventAttendanceTrends, 'events')) ?>,
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.3,
+                fill: true,
+                yAxisID: 'y1'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            },
+            y1: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                },
+                grid: {
+                    drawOnChartArea: false
+                }
+            }
+        }
+    }
+});
+
+// Program enrollment statistics chart
+const programEnrollmentCtx = document.getElementById('programEnrollmentChart').getContext('2d');
+const programEnrollmentChart = new Chart(programEnrollmentCtx, {
+    type: 'bar',
+    data: {
+        labels: <?= json_encode(array_column($programEnrollmentData, 'program_name')) ?>,
+        datasets: [
+            {
+                label: 'Total Applications',
+                data: <?= json_encode(array_column($programEnrollmentData, 'applications')) ?>,
+                backgroundColor: 'rgba(153, 102, 255, 0.5)',
+                borderColor: 'rgb(153, 102, 255)',
+                borderWidth: 1
+            },
+            {
+                label: 'Approved Applications',
+                data: <?= json_encode(array_column($programEnrollmentData, 'approved')) ?>,
+                backgroundColor: 'rgba(255, 159, 64, 0.5)',
+                borderColor: 'rgb(255, 159, 64)',
+                borderWidth: 1
+            }
+        ]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
                 beginAtZero: true,
                 ticks: {
                     stepSize: 1

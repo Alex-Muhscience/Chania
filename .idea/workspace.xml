@@ -5,7 +5,78 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b6599f4-8808-486a-8bf0-b254c7901790" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/includes/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/config.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/includes/footer.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/footer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/includes/header.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/header.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/admin_logs.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/admin_logs.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/applications.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/applications.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/contacts.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/contacts.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/events.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/events.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/files.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/files.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/login.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/login.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/media.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/media.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/pages.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/pages.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/program_add.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/program_add.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/program_edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/program_edit.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/program_export.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/program_export.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/programs.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/programs.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/settings.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/settings.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/users.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/users.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/includes/ClientActivityLogger.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/includes/config.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/includes/footer.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/includes/functions.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/includes/header.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/.htaccess" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/about.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/api/events.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/api/newsletter_subscribe.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/api/programs.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/api/register_event.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/api/submit_application.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/api/submit_contact.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/apply.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/css/modern-framework.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/css/styles.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/images/about-image.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/images/hero-image.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/images/logo.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/images/placeholder.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/images/placeholder.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/js/homepage-enhanced.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/js/main.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/js/premium-ui.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/assets/js/programs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/contact.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/event.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/events.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/index.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/privacy.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/program.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/program_categories.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/program_detail.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/programs.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/programs_api.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/terms.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Models/ApplicationModel.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Models/EventModel.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Models/ProgramModel.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Services/ApplicationService.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Services/ContactService.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Services/EventService.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Services/NewsletterService.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Services/ProgramService.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Services/newsletter_subscribe.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Services/register_event.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Services/submit_application.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Utils/FileUploader.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Utils/FormValidator.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/Utils/ResponseHandler.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/error.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shared/Core/Utilities.php" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Core/Utilities.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -222,6 +293,8 @@
       <workItem from="1753694005117" duration="61000" />
       <workItem from="1753696952038" duration="5662000" />
       <workItem from="1753728047018" duration="14953000" />
+      <workItem from="1753917780640" duration="142000" />
+      <workItem from="1753917933027" duration="400000" />
     </task>
     <servers />
   </component>

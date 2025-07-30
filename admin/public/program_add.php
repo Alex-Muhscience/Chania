@@ -24,7 +24,6 @@ $formData = [
     'start_date' => '',
     'end_date' => '',
     'max_participants' => '',
-    'requirements' => '',
     'is_active' => 1
 ];
 
@@ -37,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'start_date' => $_POST['start_date'] ?? '',
         'end_date' => $_POST['end_date'] ?? '',
         'max_participants' => intval($_POST['max_participants'] ?? 0),
-        'requirements' => trim($_POST['requirements'] ?? ''),
         'is_active' => isset($_POST['is_active']) ? 1 : 0
     ];
 
@@ -69,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $db = (new Database())->connect();
 
-            $stmt = $db->prepare("INSERT INTO programs (title, description, duration, fee, start_date, end_date, max_participants, requirements, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+            $stmt = $db->prepare("INSERT INTO programs (title, description, duration, fee, start_date, end_date, max_participants, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
             $stmt->execute([
                 $formData['title'],
                 $formData['description'],
@@ -78,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $formData['start_date'] ?: null,
                 $formData['end_date'] ?: null,
                 $formData['max_participants'] ?: null,
-                $formData['requirements'],
                 $formData['is_active']
             ]);
 
@@ -167,10 +164,6 @@ require_once __DIR__ . '/../includes/header.php';
                         <div class="form-text">Leave empty for unlimited participants</div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="requirements" class="form-label">Requirements</label>
-                        <textarea class="form-control" id="requirements" name="requirements" rows="3"><?= htmlspecialchars($formData['requirements']) ?></textarea>
-                    </div>
 
                     <div class="mb-3">
                         <div class="form-check">

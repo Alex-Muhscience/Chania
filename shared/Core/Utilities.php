@@ -7,10 +7,14 @@ class Utilities {
     public static function redirect($url) {
         // Handle relative URLs
         if (strpos($url, '/') === 0) {
-            // Simple approach: just use the base URL for the project
-            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $fullUrl = $protocol . $host . '/chania' . $url;
+            // Use BASE_URL if defined, otherwise construct it
+            if (defined('BASE_URL')) {
+                $fullUrl = BASE_URL . $url;
+            } else {
+                $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+                $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+                $fullUrl = $protocol . $host . '/chania' . $url;
+            }
         } else {
             // Handle absolute URLs
             $fullUrl = $url;
@@ -449,39 +453,78 @@ class Utilities {
         return true;
     }
 
-    // Method to upload files securely
-    public static function uploadFile($file, $uploadDir, $allowedTypes = []) {
+    // Method to upload files securely and track them in the database
+    public static function uploadFile($file, $entityType = null, $entityId = null, $uploadSubDir = 'general', $allowedTypes = []) {
         if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
-            throw new Exception('No valid file uploaded');
+            return ['success' => false, 'error' => 'No valid file uploaded'];
         }
-        
-        // Check file size
+
+        // File size check
         if ($file['size'] > MAX_FILE_SIZE) {
-            throw new Exception('File size exceeds maximum allowed size');
+            return ['success' => false, 'error' => 'File size exceeds maximum allowed size'];
         }
+
+        // Get file info
+        $originalName = basename($file['name']);
+        $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        $mimeType = $file['type'];
+        $fileSize = $file['size'];
         
-        // Get file extension
-        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        
-        // Check allowed types if specified
-        if (!empty($allowedTypes) && !in_array($extension, $allowedTypes)) {
-            throw new Exception('File type not allowed');
+        // Allowed types check
+        $allAllowedTypes = array_merge(ALLOWED_IMAGE_TYPES, ALLOWED_DOCUMENT_TYPES);
+        if (!empty($allowedTypes)) {
+            $allAllowedTypes = $allowedTypes;
         }
-        
-        // Generate unique filename
-        $filename = uniqid() . '_' . time() . '.' . $extension;
-        $destination = $uploadDir . '/' . $filename;
-        
-        // Create directory if it doesn't exist
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+
+        if (!in_array($extension, $allAllowedTypes)) {
+            return ['success' => false, 'error' => 'File type not allowed'];
         }
-        
-        // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $destination)) {
-            return $filename;
-        } else {
-            throw new Exception('Failed to upload file');
+
+        // Generate unique filename and path
+        $storedName = uniqid() . '_' . time() . '.' . $extension;
+        $destinationDir = UPLOAD_PATH . '/' . $uploadSubDir;
+        $destinationPath = $destinationDir . '/' . $storedName;
+
+        if (!is_dir($destinationDir)) {
+            mkdir($destinationDir, 0755, true);
+        }
+
+        // Move the file
+        if (!move_uploaded_file($file['tmp_name'], $destinationPath)) {
+            return ['success' => false, 'error' => 'Failed to move uploaded file'];
+        }
+
+        // Insert file record into database
+        try {
+            $db = (new Database())->connect();
+            $stmt = $db->prepare("INSERT INTO file_uploads (original_name, stored_name, file_path, file_size, file_type, mime_type, entity_type, entity_id, uploaded_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            
+            $fileType = 'document'; // Default type
+            if (in_array($extension, ALLOWED_IMAGE_TYPES)) {
+                $fileType = 'image';
+            }
+
+            $stmt->execute([
+                $originalName,
+                $storedName,
+                $destinationPath,
+                $fileSize,
+                $fileType,
+                $mimeType,
+                $entityType,
+                $entityId,
+                $_SESSION['user_id'] ?? null
+            ]);
+
+            return ['success' => true, 'file_id' => $db->lastInsertId()];
+
+        } catch (PDOException $e) {
+            // Clean up by deleting the uploaded file if DB insert fails
+            if (file_exists($destinationPath)) {
+                unlink($destinationPath);
+            }
+            error_log('File upload DB error: ' . $e->getMessage());
+            return ['success' => false, 'error' => 'Database error during file upload'];
         }
     }
 }

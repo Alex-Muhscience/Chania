@@ -42,27 +42,55 @@
     <script>
         // Initialize DataTables
         $(document).ready(function() {
-            // Only initialize DataTables on tables that have proper structure (thead and tbody)
-            $('.table:not(.no-datatables)').each(function() {
+            // Pages Table
+            if ($('#pagesTable').length > 0) {
+                $('#pagesTable').DataTable({
+                    "paging": true,
+                    "lengthChange": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                    "pageLength": 10,
+                    "columnDefs": [
+                        { "orderable": false, "targets": [5] } // Actions column not sortable
+                    ]
+                });
+            }
+            
+            // Media Table
+            if ($('#mediaTable').length > 0) {
+                $('#mediaTable').DataTable({
+                    "paging": true,
+                    "lengthChange": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": false,
+                    "responsive": true,
+                    "pageLength": 10
+                });
+            }
+            
+            // Generic table initialization for other tables
+            $('.table.data-table:not(#pagesTable):not(#mediaTable)').each(function() {
                 var $table = $(this);
-                // Check if table has thead or at least th elements for proper DataTables structure
-                if ($table.find('thead').length > 0 || $table.find('th').length > 0) {
+                if ($table.find('thead').length > 0) {
                     try {
                         $table.DataTable({
-                            "paging": false,
-                            "info": false,
-                            "searching": false,
+                            "paging": true,
+                            "lengthChange": true,
+                            "searching": true,
                             "ordering": true,
-                            "columnDefs": [
-                                { "orderable": false, "targets": "no-sort" }
-                            ]
+                            "info": true,
+                            "autoWidth": false,
+                            "responsive": true,
+                            "pageLength": 10
                         });
                     } catch (e) {
                         console.warn('Could not initialize DataTable on table:', $table, 'Error:', e);
                     }
-                } else {
-                    // Add no-datatables class to prevent future attempts
-                    $table.addClass('no-datatables');
                 }
             });
         });
@@ -71,4 +99,34 @@
         setTimeout(function() {
             $('.alert').fadeOut('slow');
         }, 5000);
+
+        // Dark Mode Toggle Functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkModeIcon = document.getElementById('darkModeIcon');
+        const body = document.body;
+
+        // Check for saved dark mode preference or default to light mode
+        const savedMode = localStorage.getItem('darkMode');
+        if (savedMode === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeIcon.classList.remove('fa-moon');
+            darkModeIcon.classList.add('fa-sun');
+        }
+
+        // Toggle dark mode on button click
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                // Switch to dark mode
+                darkModeIcon.classList.remove('fa-moon');
+                darkModeIcon.classList.add('fa-sun');
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                // Switch to light mode
+                darkModeIcon.classList.remove('fa-sun');
+                darkModeIcon.classList.add('fa-moon');
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
     </script>

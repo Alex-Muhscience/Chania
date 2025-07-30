@@ -23,7 +23,7 @@ try {
         $params = [$searchTerm, $searchTerm];
     }
 
-    $stmt = $db->prepare("SELECT id, title, description, duration, fee, start_date, end_date, max_participants, requirements, is_active, created_at FROM programs $whereClause ORDER BY created_at DESC");
+    $stmt = $db->prepare("SELECT id, title, description, duration, fee, start_date, end_date, max_participants, is_active, created_at FROM programs $whereClause ORDER BY created_at DESC");
     $stmt->execute($params);
     $programs = $stmt->fetchAll();
 
@@ -51,7 +51,6 @@ if ($format === 'csv') {
         'Start Date',
         'End Date',
         'Max Participants',
-        'Requirements',
         'Status',
         'Created At'
     ]);
@@ -67,7 +66,6 @@ if ($format === 'csv') {
             $program['start_date'] ?: 'Not set',
             $program['end_date'] ?: 'Not set',
             $program['max_participants'] ?: 'Unlimited',
-            $program['requirements'] ?: 'None',
             $program['is_active'] ? 'Active' : 'Inactive',
             $program['created_at']
         ]);

@@ -4,7 +4,12 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/Utilities.php';
 
+// Configure session settings before starting session
 if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.cookie_samesite', 'Strict');
     session_start();
 }
 ?>
@@ -164,23 +169,189 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .collapse-item {
-            color: #ecf0f1 !important;
+            color: #2c3e50 !important; /* Dark color for better visibility on white background */
             font-size: 0.85rem;
+            padding: .5rem 1.5rem;
+            text-decoration: none;
         }
 
         .collapse-item:hover {
-            color: #3498db !important;
-            background-color: rgba(52, 152, 219, 0.1);
+            color: #3498db !important; /* Blue color on hover */
+            background-color: #f8f9fc;
+            text-decoration: none;
         }
 
         .collapse-item.active {
-            color: #3498db !important;
-            background-color: rgba(52, 152, 219, 0.2);
+            color: #ffffff !important; /* White text on active */
+            font-weight: 700;
+            background-color: #3498db; /* Blue background for active */
         }
 
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
+            }
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .topbar {
+            background-color: #2d2d2d;
+            border-bottom: 1px solid #404040;
+        }
+
+        body.dark-mode .card {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-mode .card-header {
+            background-color: #404040;
+            border-bottom: 1px solid #555;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .table {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .table th,
+        body.dark-mode .table td {
+            border-color: #404040;
+        }
+
+        body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .form-control {
+            background-color: #404040;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .form-control:focus {
+            background-color: #404040;
+            border-color: #3498db;
+            color: #e0e0e0;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        body.dark-mode .btn-outline-primary {
+            color: #3498db;
+            border-color: #3498db;
+        }
+
+        body.dark-mode .btn-outline-primary:hover {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        body.dark-mode .alert {
+            border: none;
+        }
+
+        body.dark-mode .alert-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        body.dark-mode .alert-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        body.dark-mode .alert-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        body.dark-mode .alert-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background-color: #2d2d2d;
+            border-color: #404040;
+        }
+
+        body.dark-mode .dropdown-item {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .dropdown-item:hover {
+            background-color: #404040;
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .breadcrumb {
+            background-color: #404040;
+        }
+
+        body.dark-mode .breadcrumb-item + .breadcrumb-item::before {
+            color: #e0e0e0;
+        }
+
+        body.dark-mode .text-gray-800 {
+            color: #e0e0e0 !important;
+        }
+
+        body.dark-mode .text-gray-600 {
+            color: #b0b0b0 !important;
+        }
+
+        body.dark-mode .text-gray-500 {
+            color: #888 !important;
+        }
+
+        /* Mobile Responsive Tables */
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .table {
+                min-width: 600px;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+            
+            .btn-group-vertical {
+                flex-direction: column;
+            }
+            
+            .btn-group-vertical .btn {
+                margin-bottom: 0.25rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table th,
+            .table td {
+                padding: 0.25rem;
+                font-size: 0.8rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -247,11 +418,18 @@ if (session_status() === PHP_SESSION_NONE) {
             </div>
 
             <!-- Nav Item - Programs -->
-            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'programs.php' ? 'active' : '' ?>">
-                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/programs.php">
+            <li class="nav-item <?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_add.php', 'program_edit.php', 'program_categories.php']) ? 'active' : '' ?>">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePrograms">
                     <i class="fas fa-fw fa-graduation-cap"></i>
                     <span>Programs</span>
                 </a>
+                <div id="collapsePrograms" class="collapse <?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_add.php', 'program_edit.php', 'program_categories.php']) ? 'show' : '' ?>">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'programs.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/programs.php">All Programs</a>
+                        <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'program_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/program_add.php">Add Program</a>
+                        <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'program_categories.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/program_categories.php">Categories</a>
+                    </div>
+                </div>
             </li>
 
             <!-- Nav Item - Applications -->
@@ -326,6 +504,53 @@ if (session_status() === PHP_SESSION_NONE) {
                 </a>
             </li>
 
+            <!-- Nav Item - Email Templates -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'email_templates.php' || basename($_SERVER['PHP_SELF']) === 'email_template_edit.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/email_templates.php">
+                    <i class="fas fa-fw fa-envelope-square"></i>
+                    <span>Email Templates</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Email Campaigns -->
+            <li class="nav-item <?= in_array(basename($_SERVER['PHP_SELF']), ['email_campaigns.php', 'email_campaign_create.php']) ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/email_campaigns.php">
+                    <i class="fas fa-fw fa-paper-plane"></i>
+                    <span>Email Campaigns</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - SMS Templates -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'sms_templates.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/sms_templates.php">
+                    <i class="fas fa-fw fa-sms"></i>
+                    <span>SMS Templates</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Reports & Analytics
+            </div>
+
+            <!-- Nav Item - Reports -->
+            <li class="nav-item <?= in_array(basename($_SERVER['PHP_SELF']), ['reports.php', 'report_builder.php', 'report_view.php', 'data_export.php']) ? 'active' : '' ?>">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseReports">
+                    <i class="fas fa-fw fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+                <div id="collapseReports" class="collapse <?= in_array(basename($_SERVER['PHP_SELF']), ['reports.php', 'report_builder.php', 'report_view.php', 'data_export.php']) ? 'show' : '' ?>">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'reports.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/reports.php">All Reports</a>
+                        <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'report_builder.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/report_builder.php">Report Builder</a>
+                        <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'data_export.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/data_export.php">Data Export</a>
+                    </div>
+                </div>
+            </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -374,6 +599,22 @@ if (session_status() === PHP_SESSION_NONE) {
                 </a>
             </li>
 
+            <!-- Nav Item - FAQs -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'faqs.php' || basename($_SERVER['PHP_SELF']) === 'faq_edit.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/faqs.php">
+                    <i class="fas fa-fw fa-question-circle"></i>
+                    <span>FAQs</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Blog -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'blog.php' || basename($_SERVER['PHP_SELF']) === 'blog_edit.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/blog.php">
+                    <i class="fas fa-fw fa-blog"></i>
+                    <span>Blog</span>
+                </a>
+            </li>
+
             <!-- Nav Item - Files -->
             <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'files.php' ? 'active' : '' ?>">
                 <a class="nav-link" href="<?= BASE_URL ?>/admin/public/files.php">
@@ -389,6 +630,14 @@ if (session_status() === PHP_SESSION_NONE) {
             <div class="sidebar-heading">
                 System
             </div>
+
+            <!-- Nav Item - Roles -->
+            <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'roles.php' || basename($_SERVER['PHP_SELF']) === 'role_edit.php' ? 'active' : '' ?>">
+                <a class="nav-link" href="<?= BASE_URL ?>/admin/public/roles.php">
+                    <i class="fas fa-fw fa-user-tag"></i>
+                    <span>Roles</span>
+                </a>
+            </li>
 
             <!-- Nav Item - Settings -->
             <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active' : '' ?>">
@@ -414,6 +663,16 @@ if (session_status() === PHP_SESSION_NONE) {
                     <a class="nav-link" href="<?= BASE_URL ?>/admin/public/admin_logs.php">
                         <i class="fas fa-fw fa-clipboard-list"></i>
                         <span>Activity Logs</span>
+                    </a>
+                </li>
+            <?php endif; ?>
+
+            <!-- Nav Item - Security Logs (Admin Only) -->
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'security_logs.php' ? 'active' : '' ?>">
+                    <a class="nav-link" href="<?= BASE_URL ?>/admin/public/security_logs.php">
+                        <i class="fas fa-fw fa-shield-alt"></i>
+                        <span>Security Logs</span>
                     </a>
                 </li>
             <?php endif; ?>
@@ -505,6 +764,13 @@ if (session_status() === PHP_SESSION_NONE) {
                                     System Monitor
                                 </a>
                             </div>
+                        </li>
+
+                        <!-- Nav Item - Dark Mode Toggle -->
+                        <li class="nav-item no-arrow mx-1">
+                            <button class="btn btn-link nav-link" id="darkModeToggle" title="Toggle Dark Mode">
+                                <i class="fas fa-moon fa-fw" id="darkModeIcon"></i>
+                            </button>
                         </li>
 
                         <!-- Nav Item - Notifications -->
@@ -603,6 +869,10 @@ if (session_status() === PHP_SESSION_NONE) {
                                 <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/profile.php">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
+                                </a>
+                                <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/2fa_setup.php">
+                                    <i class="fas fa-shield-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Two-Factor Auth
                                 </a>
                                 <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/settings.php">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>

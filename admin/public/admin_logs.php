@@ -8,10 +8,10 @@ session_start();
 // Require admin role
 Utilities::requireRole('admin');
 
-$pageTitle = "Audit & Activity Logs";
+$pageTitle = "Activity Timeline & Audit Logs";
 $breadcrumbs = [
     ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
-    ['title' => 'Audit & Activity Logs']
+    ['title' => 'Activity Timeline']
 ];
 
 $errors = [];
@@ -188,6 +188,8 @@ try {
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<link rel="stylesheet" href="<?= BASE_URL ?>/admin/public/assets/css/timeline.css">
+
 <div class="row">
     <div class="col-md-3">
         <!-- Statistics -->
@@ -265,49 +267,44 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         </div>
 
-        <!-- Activity Logs -->
+        <!-- Activity Timeline -->
         <div class="card">
             <div class="card-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h6 class="m-0 font-weight-bold text-primary">Activity Logs</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-clock text-primary mr-2"></i>Activity Timeline
+                        </h6>
                     </div>
                     <div class="col-auto">
-                        <a href="<?= BASE_URL ?>/admin/logs_export.php" class="btn btn-success btn-sm">
-                            <i class="fas fa-download"></i> Export
-                        </a>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary btn-sm" id="timelineView" onclick="switchView('timeline')">
+                                <i class="fas fa-stream"></i> Timeline
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="tableView" onclick="switchView('table')">
+                                <i class="fas fa-table"></i> Table
+                            </button>
+                            <button type="button" class="btn btn-info btn-sm" id="refreshBtn" onclick="refreshTimeline()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <a href="<?= BASE_URL ?>/admin/logs_export.php" class="btn btn-success btn-sm">
+                                <i class="fas fa-download"></i> Export
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-
-
-
-
-<div>
-    <!-- Custom CSS styling for badges and modals -->
-    <style>
-    .badge {
-        padding: 0.5em 0.7em;
-        font-size: 90%;
-        border-radius: 0.2em;
-    }
-    .modal-dialog {
-        max-width: 80%;
-    }
-    </style>
-</div>
-// Bulk action form
-
-<form method="POST" action="" class="form-inline mb-2">
-    <select name="bulk_action" class="form-control mr-2">
-        <option value="">Bulk actions</option>
-        <option value="export">Export</option>
-        <option value="delete">Delete</option>
-        <option value="review">Mark as Reviewed</option>
-    </select>
-    <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
-</form>
             <div class="card-body">
+                <!-- Bulk Actions -->
+                <form method="POST" action="" class="form-inline mb-3">
+                    <select name="bulk_action" class="form-control form-control-sm mr-2">
+                        <option value="">Bulk actions</option>
+                        <option value="export">Export Selected</option>
+                        <option value="delete">Delete Selected</option>
+                        <option value="review">Mark as Reviewed</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
+                </form>
                 <!-- Search and Filter -->
                 <form method="GET" class="mb-4">
                     <div class="row">
@@ -350,13 +347,34 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                 </form>
 
-                <?php if (empty($logs)): ?>
-                    <div class="text-center py-5">
-                        <i class="fas fa-clipboard-list fa-5x text-muted mb-3"></i>
-                        <h5 class="text-muted">No activity logs found</h5>
-                        <p class="text-muted">Activity logs will appear here as users perform actions</p>
-                    </div>
-                <?php else: ?>
+                <!-- Timeline / Table Views -->
+                <div id="timeline-view">
+                    <ul class="timeline">
+                        <?php foreach ($logs as $log): ?>
+                            <li class="timeline-item">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h6 class="timeline-title"><?= htmlspecialchars($log['action']) ?></h6>
+                                        <small class="timeline-time"><i class="fas fa-clock"></i> <?= date('M j, Y g:i A', strtotime($log['created_at'])) ?></small>
+                                    </div>
+                                    <div class="timeline-body">
+                                        <p><strong>User:</strong> <?= htmlspecialchars($log['user_name']) ?></p>
+                                        <p><strong>Entity:</strong> <?= htmlspecialchars($log['entity_type'] ?? 'N/A') ?></p>
+                                        <a href="#" class="details-toggle" onclick="toggleDetails(this)">Show Details</a>
+                                        <div class="timeline-details">
+                                            <pre><?= htmlspecialchars($log['details'] ?? 'No additional details.') ?></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
+                <div id="table-view" style="display: none;">
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -412,21 +430,21 @@ require_once __DIR__ . '/../includes/header.php';
                             </tbody>
                         </table>
                     </div>
+                </div>
 
-                    <!-- Pagination -->
-                    <?php if ($totalPages > 1): ?>
-                        <nav aria-label="Logs pagination">
-                            <ul class="pagination justify-content-center">
-                                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                    <li class="page-item <?= $i === $page ? 'active' : '' ?>">
-                                        <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>&user_id=<?= urlencode($userId) ?>&entity_type=<?= urlencode($entityType) ?>&date_from=<?= urlencode($dateFrom) ?>&date_to=<?= urlencode($dateTo) ?>">
-                                            <?= $i ?>
-                                        </a>
-                                    </li>
-                                <?php endfor; ?>
-                            </ul>
-                        </nav>
-                    <?php endif; ?>
+                <!-- Pagination -->
+                <?php if ($totalPages > 1): ?>
+                    <nav aria-label="Logs pagination">
+                        <ul class="pagination justify-content-center">
+                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                <li class="page-item <?= $i === $page ? 'active' : '' ?>">
+                                    <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>&user_id=<?= urlencode($userId) ?>&entity_type=<?= urlencode($entityType) ?>&date_from=<?= urlencode($dateFrom) ?>&date_to=<?= urlencode($dateTo) ?>">
+                                        <?= $i ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+                        </ul>
+                    </nav>
                 <?php endif; ?>
             </div>
         </div>
@@ -510,6 +528,31 @@ const activityChart = new Chart(ctx, {
         }
     }
 });
+
+function switchView(view) {
+    if (view === 'timeline') {
+        document.getElementById('timeline-view').style.display = 'block';
+        document.getElementById('table-view').style.display = 'none';
+    } else {
+        document.getElementById('timeline-view').style.display = 'none';
+        document.getElementById('table-view').style.display = 'block';
+    }
+}
+
+function refreshTimeline() {
+    location.reload();
+}
+
+function toggleDetails(element) {
+    const details = element.nextElementSibling;
+    if (details.style.display === 'block') {
+        details.style.display = 'none';
+        element.textContent = 'Show Details';
+    } else {
+        details.style.display = 'block';
+        element.textContent = 'Hide Details';
+    }
+}
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

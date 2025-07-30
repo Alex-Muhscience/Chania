@@ -1,0 +1,5 @@
+This directory is for storing website images.
+
+Add your hero-image.jpg and other images here.
+
+Recommended hero image size: 800x400px
