@@ -16,6 +16,13 @@ class PagesController extends BaseController {
     }
 
     public function index() {
+        // CRITICAL SECURITY CHECK - Check permissions
+        if (!$this->hasPermission('pages') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to manage pages.');
+            header('Location: index.php');
+            exit;
+        }
+
         try {
             $pages = $this->pageManager->getAll();
 
@@ -35,6 +42,13 @@ class PagesController extends BaseController {
     }
 
     public function add() {
+        // Check permissions
+        if (!$this->hasPermission('pages') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to add pages.');
+            header('Location: index.php');
+            exit;
+        }
+
         $this->setPageTitle('Create New Page');
         $this->setBreadcrumbs([
             ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
@@ -53,6 +67,13 @@ class PagesController extends BaseController {
     }
 
     public function edit() {
+        // Check permissions
+        if (!$this->hasPermission('pages') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to edit pages.');
+            header('Location: index.php');
+            exit;
+        }
+
         $pageId = intval($_GET['id'] ?? 0);
         if (!$pageId) {
             $this->redirect(BASE_URL . '/admin/pages.php', 'Invalid page ID.');
@@ -87,6 +108,13 @@ class PagesController extends BaseController {
     }
 
     public function delete() {
+        // Check permissions
+        if (!$this->hasPermission('pages') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to delete pages.');
+            header('Location: index.php');
+            exit;
+        }
+
         $pageId = intval($_POST['id'] ?? 0);
         if (!$pageId) {
             $this->redirect(BASE_URL . '/admin/pages.php', 'Invalid page ID.');

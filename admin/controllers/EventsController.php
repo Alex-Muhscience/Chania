@@ -13,6 +13,13 @@ class EventsController extends BaseController {
     }
 
     public function index() {
+        // CRITICAL SECURITY CHECK - Check permissions
+        if (!$this->hasPermission('events') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to manage events.');
+            header('Location: index.php');
+            exit;
+        }
+
         // Handle POST actions
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleActions();
@@ -105,6 +112,13 @@ class EventsController extends BaseController {
     }
 
     public function add() {
+        // Check permissions
+        if (!$this->hasPermission('events') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to add events.');
+            header('Location: index.php');
+            exit;
+        }
+
         $this->setPageTitle('Add New Event');
         $this->setBreadcrumbs([
             ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
@@ -120,6 +134,13 @@ class EventsController extends BaseController {
     }
 
     public function edit() {
+        // Check permissions
+        if (!$this->hasPermission('events') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to edit events.');
+            header('Location: index.php');
+            exit;
+        }
+
         $eventId = intval($_GET['id'] ?? 0);
         if (!$eventId) {
             $this->redirect(BASE_URL . '/admin/events.php', 'Invalid event ID.');

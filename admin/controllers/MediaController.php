@@ -16,6 +16,13 @@ class MediaController extends BaseController {
     }
 
     public function index() {
+        // CRITICAL SECURITY CHECK - Check permissions
+        if (!$this->hasPermission('media') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to manage media.');
+            header('Location: index.php');
+            exit;
+        }
+
         // Handle bulk delete
         if (($_POST['action'] ?? '') === 'bulk_delete' && !empty($_POST['selected_items'])) {
             $this->handleBulkDelete();

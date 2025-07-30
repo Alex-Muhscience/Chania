@@ -11,6 +11,13 @@ class FilesController extends BaseController {
     }
 
     public function index() {
+        // CRITICAL SECURITY CHECK - Check permissions
+        if (!$this->hasPermission('files') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to manage files.');
+            header('Location: index.php');
+            exit;
+        }
+
         $this->setPageTitle('File Management');
         $this->setBreadcrumbs([
             ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],

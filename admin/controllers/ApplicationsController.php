@@ -14,6 +14,13 @@ class ApplicationsController extends BaseController {
     }
 
     public function index() {
+        // CRITICAL SECURITY CHECK - Check permissions
+        if (!$this->hasPermission('applications') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to manage applications.');
+            header('Location: index.php');
+            exit;
+        }
+
         // Handle POST actions
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleActions();

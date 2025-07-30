@@ -16,6 +16,13 @@ class ProgramsController extends BaseController {
     }
 
     public function index() {
+        // Check permissions - CRITICAL SECURITY CHECK
+        if (!$this->hasPermission('programs') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to manage programs.');
+            header('Location: index.php');
+            exit;
+        }
+
         // Handle POST actions
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleActions();
@@ -108,6 +115,13 @@ class ProgramsController extends BaseController {
     }
 
     public function add() {
+        // Check permissions
+        if (!$this->hasPermission('programs') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to add programs.');
+            header('Location: index.php');
+            exit;
+        }
+
         $this->setPageTitle('Add New Program');
         $this->setBreadcrumbs([
             ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
@@ -123,6 +137,13 @@ class ProgramsController extends BaseController {
     }
 
     public function edit() {
+        // Check permissions
+        if (!$this->hasPermission('programs') && !$this->hasPermission('*')) {
+            $this->setFlashMessage('error', 'Access denied. You do not have permission to edit programs.');
+            header('Location: index.php');
+            exit;
+        }
+
         $programId = intval($_GET['id'] ?? 0);
         if (!$programId) {
             $this->redirect(BASE_URL . '/admin/programs.php', 'Invalid program ID.');
