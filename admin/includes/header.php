@@ -2,6 +2,7 @@
 // Fix include path to ensure config.php is included correctly regardless of execution context
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../../shared/Core/Database.php';
+require_once __DIR__ . '/../../shared/Core/Utilities.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

@@ -49,7 +49,7 @@ $mediaItems = $media->getAll();
                                     <td><?= $item['file_type'] ?></td>
                                     <td><?= $item['uploaded_at'] ?></td>
                                     <td>
-                                        <a href="/admin/actions/delete_media.php?id=<?= $item['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this media?')">Delete</a>
+                                        <a href="<?= BASE_URL ?>/admin/actions/delete_media.php?id=<?= $item['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this media?')">Delete</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -72,7 +72,7 @@ $mediaItems = $media->getAll();
                 </button>
             </div>
             <div class="modal-body">
-                <form action="/admin/actions/upload_media.php" method="post" enctype="multipart/form-data">
+                <form action="<?= BASE_URL ?>/admin/actions/upload_media.php" method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="mediaFile">Select file</label>
                         <input type="file" class="form-control-file" id="mediaFile" name="mediaFile">

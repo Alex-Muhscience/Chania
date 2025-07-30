@@ -5,53 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b6599f4-8808-486a-8bf0-b254c7901790" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/includes/header.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/header.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/test.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin_diagnostic.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin_test.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/submit-application.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/check_admin_logs.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/check_admin_logs_table.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/check_db.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/check_events_table.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/check_schema.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/check_tables.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/check_users_table.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/api/submit_application.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_missing_tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tests/create_missing_tables.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/database/schema.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database_health_check.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug_admin_logs.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug_database.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/fix_admin_logs_notifications.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/fix_admin_logs_notifications.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fix_admin_logs_user_id.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/fix_admin_logs_user_id.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fix_event_notifications.php" beforeDir="false" afterPath="$PROJECT_DIR$/tests/fix_event_notifications.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/insert_sample_data.sql" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/error.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/program_categories_simple.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tests/program_categories_simple.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/recreate_users.sql" beforeDir="false" afterPath="$PROJECT_DIR$/tests/recreate_users.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sample_data.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/sample_data_inserts.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/Database/sample_data.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/Database/sample_data_inserts.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/system_check.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp_describe.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_admin_final.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_admin_routes.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_comprehensive.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_connection.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_dashboard.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_dashboard_raw_data.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_db_connection.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_logging.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_login_flow.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_newsletter_stats.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_password.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_session.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_system_monitor.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_web_functionality.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/verify_password.php" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
