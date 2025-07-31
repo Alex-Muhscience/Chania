@@ -23,7 +23,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta name="description" content="Digital Empowerment Network - Admin Panel">
     <meta name="author" content="Digital Empowerment Network">
 
-    <title><?= isset($pageTitle) ? $pageTitle . ' - ' : '' ?>DEN Admin</title>
+    <title><?= isset($pageTitle) ? $pageTitle . ' - ' : '' ?>Chania Admin</title>
 
     <!-- Custom fonts for this template -->
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
@@ -367,7 +367,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <div class="sidebar-brand-icon">
                     <i class="fas fa-digital-tachograph"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">DEN Admin</div>
+                <div class="sidebar-brand-text mx-3">CHANIA Admin</div>
             </a>
 
             <!-- Divider -->

@@ -5,78 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4b6599f4-8808-486a-8bf0-b254c7901790" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/includes/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/config.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/includes/footer.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/footer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/check_file_uploads.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/includes/header.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/includes/header.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/admin_logs.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/admin_logs.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/applications.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/applications.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/contacts.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/contacts.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/events.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/events.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/files.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/files.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/index.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/login.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/login.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/media.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/media.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/pages.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/pages.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/program_add.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/program_add.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/program_edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/program_edit.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/program_export.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/program_export.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/programs.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/programs.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/settings.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/settings.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/public/users.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/users.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/ClientActivityLogger.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/config.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/footer.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/functions.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/includes/header.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/.htaccess" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/about.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/api/events.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/api/newsletter_subscribe.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/api/programs.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/api/register_event.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/api/submit_application.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/api/submit_contact.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/apply.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/css/modern-framework.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/css/styles.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/images/about-image.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/images/hero-image.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/images/logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/images/placeholder.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/images/placeholder.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/js/homepage-enhanced.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/js/main.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/js/premium-ui.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/assets/js/programs.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/contact.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/event.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/events.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/index.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/privacy.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/program.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/program_categories.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/program_detail.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/programs.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/programs_api.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/public/terms.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Models/ApplicationModel.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Models/EventModel.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Models/ProgramModel.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/ApplicationService.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/ContactService.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/EventService.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/NewsletterService.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/ProgramService.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/newsletter_subscribe.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/register_event.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Services/submit_application.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Utils/FileUploader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Utils/FormValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/Utils/ResponseHandler.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logs/error.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/error.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shared/Core/Utilities.php" beforeDir="false" afterPath="$PROJECT_DIR$/shared/Core/Utilities.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/reports_debug.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/public/security_logs.php" beforeDir="false" afterPath="$PROJECT_DIR$/admin/public/security_logs.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/assets/css/style.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/assets/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/assets/js/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/includes/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/includes/config.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/includes/header.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/includes/header.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/public/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/index.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,78 +47,79 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Database Script.add_is_approved_to_testimonials.sql.executor&quot;: &quot;Run&quot;,
-    &quot;Database Script.add_login_security_columns.sql.executor&quot;: &quot;Run&quot;,
-    &quot;Database Script.chania_db.sql.executor&quot;: &quot;Run&quot;,
-    &quot;Database Script.insert_sample_data.sql.executor&quot;: &quot;Run&quot;,
-    &quot;Database Script.program_categories_simple.sql.executor&quot;: &quot;Run&quot;,
-    &quot;Database Script.program_categories_table.sql.executor&quot;: &quot;Run&quot;,
-    &quot;Database Script.sample_data_inserts.sql.executor&quot;: &quot;Run&quot;,
-    &quot;Database Script.sample_programs.sql.executor&quot;: &quot;Run&quot;,
-    &quot;Database Script.sample_programs_data.sql.executor&quot;: &quot;Run&quot;,
-    &quot;JavaScript Debug.event_add.php.executor&quot;: &quot;Run&quot;,
-    &quot;JavaScript Debug.login.php.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;PHP Script.ProgramService.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.check_admin_logs_table.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.check_db.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.check_programs_structure.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.check_schema.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.check_users_table.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.debug_fk_error.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.debug_foreign_key_fixed.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.diagnose_login.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.event.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.event_add.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.events.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.fix_login_schema.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.footer.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.header.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.index.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.login.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.program.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.program_add.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.program_categories.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.program_detail.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.programs.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.submit_application.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.test.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.test_db_connection.php.executor&quot;: &quot;Run&quot;,
-    &quot;PHP Script.update_login_schema.php.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/xampp/htdocs/chania&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.LLMThirdPartyAiProvidersConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Database Script.add_is_approved_to_testimonials.sql.executor": "Run",
+    "Database Script.add_login_security_columns.sql.executor": "Run",
+    "Database Script.chania_db.sql.executor": "Run",
+    "Database Script.insert_sample_data.sql.executor": "Run",
+    "Database Script.program_categories_simple.sql.executor": "Run",
+    "Database Script.program_categories_table.sql.executor": "Run",
+    "Database Script.sample_data_inserts.sql.executor": "Run",
+    "Database Script.sample_programs.sql.executor": "Run",
+    "Database Script.sample_programs_data.sql.executor": "Run",
+    "JavaScript Debug.event_add.php.executor": "Run",
+    "JavaScript Debug.login.php.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "PHP Script.ProgramService.php.executor": "Run",
+    "PHP Script.check_admin_logs_table.php.executor": "Run",
+    "PHP Script.check_db.php.executor": "Run",
+    "PHP Script.check_programs_structure.php.executor": "Run",
+    "PHP Script.check_schema.php.executor": "Run",
+    "PHP Script.check_users_table.php.executor": "Run",
+    "PHP Script.debug_fk_error.php.executor": "Run",
+    "PHP Script.debug_foreign_key_fixed.php.executor": "Run",
+    "PHP Script.diagnose_login.php.executor": "Run",
+    "PHP Script.event.php.executor": "Run",
+    "PHP Script.event_add.php.executor": "Run",
+    "PHP Script.events.php.executor": "Run",
+    "PHP Script.fix_login_schema.php.executor": "Run",
+    "PHP Script.footer.php.executor": "Run",
+    "PHP Script.header.php.executor": "Run",
+    "PHP Script.index.php.executor": "Run",
+    "PHP Script.login.php.executor": "Run",
+    "PHP Script.program.php.executor": "Run",
+    "PHP Script.program_add.php.executor": "Run",
+    "PHP Script.program_categories.php.executor": "Run",
+    "PHP Script.program_detail.php.executor": "Run",
+    "PHP Script.programs.php.executor": "Run",
+    "PHP Script.submit_application.php.executor": "Run",
+    "PHP Script.test.php.executor": "Run",
+    "PHP Script.test_db_connection.php.executor": "Run",
+    "PHP Script.update_login_schema.php.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/xampp/htdocs/chania/client/assets/images",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mariadb&quot;,
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mariadb",
+      "mysql"
     ],
-    &quot;RunConfigurationTargetLRU&quot;: [
-      &quot;2607924d-872a-4672-af22-d94f7bb51ebd&quot;,
-      &quot;787051ba-9847-424d-8f19-2c2412618329&quot;,
-      &quot;8b8640b5-2d9f-4cd9-99b2-4d75d1d118e8&quot;,
-      &quot;f106aa80-980c-44ba-acad-dcf089057c6c&quot;
+    "RunConfigurationTargetLRU": [
+      "2607924d-872a-4672-af22-d94f7bb51ebd",
+      "787051ba-9847-424d-8f19-2c2412618329",
+      "8b8640b5-2d9f-4cd9-99b2-4d75d1d118e8",
+      "f106aa80-980c-44ba-acad-dcf089057c6c"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\xampp\htdocs\chania\client\assets\images" />
       <recent name="C:\xampp\htdocs\chania\admin\public\assets\images" />
       <recent name="C:\xampp\htdocs\chania\client\public\assets\images" />
     </key>
@@ -190,7 +129,7 @@
       <recent name="C:\xampp\htdocs\chania\admin\public" />
     </key>
   </component>
-  <component name="RunManager" selected="Database Script.add_login_security_columns.sql">
+  <component name="RunManager">
     <configuration name="add_login_security_columns.sql" type="DatabaseScript" editBeforeRun="true" nameIsGenerated="true">
       <script-file value="$PROJECT_DIR$/admin/database/add_login_security_columns.sql" />
       <script-mode>FILE</script-mode>
@@ -294,7 +233,7 @@
       <workItem from="1753696952038" duration="5662000" />
       <workItem from="1753728047018" duration="14953000" />
       <workItem from="1753917780640" duration="142000" />
-      <workItem from="1753917933027" duration="400000" />
+      <workItem from="1753917933027" duration="5871000" />
     </task>
     <servers />
   </component>

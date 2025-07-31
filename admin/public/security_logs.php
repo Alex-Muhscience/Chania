@@ -2,19 +2,52 @@
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/SecurityLogger.php';
+require_once __DIR__ . '/../classes/BaseController.php';
 
-// Check for admin role
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    echo "<div class='alert alert-danger'>Access denied. You must be an administrator to view this page.</div>";
-    require_once __DIR__ . '/../includes/footer.php';
+// Initialize controller for permission checks
+$controller = new BaseController();
+
+// Check for admin permissions
+if (!$controller->hasPermission('*')) {
+    $_SESSION['flash_message'] = 'Access denied. You must be an administrator to view security logs.';
+    $_SESSION['flash_type'] = 'error';
+    header('Location: index.php');
     exit;
 }
 
-$db = (new Database())->connect();
-$logger = new SecurityLogger($db);
-
-// TODO: Implement pagination and filtering
-$logs = $logger->getLogs();
+try {
+    $db = (new Database())->connect();
+    $logger = new SecurityLogger($db);
+    
+    // Implement pagination
+    $page = max(1, (int)($_GET['page'] ?? 1));
+    $limit = 50;
+    $offset = ($page - 1) * $limit;
+    
+    // Get filters
+    $eventType = $_GET['event_type'] ?? '';
+    $severity = $_GET['severity'] ?? '';
+    $dateFrom = $_GET['date_from'] ?? '';
+    $dateTo = $_GET['date_to'] ?? '';
+    
+    // Get logs with filters and pagination
+    $logs = $logger->getLogs($limit, $offset, $eventType, $severity, $dateFrom, $dateTo);
+    $totalLogs = $logger->getLogsCount($eventType, $severity, $dateFrom, $dateTo);
+    $totalPages = ceil($totalLogs / $limit);
+    
+    // Get unique event types and severities for filters
+    $eventTypes = $logger->getUniqueEventTypes();
+    $severities = ['low', 'medium', 'high', 'critical'];
+    
+} catch (Exception $e) {
+    error_log('Security logs error: ' . $e->getMessage());
+    $_SESSION['flash_message'] = 'Error loading security logs. Please try again later.';
+    $_SESSION['flash_type'] = 'error';
+    $logs = [];
+    $totalLogs = 0;
+    $totalPages = 0;
+    $eventTypes = [];
+}
 
 ?>
 

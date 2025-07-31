@@ -5,15 +5,75 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all components
+    initTopbar();
     initNavbar();
     initBackToTop();
     initNewsletterForm();
     initAnimations();
     initCounters();
+    initLoadingSpinner();
 });
 
 /**
- * Navbar functionality
+ * Premium Topbar functionality
+ */
+function initTopbar() {
+    const topbar = document.getElementById('topbar');
+    const navbar = document.getElementById('mainNav');
+    if (!topbar || !navbar) return;
+
+    let lastScrollY = window.scrollY;
+    let topbarHeight = topbar.offsetHeight;
+
+    function handleTopbarScroll() {
+        const currentScrollY = window.scrollY;
+        
+        if (currentScrollY > 100) {
+            // Hide topbar when scrolling down
+            topbar.style.transform = 'translateY(-100%)';
+            topbar.style.opacity = '0';
+            navbar.style.top = '0';
+        } else {
+            // Show topbar when at top
+            topbar.style.transform = 'translateY(0)';
+            topbar.style.opacity = '1';
+            navbar.style.top = topbarHeight + 'px';
+        }
+        
+        lastScrollY = currentScrollY;
+    }
+
+    // Add transition styles
+    topbar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+    navbar.style.transition = 'top 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease';
+
+    // Throttle scroll event for better performance
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            requestAnimationFrame(function() {
+                handleTopbarScroll();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Social links hover effects
+    const socialLinks = document.querySelectorAll('.social-link');
+    socialLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px) scale(1.1)';
+        });
+        
+        link.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+}
+
+/**
+ * Enhanced Navbar functionality
  */
 function initNavbar() {
     const navbar = document.getElementById('mainNav');
@@ -52,6 +112,33 @@ function initNavbar() {
             }
         });
     });
+
+    // Enhanced nav link interactions
+    navLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('active')) {
+                this.style.transform = 'translateY(-1px)';
+            }
+        });
+        
+        link.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('active')) {
+                this.style.transform = 'translateY(0)';
+            }
+        });
+    });
+
+    // Premium CTA button effects
+    const ctaBtn = document.querySelector('.nav-cta-btn');
+    if (ctaBtn) {
+        ctaBtn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px) scale(1.02)';
+        });
+        
+        ctaBtn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    }
 }
 
 /**
@@ -241,6 +328,77 @@ function animateCounter(element) {
     requestAnimationFrame(update);
 }
 
+/**
+ * Loading Spinner
+ */
+function initLoadingSpinner() {
+    const spinner = document.getElementById('loading-spinner');
+    if (!spinner) return;
+
+    // Hide spinner after page load
+    window.addEventListener('load', function() {
+        spinner.style.opacity = '0';
+        setTimeout(() => {
+            spinner.style.display = 'none';
+        }, 300);
+    });
+
+    // Fallback: hide spinner after 3 seconds
+    setTimeout(() => {
+        if (spinner.style.display !== 'none') {
+            spinner.style.opacity = '0';
+            setTimeout(() => {
+                spinner.style.display = 'none';
+            }, 300);
+        }
+    }, 3000);
+}
+
+/**
+ * Enhanced Card Interactions
+ */
+function initCardInteractions() {
+    const cards = document.querySelectorAll('.program-card-premium, .popular-course-card, .testimonial-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+}
+
+/**
+ * Enhanced Button Interactions
+ */
+function initButtonInteractions() {
+    const buttons = document.querySelectorAll('.btn:not(.nav-cta-btn)');
+    
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            if (!this.disabled) {
+                this.style.transform = 'translateY(-1px)';
+                this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+            }
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '';
+        });
+    });
+}
+
+// Initialize enhanced interactions
+document.addEventListener('DOMContentLoaded', function() {
+    initCardInteractions();
+    initButtonInteractions();
+});
+
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -250,9 +408,10 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         const target = document.querySelector(href);
         if (target) {
             e.preventDefault();
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+            const offsetTop = target.offsetTop - 100; // Account for fixed header
+            window.scrollTo({
+                top: offsetTop,
+                behavior: 'smooth'
             });
         }
     });

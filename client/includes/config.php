@@ -2,8 +2,12 @@
 require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/Utilities.php';
 
-// Start session if not already started
+// Session security (must be set before session_start())
 if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.cookie_samesite', 'Lax');
     session_start();
 }
 
@@ -39,14 +43,6 @@ if (!isset($db)) {
 // Error reporting (disable in production)
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-
-// Session security (only set if session is not active)
-if (session_status() === PHP_SESSION_NONE) {
-    ini_set('session.cookie_httponly', 1);
-    ini_set('session.cookie_secure', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
-    ini_set('session.use_strict_mode', 1);
-    ini_set('session.cookie_samesite', 'Lax');
-}
 
 // Utility functions
 function formatDate($date, $format = 'M j, Y') {
