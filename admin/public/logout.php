@@ -16,7 +16,8 @@ if (ini_get("session.use_cookies")) {
 // Destroy the session
 session_destroy();
 
-// Redirect to login page
-header('Location: /chania/admin/public/login.php');
+// Redirect to login page using BASE_URL
+require_once __DIR__ . '/../includes/config.php';
+header('Location: ' . BASE_URL . '/admin/public/login.php');
 exit;
 ?>

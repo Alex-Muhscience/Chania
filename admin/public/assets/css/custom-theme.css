@@ -1,0 +1,299 @@
+/* 
+ * Custom Theme Override for Chania Finance Consultancy Admin Panel
+ * Matches client-side color scheme
+ */
+
+:root {
+  /* Client-side color variables */
+  --primary-color: #DA2525;
+  --primary-dark: #B31E1E;
+  --primary-light: #E55555;
+  --secondary-color: #2C3E50;
+  --secondary-dark: #1A252F;
+  --accent-blue: #3498DB;
+  --accent-green: #2ECC71;
+  --accent-orange: #F39C12;
+  --accent-purple: #9B59B6;
+}
+
+/* Override Bootstrap/SB Admin primary colors */
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+.btn-primary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(218, 37, 37, 0.25) !important;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+/* Update success color */
+.btn-success {
+  background-color: var(--accent-green) !important;
+  border-color: var(--accent-green) !important;
+}
+
+.btn-success:hover {
+  background-color: #27AE60 !important;
+  border-color: #27AE60 !important;
+}
+
+/* Update info color */
+.btn-info {
+  background-color: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
+}
+
+.btn-info:hover {
+  background-color: #2980B9 !important;
+  border-color: #2980B9 !important;
+}
+
+/* Update warning color */
+.btn-warning {
+  background-color: var(--accent-orange) !important;
+  border-color: var(--accent-orange) !important;
+}
+
+.btn-warning:hover {
+  background-color: #E67E22 !important;
+  border-color: #E67E22 !important;
+}
+
+/* Sidebar background with primary color */
+.sidebar {
+  background: linear-gradient(180deg, var(--primary-color) 10%, var(--primary-dark) 100%) !important;
+}
+
+.sidebar .sidebar-brand {
+  background-color: var(--primary-dark) !important;
+}
+
+/* Active nav link in sidebar */
+.sidebar .nav-item .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.sidebar .nav-item .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Progress bars */
+.progress-bar {
+  background-color: var(--primary-color) !important;
+}
+
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.bg-success {
+  background-color: var(--accent-green) !important;
+}
+
+.bg-info {
+  background-color: var(--accent-blue) !important;
+}
+
+.bg-warning {
+  background-color: var(--accent-orange) !important;
+}
+
+/* Text colors */
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.text-success {
+  color: var(--accent-green) !important;
+}
+
+.text-info {
+  color: var(--accent-blue) !important;
+}
+
+.text-warning {
+  color: var(--accent-orange) !important;
+}
+
+/* Border colors for cards */
+.border-left-primary {
+  border-left-color: var(--primary-color) !important;
+}
+
+.border-left-success {
+  border-left-color: var(--accent-green) !important;
+}
+
+.border-left-info {
+  border-left-color: var(--accent-blue) !important;
+}
+
+.border-left-warning {
+  border-left-color: var(--accent-orange) !important;
+}
+
+/* Links */
+a {
+  color: var(--primary-color) !important;
+}
+
+a:hover {
+  color: var(--primary-dark) !important;
+}
+
+/* Form controls focus */
+.form-control:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.2rem rgba(218, 37, 37, 0.25) !important;
+}
+
+/* Custom select focus */
+.custom-select:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 0.2rem rgba(218, 37, 37, 0.25) !important;
+}
+
+/* Pagination */
+.page-link {
+  color: var(--primary-color) !important;
+}
+
+.page-link:hover {
+  color: var(--primary-dark) !important;
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Badges */
+.badge-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.badge-success {
+  background-color: var(--accent-green) !important;
+}
+
+.badge-info {
+  background-color: var(--accent-blue) !important;
+}
+
+.badge-warning {
+  background-color: var(--accent-orange) !important;
+}
+
+/* Tables */
+.table-primary,
+.table-primary > td,
+.table-primary > th {
+  background-color: rgba(218, 37, 37, 0.1) !important;
+}
+
+/* Alerts */
+.alert-primary {
+  color: #721c24 !important;
+  background-color: rgba(218, 37, 37, 0.1) !important;
+  border-color: rgba(218, 37, 37, 0.2) !important;
+}
+
+.alert-success {
+  color: #155724 !important;
+  background-color: rgba(46, 204, 113, 0.1) !important;
+  border-color: rgba(46, 204, 113, 0.2) !important;
+}
+
+.alert-info {
+  color: #0c5460 !important;
+  background-color: rgba(52, 152, 219, 0.1) !important;
+  border-color: rgba(52, 152, 219, 0.2) !important;
+}
+
+.alert-warning {
+  color: #856404 !important;
+  background-color: rgba(243, 156, 18, 0.1) !important;
+  border-color: rgba(243, 156, 18, 0.2) !important;
+}
+
+/* Dropdown menu active item */
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--primary-color) !important;
+}
+
+/* Nav pills */
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: var(--primary-color) !important;
+}
+
+/* List group active item */
+.list-group-item.active {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Custom controls */
+.custom-control-input:checked ~ .custom-control-label::before {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: 0 0 0 0.2rem rgba(218, 37, 37, 0.25) !important;
+}
+
+/* Switch toggle */
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Range slider */
+.custom-range::-webkit-slider-thumb {
+  background-color: var(--primary-color) !important;
+}
+
+.custom-range::-moz-range-thumb {
+  background-color: var(--primary-color) !important;
+}
+
+.custom-range::-ms-thumb {
+  background-color: var(--primary-color) !important;
+}
+
+/* Topbar search */
+.topbar-search .form-control {
+  border-color: transparent !important;
+}
+
+.topbar-search .form-control:focus {
+  border-color: var(--primary-color) !important;
+}
+
+/* Card headers with primary background */
+.card-header.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+
+/* Charts and data visualization colors */
+.chart-area,
+.chart-bar,
+.chart-pie {
+  --primary: var(--primary-color);
+  --success: var(--accent-green);
+  --info: var(--accent-blue);
+  --warning: var(--accent-orange);
+}

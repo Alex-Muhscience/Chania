@@ -100,35 +100,35 @@
 
 /* Stats Cards */
 .border-left-primary {
-    border-left: 0.25rem solid #4e73df !important;
+    border-left: 0.25rem solid #DA2525 !important;
 }
 
 .border-left-success {
-    border-left: 0.25rem solid #1cc88a !important;
+    border-left: 0.25rem solid #2ECC71 !important;
 }
 
 .border-left-warning {
-    border-left: 0.25rem solid #f6c23e !important;
+    border-left: 0.25rem solid #F39C12 !important;
 }
 
 .border-left-info {
-    border-left: 0.25rem solid #36b9cc !important;
+    border-left: 0.25rem solid #3498DB !important;
 }
 
 .text-primary {
-    color: #4e73df !important;
+    color: #DA2525 !important;
 }
 
 .text-success {
-    color: #1cc88a !important;
+    color: #2ECC71 !important;
 }
 
 .text-warning {
-    color: #f6c23e !important;
+    color: #F39C12 !important;
 }
 
 .text-info {
-    color: #36b9cc !important;
+    color: #3498DB !important;
 }
 
 .text-gray-800 {
@@ -241,18 +241,18 @@
 
 /* Form Styles */
 .form-control:focus {
-    border-color: #4e73df;
-    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    border-color: #DA2525;
+    box-shadow: 0 0 0 0.2rem rgba(218, 37, 37, 0.25);
 }
 
 .btn-primary {
-    background-color: #4e73df;
-    border-color: #4e73df;
+    background-color: #DA2525;
+    border-color: #DA2525;
 }
 
 .btn-primary:hover {
-    background-color: #2e59d9;
-    border-color: #2653d4;
+    background-color: #B31E1E;
+    border-color: #B31E1E;
 }
 
 /* Table Styles */
@@ -275,8 +275,8 @@
 }
 
 .alert-success {
-    background-color: #d1edff;
-    color: #0c5460;
+    background-color: #d4edda;
+    color: #155724;
 }
 
 .alert-danger {

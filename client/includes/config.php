@@ -67,4 +67,59 @@ function truncateText($text, $limit = 150) {
     }
     return substr($text, 0, $limit) . '...';
 }
+
+// Language System
+$supported_languages = ['en', 'fr', 'es', 'de', 'pt', 'sw', 'ar', 'zh'];
+
+// Set default language
+if (!isset($_SESSION['lang'])) {
+    $_SESSION['lang'] = 'en';
+}
+
+// Change language if requested
+if (isset($_GET['lang']) && in_array($_GET['lang'], $supported_languages)) {
+    $_SESSION['lang'] = $_GET['lang'];
+    // Redirect to remove lang parameter from URL
+    $redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+    if (!empty($_GET)) {
+        $params = $_GET;
+        unset($params['lang']);
+        if (!empty($params)) {
+            $redirect_url .= '?' . http_build_query($params);
+        }
+    }
+    header('Location: ' . $redirect_url);
+    exit;
+}
+
+// Load language file
+$current_lang = $_SESSION['lang'];
+$lang_file = __DIR__ . "/../languages/{$current_lang}.php";
+if (file_exists($lang_file)) {
+    $lang_data = include $lang_file;
+} else {
+    // Fallback to English if language file doesn't exist
+    $lang_data = include __DIR__ . "/../languages/en.php";
+}
+
+// Language function
+function lang($key, $default = null) {
+    global $lang_data;
+    return $lang_data[$key] ?? $default ?? $key;
+}
+
+// Get language name and flag
+function getLanguageInfo($lang_code) {
+    $languages = [
+        'en' => ['name' => 'English', 'flag' => '🇺🇸'],
+        'fr' => ['name' => 'Français', 'flag' => '🇫🇷'],
+        'es' => ['name' => 'Español', 'flag' => '🇪🇸'],
+        'de' => ['name' => 'Deutsch', 'flag' => '🇩🇪'],
+        'pt' => ['name' => 'Português', 'flag' => '🇵🇹'],
+        'sw' => ['name' => 'Kiswahili', 'flag' => '🇰🇪'],
+        'ar' => ['name' => 'العربية', 'flag' => '🇸🇦'],
+        'zh' => ['name' => '中文', 'flag' => '🇨🇳']
+    ];
+    return $languages[$lang_code] ?? $languages['en'];
+}
 ?>

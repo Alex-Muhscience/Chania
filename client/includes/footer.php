@@ -88,24 +88,25 @@
             </div>
 
             <!-- Copyright -->
-            <div class="row py-3 border-top border-secondary">
+            <div class="row py-3 border-top border-secondary position-relative">
                 <div class="col-md-6">
                     <p class="text-light-gray mb-0">&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.</p>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <div class="footer-legal-links">
+                <div class="col-md-6 text-md-end d-flex align-items-center justify-content-md-end">
+                    <div class="footer-legal-links me-3">
                         <a href="<?php echo BASE_URL; ?>privacy" class="text-light-gray me-3">Privacy Policy</a>
                         <a href="<?php echo BASE_URL; ?>terms" class="text-light-gray">Terms of Service</a>
                     </div>
+                    <!-- Back to Top Button in Footer -->
+                    <button id="back-to-top-footer" class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+                            style="width: 40px; height: 40px; border: none;" title="Back to top">
+                        <i class="fas fa-arrow-up"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Back to Top Button -->
-    <button id="back-to-top" class="btn btn-primary btn-floating" title="Back to top">
-        <i class="fas fa-arrow-up"></i>
-    </button>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

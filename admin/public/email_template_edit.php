@@ -1,14 +1,15 @@
 <?php
-require_once '../../shared/Core/Database.php';
-require_once '../../shared/Core/EmailTemplate.php';
-require_once '../../shared/Core/User.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../../shared/Core/Database.php';
+require_once __DIR__ . '/../../shared/Core/EmailTemplate.php';
+require_once __DIR__ . '/../../shared/Core/User.php';
+require_once __DIR__ . '/../../shared/Core/Utilities.php';
 
-// Include header first to start session
-include '../includes/header.php';
+session_start();
 
 // Check if user is logged in and has permission
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    Utilities::redirect('/admin/public/login.php');
     exit();
 }
 
@@ -19,9 +20,11 @@ $userModel = new User($db);
 // Check for permission
 if (!$userModel->hasPermission($_SESSION['user_id'], 'templates') && !$userModel->hasPermission($_SESSION['user_id'], '*')) {
      $_SESSION['error'] = "You don't have permission to access this resource.";
-     header('Location: index.php');
+     Utilities::redirect('/admin/public/index.php');
      exit();
 }
+
+require_once __DIR__ . '/../includes/header.php';
 
 $emailTemplate = new EmailTemplate($db);
 
@@ -65,7 +68,7 @@ if ($_POST) {
                 // Get the newly created template
                 $newTemplate = $emailTemplate->getByName($data['name']);
                 if ($newTemplate) {
-                    header('Location: email_template_edit.php?id=' . $newTemplate['id']);
+                    Utilities::redirect('/admin/public/email_template_edit.php?id=' . $newTemplate['id']);
                     exit();
                 }
             } else {

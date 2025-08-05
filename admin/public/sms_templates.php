@@ -1,11 +1,13 @@
 <?php
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/User.php';
+require_once __DIR__ . '/../../shared/Core/Utilities.php';
 
-require_once __DIR__ . '/../includes/header.php';
+session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    Utilities::redirect('/admin/public/login.php');
     exit();
 }
 
@@ -16,9 +18,11 @@ $userModel = new User($db);
 // Check permission
 if (!$userModel->hasPermission($_SESSION['user_id'], 'sms') && !$userModel->hasPermission($_SESSION['user_id'], '*')) {
     $_SESSION['error'] = "You don't have permission to access this resource.";
-    header('Location: index.php');
+    Utilities::redirect('/admin/public/index.php');
     exit();
 }
+
+require_once __DIR__ . '/../includes/header.php';
 
 // Handle actions
 $message = '';

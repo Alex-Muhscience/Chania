@@ -179,11 +179,14 @@ class ProgramsController extends BaseController {
     }
 
     private function handleProgramCreation() {
-        $requiredFields = ['title', 'description', 'duration', 'fee'];
+        $requiredFields = ['title', 'description', 'duration'];
         $errors = $this->validateRequired($_POST, $requiredFields);
 
         if (empty($errors)) {
             try {
+                $this->db->beginTransaction();
+                
+                // Create basic program
                 $programData = $this->sanitizeInput($_POST);
                 $stmt = $this->db->prepare("
                     INSERT INTO programs (title, description, duration, fee, is_active, created_at) 
@@ -193,8 +196,31 @@ class ProgramsController extends BaseController {
                     $programData['title'],
                     $programData['description'],
                     $programData['duration'],
-                    $programData['fee']
+                    $programData['fee'] ?? 0
                 ]);
+                
+                $programId = $this->db->lastInsertId();
+                
+                // Create program info if provided
+                if (!empty($programData['introduction']) || !empty($programData['objectives'])) {
+                    $stmt = $this->db->prepare("
+                        INSERT INTO program_info (program_id, introduction, objectives, target_audience, prerequisites, 
+                                                course_content, general_notes, certification_details, created_at) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    $stmt->execute([
+                        $programId,
+                        $programData['introduction'] ?? '',
+                        $programData['objectives'] ?? '',
+                        $programData['target_audience'] ?? '',
+                        $programData['prerequisites'] ?? '',
+                        $programData['course_content'] ?? '',
+                        $programData['general_notes'] ?? '',
+                        $programData['certification_details'] ?? ''
+                    ]);
+                }
+                
+                $this->db->commit();
                 
                 if ($result) {
                     $this->redirect(BASE_URL . '/admin/programs.php', 'Program created successfully.');
@@ -202,6 +228,7 @@ class ProgramsController extends BaseController {
                     $this->addError('Failed to create program.');
                 }
             } catch (Exception $e) {
+                $this->db->rollBack();
                 $this->addError('Error creating program: ' . $e->getMessage());
             }
         } else {
@@ -210,12 +237,16 @@ class ProgramsController extends BaseController {
     }
 
     private function handleProgramUpdate($programId) {
-        $requiredFields = ['title', 'description', 'duration', 'fee'];
+        $requiredFields = ['title', 'description', 'duration'];
         $errors = $this->validateRequired($_POST, $requiredFields);
 
         if (empty($errors)) {
             try {
+                $this->db->beginTransaction();
+                
                 $programData = $this->sanitizeInput($_POST);
+                
+                // Update basic program
                 $stmt = $this->db->prepare("
                     UPDATE programs 
                     SET title = ?, description = ?, duration = ?, fee = ?, updated_at = NOW() 
@@ -225,9 +256,51 @@ class ProgramsController extends BaseController {
                     $programData['title'],
                     $programData['description'],
                     $programData['duration'],
-                    $programData['fee'],
+                    $programData['fee'] ?? 0,
                     $programId
                 ]);
+                
+                // Update or create program info
+                $stmt = $this->db->prepare("SELECT id FROM program_info WHERE program_id = ?");
+                $stmt->execute([$programId]);
+                $infoExists = $stmt->fetchColumn();
+                
+                if ($infoExists) {
+                    $stmt = $this->db->prepare("
+                        UPDATE program_info 
+                        SET introduction = ?, objectives = ?, target_audience = ?, prerequisites = ?, 
+                            course_content = ?, general_notes = ?, certification_details = ?, updated_at = NOW()
+                        WHERE program_id = ?
+                    ");
+                    $stmt->execute([
+                        $programData['introduction'] ?? '',
+                        $programData['objectives'] ?? '',
+                        $programData['target_audience'] ?? '',
+                        $programData['prerequisites'] ?? '',
+                        $programData['course_content'] ?? '',
+                        $programData['general_notes'] ?? '',
+                        $programData['certification_details'] ?? '',
+                        $programId
+                    ]);
+                } else {
+                    $stmt = $this->db->prepare("
+                        INSERT INTO program_info (program_id, introduction, objectives, target_audience, prerequisites, 
+                                                course_content, general_notes, certification_details, created_at) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                    ");
+                    $stmt->execute([
+                        $programId,
+                        $programData['introduction'] ?? '',
+                        $programData['objectives'] ?? '',
+                        $programData['target_audience'] ?? '',
+                        $programData['prerequisites'] ?? '',
+                        $programData['course_content'] ?? '',
+                        $programData['general_notes'] ?? '',
+                        $programData['certification_details'] ?? ''
+                    ]);
+                }
+                
+                $this->db->commit();
                 
                 if ($result) {
                     $this->redirect(BASE_URL . '/admin/programs.php', 'Program updated successfully.');
@@ -235,6 +308,7 @@ class ProgramsController extends BaseController {
                     $this->addError('Failed to update program.');
                 }
             } catch (Exception $e) {
+                $this->db->rollBack();
                 $this->addError('Error updating program: ' . $e->getMessage());
             }
         } else {

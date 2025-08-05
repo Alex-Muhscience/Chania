@@ -15,7 +15,7 @@ if (isset($_SESSION['login_attempts'])) {
     if ($_SESSION['login_attempts'] >= MAX_LOGIN_ATTEMPTS) {
         if (time() - $_SESSION['last_login_attempt'] < LOGIN_LOCKOUT_TIME) {
             $_SESSION['error_message'] = "Too many login attempts. Please try again later.";
-            Utilities::redirect('/admin/login.php');
+            Utilities::redirect('/admin/public/login.php');
         } else {
             // Reset attempts after timeout
             unset($_SESSION['login_attempts']);
@@ -27,7 +27,7 @@ if (isset($_SESSION['login_attempts'])) {
 // Redirect to log in if not authenticated
 if (!Utilities::isLoggedIn()) {
     $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'] ?? '/admin/index.php';
-    Utilities::redirect(BASE_URL . 'admin/login.php');
+    Utilities::redirect('/admin/public/login.php');
     exit;
 }
 
@@ -38,7 +38,7 @@ $restrictedPages = ['users.php', 'logs.php', 'settings.php'];
 
 if (in_array($currentPage, $restrictedPages) && !in_array($_SESSION['role'], $allowedRoles)) {
     $_SESSION['error_message'] = "You don't have permission to access this page.";
-    Utilities::redirect('/admin/index.php');
+    Utilities::redirect('/admin/public/index.php');
     exit;
 }
 
@@ -75,7 +75,7 @@ if (isset($_GET['logout'])) {
     ]);
 
     session_destroy();
-    Utilities::redirect('/admin/login.php');
+    Utilities::redirect('/admin/public/login.php');
     exit;
 }
 

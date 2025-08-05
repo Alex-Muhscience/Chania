@@ -50,43 +50,91 @@ include '../includes/header.php';
                         <li class="breadcrumb-item active" aria-current="page">About Us</li>
                     </ol>
                 </nav>
-                <h1 class="text-white mb-4" data-aos="fade-up">About Chania Skills for Africa</h1>
-                <p class="text-white-50 fs-5 mb-0" data-aos="fade-up" data-aos-delay="200">
+                <h1 class="text-black mb-4" data-aos="fade-up">About Chania Skills for Africa</h1>
+                <p class="text-black-50 fs-5 mb-0" data-aos="fade-up" data-aos-delay="200">
                     Empowering communities across Africa through transformative skills development, innovative training programs, and sustainable capacity building initiatives.
                 </p>
             </div>
         </div>
-        
-        <div class="row mt-5">
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="header-stats">
-                    <div class="stat-item">
-                        <div class="stat-number"><?php echo $achievements['total_programs'] ?: '25'; ?>+</div>
-                        <div class="stat-label">Training Programs</div>
+    </div>
+</section>
+
+<!-- Hero Story Section -->
+<section class="py-5 bg-light-gray">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="pe-lg-4">
+                    <div class="badge bg-primary bg-opacity-10 text-black mb-3 px-3 py-2">
+                        <i class="fas fa-heart me-2"></i>Our Story
+                    </div>
+                    <h2 class="display-6 fw-bold mb-4">Transforming Lives Through Skills Development</h2>
+                    <p class="fs-5 text-muted mb-4">
+                        Founded with a simple yet powerful belief: every individual deserves access to quality skills training that can transform their future and uplift entire communities across Africa.
+                    </p>
+                    <p class="mb-4">
+                        Since our inception, we've been bridging the critical skills gap in technology, business, agriculture, and healthcare sectors, creating pathways to prosperity for thousands of African youth and professionals.
+                    </p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Established</small>
+                                    <strong>2015</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Headquarters</small>
+                                    <strong>Nairobi, Kenya</strong>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
-                <div class="header-stats">
-                    <div class="stat-item">
-                        <div class="stat-number"><?php echo number_format($achievements['successful_graduates'] ?: 5000); ?>+</div>
-                        <div class="stat-label">Lives Transformed</div>
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                <div class="position-relative">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <img src="https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=600&h=300&fit=crop&crop=center" 
+                                 alt="Students in training session" 
+                                 class="img-fluid rounded-3 shadow-lg w-100" 
+                                 style="height: 250px; object-fit: cover;">
+                        </div>
+                        <div class="col-6">
+                            <img src="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=300&h=200&fit=crop&crop=center" 
+                                 alt="Technology training" 
+                                 class="img-fluid rounded-3 shadow-sm w-100" 
+                                 style="height: 150px; object-fit: cover;">
+                        </div>
+                        <div class="col-6">
+                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=300&h=200&fit=crop&crop=center" 
+                                 alt="Collaborative learning" 
+                                 class="img-fluid rounded-3 shadow-sm w-100" 
+                                 style="height: 150px; object-fit: cover;">
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="500">
-                <div class="header-stats">
-                    <div class="stat-item">
-                        <div class="stat-number"><?php echo $achievements['events_conducted'] ?: '150'; ?>+</div>
-                        <div class="stat-label">Events Conducted</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="600">
-                <div class="header-stats">
-                    <div class="stat-item">
-                        <div class="stat-number">15+</div>
-                        <div class="stat-label">Countries Served</div>
+                    <!-- Floating stats card -->
+                    <div class="position-absolute bottom-0 start-0 translate-middle-x bg-white rounded-3 shadow-lg p-4" style="width: 250px;">
+                        <div class="row g-2 text-center">
+                            <div class="col-6">
+                                <div class="text-primary fw-bold fs-4">9+</div>
+                                <small class="text-muted">Years Impact</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-success fw-bold fs-4">15+</div>
+                                <small class="text-muted">Countries</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,30 +148,52 @@ include '../includes/header.php';
         <div class="row align-items-center mb-5">
             <div class="col-lg-6" data-aos="fade-right">
                 <div class="pe-lg-4">
-                    <h2 class="section-title mb-4">Our Mission</h2>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary text-black rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-bullseye fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title mb-1">Our Mission</h2>
+                            <p class="text-primary mb-0">Empowering Communities</p>
+                        </div>
+                    </div>
                     <p class="fs-5 text-muted mb-4">
                         To empower communities across Africa by providing accessible, high-quality skills training that transforms lives, creates opportunities, and drives sustainable economic development.
                     </p>
                     <p class="mb-4">
-                        We believe that every individual deserves the opportunity to unlock their potential through education and skills development. Our comprehensive programs are designed to bridge the skills gap in critical sectors including technology, business, agriculture, and healthcare.
+                        We believe that every individual deserves the opportunity to unlock their potential through education and skills development. Our comprehensive programs are designed to bridge the skills gap in critical sectors.
                     </p>
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                                <i class="fas fa-target fa-lg"></i>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center p-3 bg-light rounded-3">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                    <i class="fas fa-target"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">Impact-Driven Approach</h6>
+                                    <small class="text-muted">Measurable outcomes and real-world applications</small>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-1">Impact-Driven Approach</h6>
-                            <p class="text-muted mb-0">Every program is designed with measurable outcomes and real-world applications.</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
                 <div class="position-relative">
-                    <img src="https://via.placeholder.com/600x400?text=Our+Mission" alt="Our Mission" class="img-fluid rounded-3 shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop&crop=center" 
+                         alt="Students collaborating on projects" 
+                         class="img-fluid rounded-3 shadow-lg main-image">
                     <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary opacity-10 rounded-3"></div>
+                    <!-- Mission highlight card -->
+                    <div class="position-absolute bottom-0 end-0 translate-middle bg-white rounded-3 shadow-lg p-3 me-3" style="width: 200px;">
+                        <div class="text-center">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 50px; height: 50px;">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="text-primary fw-bold fs-5">5,000+</div>
+                            <small class="text-muted">Lives Transformed</small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -131,7 +201,15 @@ include '../includes/header.php';
         <div class="row align-items-center">
             <div class="col-lg-6 order-lg-2" data-aos="fade-left">
                 <div class="ps-lg-4">
-                    <h2 class="section-title mb-4">Our Vision</h2>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                            <i class="fas fa-eye fa-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title mb-1">Our Vision</h2>
+                            <p class="text-secondary mb-0">Leading Africa's Future</p>
+                        </div>
+                    </div>
                     <p class="fs-5 text-muted mb-4">
                         To be Africa's leading skills development organization, creating a continent where every individual has access to quality education and training opportunities that enable them to thrive in the global economy.
                     </p>
@@ -140,14 +218,14 @@ include '../includes/header.php';
                     </p>
                     <div class="row g-3">
                         <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded-3">
+                            <div class="text-center p-3 bg-light rounded-3 h-100">
                                 <i class="fas fa-globe-africa text-primary fa-2x mb-2"></i>
                                 <h6 class="mb-1">Pan-African</h6>
                                 <small class="text-muted">Reach</small>
                             </div>
                         </div>
                         <div class="col-6">
-                            <div class="text-center p-3 bg-light rounded-3">
+                            <div class="text-center p-3 bg-light rounded-3 h-100">
                                 <i class="fas fa-users text-primary fa-2x mb-2"></i>
                                 <h6 class="mb-1">Community</h6>
                                 <small class="text-muted">Focused</small>
@@ -158,8 +236,138 @@ include '../includes/header.php';
             </div>
             <div class="col-lg-6 order-lg-1" data-aos="fade-right" data-aos-delay="200">
                 <div class="position-relative">
-                    <img src="https://via.placeholder.com/600x400?text=Our+Vision" alt="Our Vision" class="img-fluid rounded-3 shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=600&h=400&fit=crop&crop=center" 
+                         alt="African students in technology lab" 
+                         class="img-fluid rounded-3 shadow-lg main-image">
                     <div class="position-absolute top-0 start-0 w-100 h-100 bg-secondary opacity-10 rounded-3"></div>
+                    <!-- Vision highlight card -->
+                    <div class="position-absolute top-0 start-0 translate-middle bg-white rounded-3 shadow-lg p-3 ms-3" style="width: 180px;">
+                        <div class="text-center">
+                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 50px; height: 50px;">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="text-secondary fw-bold fs-5">25+</div>
+                            <small class="text-muted">Programs</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Impact Showcase Section -->
+<section class="py-5 bg-light-gray">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center" data-aos="fade-up">
+                <h2 class="section-title">Our Impact in Action</h2>
+                <p class="section-subtitle text-muted">
+                    See how we're transforming communities across Africa through skills development
+                </p>
+            </div>
+        </div>
+        
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-7" data-aos="fade-right">
+                <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=700&h=450&fit=crop&crop=center" 
+                         alt="Agricultural training program in rural Kenya" 
+                         class="img-fluid rounded-3 shadow-lg w-100" 
+                         style="height: 400px; object-fit: cover;">
+                    <!-- Play button overlay -->
+                    <div class="position-absolute top-50 start-50 translate-middle">
+                        <button class="btn btn-primary btn-lg rounded-circle" style="width: 80px; height: 80px;">
+                            <i class="fas fa-play fs-4"></i>
+                        </button>
+                    </div>
+                    <!-- Success badge -->
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="badge bg-success px-3 py-2 rounded-pill">
+                            <i class="fas fa-check me-1"></i>Success Story
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5" data-aos="fade-left" data-aos-delay="200">
+                <div class="ps-lg-4">
+                    <div class="badge bg-success bg-opacity-10 text-success mb-3 px-3 py-2">
+                        <i class="fas fa-seedling me-2"></i>Agriculture Program
+                    </div>
+                    <h3 class="mb-4">Transforming Rural Farming in Kenya</h3>
+                    <p class="text-muted mb-4">
+                        Our agricultural training program has helped over 2,000 farmers in rural Kenya adopt modern farming techniques, increasing their yield by an average of 40% and improving their livelihoods significantly.
+                    </p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 bg-white rounded-3 text-center">
+                                <div class="text-success fw-bold fs-4">2,000+</div>
+                                <small class="text-muted">Farmers Trained</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-white rounded-3 text-center">
+                                <div class="text-success fw-bold fs-4">40%</div>
+                                <small class="text-muted">Yield Increase</small>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-success">
+                        <i class="fas fa-arrow-right me-2"></i>Read Full Story
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row align-items-center">
+            <div class="col-lg-5 order-lg-1" data-aos="fade-right">
+                <div class="pe-lg-4">
+                    <div class="badge bg-primary bg-opacity-10 text-black mb-3 px-3 py-2">
+                        <i class="fas fa-code me-2"></i>Technology Program
+                    </div>
+                    <h3 class="mb-4">Building Tech Talent in Nigeria</h3>
+                    <p class="text-muted mb-4">
+                        Our coding bootcamp in Lagos has graduated over 1,500 software developers, with 85% securing employment within 6 months of completion. These graduates are now contributing to Nigeria's growing tech ecosystem.
+                    </p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 bg-white rounded-3 text-center">
+                                <div class="text-primary fw-bold fs-4">1,500+</div>
+                                <small class="text-muted">Developers</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-white rounded-3 text-center">
+                                <div class="text-primary fw-bold fs-4">85%</div>
+                                <small class="text-muted">Employment Rate</small>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-2"></i>View Program
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-7 order-lg-2" data-aos="fade-left" data-aos-delay="200">
+                <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=700&h=450&fit=crop&crop=center" 
+                         alt="Software development training in Lagos, Nigeria" 
+                         class="img-fluid rounded-3 shadow-lg w-100" 
+                         style="height: 400px; object-fit: cover;">
+                    <!-- Achievement badge -->
+                    <div class="position-absolute bottom-0 start-0 m-3">
+                        <div class="bg-white rounded-3 shadow-sm p-3" style="width: 200px;">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Award Winner</div>
+                                    <small class="text-muted">Best Tech Program 2023</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

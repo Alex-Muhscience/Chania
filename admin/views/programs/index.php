@@ -75,6 +75,11 @@
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        
+                                        <a href="<?= BASE_URL ?>/admin/public/enhanced_programs.php?action=schedules&program_id=<?= $program['id'] ?>"
+                                           class="btn btn-sm btn-outline-info" title="Manage Schedules">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </a>
 
                                         <form method="POST" style="display: inline;">
                                             <input type="hidden" name="action" value="toggle_status">

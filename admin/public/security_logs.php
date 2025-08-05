@@ -1,17 +1,34 @@
 <?php
-require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/SecurityLogger.php';
-require_once __DIR__ . '/../classes/BaseController.php';
 
-// Initialize controller for permission checks
-$controller = new BaseController();
+// Ensure session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check authentication
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    // Store the current URL for redirect after login
+    if (isset($_SERVER['REQUEST_URI'])) {
+        $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
+    }
+    
+    // Redirect to login page
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $loginUrl = $protocol . $host . '/chania/admin/public/login.php';
+    
+    header('Location: ' . $loginUrl);
+    exit;
+}
 
 // Check for admin permissions
-if (!$controller->hasPermission('*')) {
+if (!isset($_SESSION['permissions']) || !in_array('*', $_SESSION['permissions'])) {
     $_SESSION['flash_message'] = 'Access denied. You must be an administrator to view security logs.';
     $_SESSION['flash_type'] = 'error';
-    header('Location: index.php');
+    header('Location: ' . BASE_URL . '/admin/public/index.php');
     exit;
 }
 
@@ -49,6 +66,8 @@ try {
     $eventTypes = [];
 }
 
+// Include header after authentication checks
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="container-fluid px-4">

@@ -86,30 +86,49 @@ $category_info = [
 include '../includes/header.php';
 ?>
 
-<!-- Page Header -->
-<section class="page-header bg-gradient-primary position-relative overflow-hidden">
-    <div class="header-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
+<!-- Modern Page Header -->
+<section class="page-header bg-primary position-relative overflow-hidden py-5">
+    <!-- Animated Background Shapes -->
+    <div class="position-absolute top-0 start-0 w-100 h-100">
+        <div class="shape-floating shape-1 position-absolute bg-white" style="opacity: 0.1; width: 120px; height: 120px; border-radius: 50%; top: 10%; left: 5%; animation: float 6s ease-in-out infinite;"></div>
+        <div class="shape-floating shape-2 position-absolute bg-white" style="opacity: 0.08; width: 100px; height: 100px; border-radius: 50%; top: 60%; right: 10%; animation: float 8s ease-in-out infinite reverse;"></div>
+        <div class="shape-floating shape-3 position-absolute bg-white" style="opacity: 0.05; width: 80px; height: 80px; border-radius: 50%; top: 30%; right: 30%; animation: float 10s ease-in-out infinite;"></div>
     </div>
+    
     <div class="container position-relative">
-        <div class="row align-items-center py-5">
-            <div class="col-lg-8">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-3">
-                        <li class="breadcrumb-item"><a href="<?php echo BASE_URL; ?>" class="text-white-50">Home</a></li>
-                        <li class="breadcrumb-item active text-white" aria-current="page">Training Fields</li>
+        <div class="row align-items-center">
+            <div class="col-lg-8" data-aos="fade-up">
+                <!-- Enhanced Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="<?php echo BASE_URL; ?>" class="text-white-50 text-decoration-none">
+                                <i class="fas fa-home me-2"></i>Home
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">
+                            <i class="fas fa-graduation-cap me-2"></i>Training Fields
+                        </li>
                     </ol>
                 </nav>
-                <h1 class="display-4 text-white fw-bold mb-3">Training Fields</h1>
-                <p class="lead text-white-75 mb-0">Explore our diverse range of intensive short courses designed to match your career goals. Learn new skills in just 2-5 days with our online training programs.</p>
+                
+                <!-- Enhanced Title Section -->
+                <h1 class="display-4 text-white fw-bold mb-4">
+                    Training Fields
+                </h1>
+                <p class="lead text-white-75 mb-4">
+                    Choose from our specialized training fields and master new skills with intensive, practical courses designed for quick results.
+                </p>
             </div>
-            <div class="col-lg-4 text-end">
-                <div class="header-stats">
-                    <div class="stat-item">
-                        <div class="stat-number"><?php echo array_sum(array_column($categories, 'program_count')); ?>+</div>
-                        <div class="stat-label">Total Programs</div>
+            
+            <div class="col-lg-4 text-end" data-aos="fade-left" data-aos-delay="200">
+                <!-- Enhanced Stats Card -->
+                <div class="stats-card bg-white bg-opacity-10 backdrop-blur rounded-3 p-4 text-white">
+                    <div class="text-center">
+                        <div class="display-5 fw-bold text-warning"><?php echo array_sum(array_column($categories, 'program_count')); ?>+</div>
+                        <div class="small">Training Programs</div>
+                        <hr class="my-3 border-white-50">
+                        <div class="small opacity-75"><?php echo count($categories); ?> Specialized Fields</div>
                     </div>
                 </div>
             </div>
@@ -129,7 +148,7 @@ include '../includes/header.php';
             </div>
         </div>
         
-        <div class="row">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4">
             <?php foreach ($categories as $index => $category): ?>
                 <?php 
                 $cat_key = strtolower($category['category']);
@@ -137,62 +156,52 @@ include '../includes/header.php';
                     'title' => ucfirst($category['category']),
                     'description' => 'Comprehensive training programs in ' . $category['category'],
                     'icon' => 'fas fa-bookmark',
-                    'color' => 'primary',
-                    'gradient' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                    'color' => 'primary'
                 ];
                 ?>
-                <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="<?php echo ($index + 1) * 100; ?>">
-                    <div class="training-field-card h-100">
-                        <div class="field-header" style="background: <?php echo $info['gradient']; ?>">
-                            <div class="field-icon">
-                                <i class="<?php echo $info['icon']; ?>"></i>
-                            </div>
-                            <div class="field-info">
-                                <h3 class="field-title"><?php echo $info['title']; ?></h3>
-                                <div class="field-stats">
-                                    <span class="program-count"><?php echo $category['program_count']; ?> Short Courses</span>
+                <div class="col" data-aos="fade-up" data-aos-delay="<?php echo ($index + 1) * 100; ?>">
+                    <div class="card h-100 shadow-sm border-0 training-field-card">
+                        <div class="card-body p-4 text-center">
+                            <div class="training-icon mb-3">
+                                <div class="icon-wrapper bg-<?php echo $info['color']; ?> bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                    <i class="<?php echo $info['icon']; ?> fs-1 text-<?php echo $info['color']; ?>"></i>
                                 </div>
                             </div>
-                        </div>
-                        <div class="field-body">
-                            <p class="field-description"><?php echo $info['description']; ?></p>
                             
-                            <div class="field-highlights">
-                                <h6 class="mb-3">What You'll Learn:</h6>
-                                <ul class="highlight-list">
+                            <h5 class="card-title mb-2"><?php echo $info['title']; ?></h5>
+                            <span class="badge bg-<?php echo $info['color']; ?> bg-opacity-10 text-<?php echo $info['color']; ?> mb-3">
+                                <?php echo $category['program_count']; ?> Courses
+                            </span>
+                            
+                            <p class="card-text text-muted small mb-3"><?php echo substr($info['description'], 0, 100) . '...'; ?></p>
+                            
+                            <div class="training-highlights mb-4">
+                                <ul class="list-unstyled small text-start">
                                     <?php if ($cat_key === 'technology'): ?>
-                                        <li>Web & Mobile Development</li>
-                                        <li>Data Science & Analytics</li>
-                                        <li>Artificial Intelligence</li>
-                                        <li>Cybersecurity</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Web Development</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Data Science</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Cybersecurity</li>
                                     <?php elseif ($cat_key === 'business'): ?>
-                                        <li>Digital Marketing</li>
-                                        <li>Project Management</li>
-                                        <li>Entrepreneurship</li>
-                                        <li>Financial Management</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Digital Marketing</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Project Management</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Entrepreneurship</li>
                                     <?php elseif ($cat_key === 'agriculture'): ?>
-                                        <li>Smart Farming Techniques</li>
-                                        <li>Sustainable Agriculture</li>
-                                        <li>Crop Management</li>
-                                        <li>Agribusiness</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Smart Farming</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Sustainable Practices</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Agribusiness</li>
                                     <?php elseif ($cat_key === 'healthcare'): ?>
-                                        <li>Healthcare Management</li>
-                                        <li>Medical Technology</li>
-                                        <li>Patient Care Systems</li>
-                                        <li>Health Informatics</li>
-                                    <?php else: ?>
-                                        <li>Industry-relevant skills</li>
-                                        <li>Practical applications</li>
-                                        <li>Professional development</li>
-                                        <li>Career advancement</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Healthcare Management</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Medical Technology</li>
+                                        <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Health Informatics</li>
                                     <?php endif; ?>
                                 </ul>
                             </div>
                         </div>
-                        <div class="field-footer">
+                        
+                        <div class="card-footer bg-transparent px-4 pb-4 pt-0">
                             <a href="<?php echo BASE_URL; ?>programs.php?category=<?php echo $category['category']; ?>" 
-                               class="btn btn-<?php echo $info['color']; ?> w-100">
-                                <i class="fas fa-arrow-right me-2"></i>Explore <?php echo $info['title']; ?> Courses
+                               class="btn btn-<?php echo $info['color']; ?> btn-sm w-100">
+                                <i class="fas fa-arrow-right me-2"></i>View Courses
                             </a>
                         </div>
                     </div>
@@ -214,41 +223,49 @@ include '../includes/header.php';
             </div>
         </div>
         
-        <div class="row">
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="feature-card text-center">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-industry"></i>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <div class="col" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-industry text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h5 class="card-title">Industry-Aligned</h5>
+                        <p class="card-text text-muted">Curriculum developed with industry partners to ensure relevance and employability.</p>
                     </div>
-                    <h5 class="feature-title">Industry-Aligned</h5>
-                    <p class="feature-description">Curriculum developed with industry partners to ensure relevance and employability.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="feature-card text-center">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-hands-helping"></i>
+            <div class="col" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-bolt text-warning" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h5 class="card-title">Quick Results</h5>
+                        <p class="card-text text-muted">Complete courses in 2-14 weeks and start applying new skills immediately.</p>
                     </div>
-                    <h5 class="feature-title">Quick Results</h5>
-                    <p class="feature-description">Complete courses in 2-5 days and start applying new skills immediately.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="feature-card text-center">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-users"></i>
+            <div class="col" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-users text-success" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h5 class="card-title">Expert Instructors</h5>
+                        <p class="card-text text-muted">Learn from experienced professionals and industry experts.</p>
                     </div>
-                    <h5 class="feature-title">Expert Instructors</h5>
-                    <p class="feature-description">Learn from experienced professionals and industry experts.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
-                <div class="feature-card text-center">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-certificate"></i>
+            <div class="col" data-aos="fade-up" data-aos-delay="400">
+                <div class="card h-100 border-0 shadow-sm text-center">
+                    <div class="card-body p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-laptop text-info" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h5 class="card-title">Online Flexibility</h5>
+                        <p class="card-text text-muted">100% online courses that fit your schedule. Learn at your own pace.</p>
                     </div>
-                    <h5 class="feature-title">Online Flexibility</h5>
-                    <p class="feature-description">100% online courses that fit your schedule. Learn at your own pace.</p>
                 </div>
             </div>
         </div>
@@ -267,35 +284,39 @@ include '../includes/header.php';
             </div>
         </div>
         
-        <div class="row">
-            <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="pathway-card">
-                    <div class="pathway-header">
-                        <i class="fas fa-rocket text-primary"></i>
-                        <h5>Entry Level Positions</h5>
+        <div class="row row-cols-1 row-cols-lg-2 g-4">
+            <div class="col" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 border-start border-primary border-4 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-rocket text-primary fs-3 me-3"></i>
+                            <h5 class="card-title mb-0">Entry Level Positions</h5>
+                        </div>
+                        <p class="card-text text-muted">Start your career with foundational roles that provide growth opportunities and skill development.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Junior Developer / Analyst</li>
+                            <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Marketing Assistant</li>
+                            <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Agricultural Technician</li>
+                            <li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>Healthcare Support Staff</li>
+                        </ul>
                     </div>
-                    <p>Start your career with foundational roles that provide growth opportunities and skill development.</p>
-                    <ul class="pathway-list">
-                        <li>Junior Developer / Analyst</li>
-                        <li>Marketing Assistant</li>
-                        <li>Agricultural Technician</li>
-                        <li>Healthcare Support Staff</li>
-                    </ul>
                 </div>
             </div>
-            <div class="col-lg-6 mb-4" data-aos="fade-up" data-aos-delay="200">
-                <div class="pathway-card">
-                    <div class="pathway-header">
-                        <i class="fas fa-trophy text-warning"></i>
-                        <h5>Advanced Positions</h5>
+            <div class="col" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 border-start border-warning border-4 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fas fa-trophy text-warning fs-3 me-3"></i>
+                            <h5 class="card-title mb-0">Advanced Positions</h5>
+                        </div>
+                        <p class="card-text text-muted">Advance to senior roles with specialized skills and leadership responsibilities.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-arrow-right text-warning me-2"></i>Senior Developer / Data Scientist</li>
+                            <li class="mb-2"><i class="fas fa-arrow-right text-warning me-2"></i>Business Manager / Consultant</li>
+                            <li class="mb-2"><i class="fas fa-arrow-right text-warning me-2"></i>Agricultural Specialist</li>
+                            <li class="mb-2"><i class="fas fa-arrow-right text-warning me-2"></i>Healthcare Administrator</li>
+                        </ul>
                     </div>
-                    <p>Advance to senior roles with specialized skills and leadership responsibilities.</p>
-                    <ul class="pathway-list">
-                        <li>Senior Developer / Data Scientist</li>
-                        <li>Business Manager / Consultant</li>
-                        <li>Agricultural Specialist</li>
-                        <li>Healthcare Administrator</li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -307,16 +328,16 @@ include '../includes/header.php';
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center" data-aos="fade-up">
-                <h2 class="h3 mb-3">Ready to Learn Something New?</h2>
-                <p class="mb-4">
-                    Choose your training field and master new skills in just days. Quick, practical, and designed for busy professionals.
+                <h2 class="h3 mb-3">Ready to Transform Your Career?</h2>
+                <p class="mb-4 fs-5">
+                    Choose your training field and master new skills with our intensive programs. Quick, practical, and designed for busy professionals.
                 </p>
-                <div class="cta-actions">
-                    <a href="<?php echo BASE_URL; ?>programs.php" class="btn btn-light btn-lg me-3">
-                        <i class="fas fa-search me-2"></i>Browse All Programs
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="<?php echo BASE_URL; ?>programs.php" class="btn btn-light btn-lg px-4">
+                        <i class="fas fa-search me-2"></i>Browse All Courses
                     </a>
-                    <a href="<?php echo BASE_URL; ?>apply.php" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-user-plus me-2"></i>Apply Now
+                    <a href="<?php echo BASE_URL; ?>contact.php" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fas fa-phone me-2"></i>Get In Touch
                     </a>
                 </div>
             </div>
@@ -324,179 +345,48 @@ include '../includes/header.php';
     </div>
 </section>
 
-<style>
-.training-field-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
-}
-
-.training-field-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-}
-
-.field-header {
-    padding: 2rem;
-    color: white;
-    display: flex;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.field-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-}
-
-.field-icon {
-    font-size: 3rem;
-    margin-right: 1.5rem;
-    position: relative;
-    z-index: 2;
-}
-
-.field-info {
-    position: relative;
-    z-index: 2;
-}
-
-.field-title {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.program-count {
-    background: rgba(255,255,255,0.2);
-    padding: 0.25rem 1rem;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.field-body {
-    padding: 2rem;
-}
-
-.field-description {
-    color: #6c757d;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
-
-.field-highlights h6 {
-    color: #495057;
-    font-weight: 600;
-}
-
-.highlight-list {
-    list-style: none;
-    padding: 0;
-}
-
-.highlight-list li {
-    padding: 0.5rem 0;
-    position: relative;
-    padding-left: 1.5rem;
-    color: #6c757d;
-}
-
-.highlight-list li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: #28a745;
-    font-weight: bold;
-}
-
-.field-footer {
-    padding: 0 2rem 2rem 2rem;
-}
-
-.feature-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    height: 100%;
-    transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-}
-
-.feature-icon {
-    color: #007bff;
-    font-size: 2.5rem;
-}
-
-.feature-title {
-    color: #495057;
-    margin-bottom: 1rem;
-}
-
-.feature-description {
-    color: #6c757d;
-    margin: 0;
-}
-
-.pathway-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    border-left: 4px solid #007bff;
-    height: 100%;
-}
-
-.pathway-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.pathway-header i {
-    font-size: 1.5rem;
-    margin-right: 1rem;
-}
-
-.pathway-header h5 {
-    margin: 0;
-    color: #495057;
-}
-
-.pathway-list {
-    list-style: none;
-    padding: 0;
-}
-
-.pathway-list li {
-    padding: 0.5rem 0;
-    color: #6c757d;
-    position: relative;
-    padding-left: 1.5rem;
-}
-
-.pathway-list li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: #007bff;
-    font-weight: bold;
-}
-
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-</style>
+<script>
+// Floating animation keyframes
+document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .training-field-card {
+            transition: all 0.3s ease;
+            border-radius: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        
+        .training-field-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+            border-color: rgba(218, 37, 37, 0.2);
+        }
+        
+        .icon-wrapper {
+            transition: all 0.3s ease;
+        }
+        
+        .training-field-card:hover .icon-wrapper {
+            transform: scale(1.1);
+        }
+        
+        .breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+            content: '/';
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .backdrop-blur {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
 
 <?php include '../includes/footer.php'; ?>

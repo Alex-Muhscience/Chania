@@ -17,7 +17,7 @@ class ApplicationsController extends BaseController {
         // CRITICAL SECURITY CHECK - Check permissions
         if (!$this->hasPermission('applications') && !$this->hasPermission('*')) {
             $this->setFlashMessage('error', 'Access denied. You do not have permission to manage applications.');
-            header('Location: index.php');
+            $this->redirect('/admin/public/index.php');
             exit;
         }
 

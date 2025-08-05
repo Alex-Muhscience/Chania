@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/config.php';
 
-$page_title = 'Contact Us';
+$page_title = lang('contact_us');
 $page_description = 'Get in touch with Chania Skills for Africa. Contact us for inquiries about our programs, partnerships, or general information.';
 $page_keywords = 'contact, inquiries, support, location, phone, email, office, Chania Skills for Africa';
 
@@ -23,16 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Basic validation
     if (empty($name)) {
-        $form_errors[] = 'Name is required';
+        $form_errors[] = lang('name_required');
     }
     if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $form_errors[] = 'Valid email is required';
+        $form_errors[] = lang('valid_email_required');
     }
     if (empty($subject)) {
-        $form_errors[] = 'Subject is required';
+        $form_errors[] = lang('subject_required');
     }
     if (empty($message)) {
-        $form_errors[] = 'Message is required';
+        $form_errors[] = lang('message_required');
     }
     
     // If no errors, try to save to database
@@ -75,8 +75,8 @@ include '../includes/header.php';
                         <li class="breadcrumb-item active" aria-current="page">Contact Us</li>
                     </ol>
                 </nav>
-                <h1 class="text-white mb-4" data-aos="fade-up">Get In Touch</h1>
-                <p class="text-white-50 fs-5 mb-0" data-aos="fade-up" data-aos-delay="200">
+                <h1 class="text-black mb-4" data-aos="fade-up">Get In Touch</h1>
+                <p class="text-black-50 fs-5 mb-0" data-aos="fade-up" data-aos-delay="200">
                     We'd love to hear from you. Send us a message and we'll respond as soon as possible.
                 </p>
             </div>

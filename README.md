@@ -1,6 +1,38 @@
-# Digital Empowerment Network - Admin Panel
+# Digital Empowerment Network Platform
 
-A comprehensive, production-ready admin panel built with PHP, MySQL, and modern web technologies for managing digital empowerment programs, users, and organizational activities.
+<div align="center">
+  <h3>🚀 Empowering Communities Through Digital Education</h3>
+  <p>A comprehensive, production-ready platform built with PHP, MySQL, and modern web technologies for managing digital empowerment programs, users, and organizational activities.</p>
+  
+  ![Version](https://img.shields.io/badge/version-2.0-blue.svg)
+  ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4.svg)
+  ![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1.svg)
+  ![License](https://img.shields.io/badge/license-MIT-green.svg)
+</div>
+
+---
+
+## 📖 Table of Contents
+
+- [🌟 Features](#-features)
+- [🏗️ Architecture](#️-architecture)
+- [🚀 Quick Start](#-quick-start)
+- [📁 Project Structure](#-project-structure)
+- [🔧 Configuration](#-configuration)
+- [🛡️ Security](#️-security)
+- [📱 Responsive Design](#-responsive-design)
+- [🌍 Multi-language Support](#-multi-language-support)
+- [📊 Admin Dashboard](#-admin-dashboard)
+- [🎨 Frontend Website](#-frontend-website)
+- [🔌 API Integration](#-api-integration)
+- [📈 Performance](#-performance)
+- [🧪 Testing](#-testing)
+- [🚀 Deployment](#-deployment)
+- [📚 Documentation](#-documentation)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+
+The **Digital Empowerment Network Platform** is a full-stack web application designed to bridge the digital divide by providing comprehensive tools for managing educational programs, events, user engagement, and organizational operations.
 
 ## 🌟 Features
 
@@ -62,22 +94,30 @@ A comprehensive, production-ready admin panel built with PHP, MySQL, and modern 
 
 ## 🏗️ Architecture
 
-### **Backend Architecture**
+### **Project Structure**
 ```
-admin/
-├── classes/           # Core business logic classes
-├── controllers/       # MVC controllers for each module
-├── views/            # HTML templates with PHP
-├── includes/         # Common includes and configuration
-├── public/           # Public-facing admin pages
-└── actions/          # Form processing scripts
-
-shared/Core/          # Shared core classes
-├── Database.php      # Database connection and utilities
-├── User.php          # User management
-├── Utilities.php     # Common utility functions
-├── AdminLogger.php   # Activity logging
-└── Security/         # Security-related classes
+chania/
+├── admin/               # Administrative panel
+│   ├── classes/         # Core business logic classes
+│   ├── controllers/     # MVC controllers for each module
+│   ├── views/          # HTML templates with PHP
+│   ├── includes/       # Common includes and configuration
+│   ├── public/         # Public-facing admin pages
+│   └── actions/        # Form processing scripts
+├── client/             # Frontend website
+│   ├── public/         # Public pages
+│   └── includes/       # Frontend includes
+├── api/                # API endpoints
+├── shared/             # Shared core classes
+│   └── Core/          # Core functionality
+├── database/           # Database schema and scripts
+├── docs/              # Project documentation
+├── uploads/           # File uploads
+├── backups/           # Database backups
+├── logs/              # System logs
+├── scripts/           # Development scripts (git-ignored)
+├── migrations/        # Database migrations (git-ignored)
+└── vendor/            # Composer dependencies
 ```
 
 ### **MVC Pattern Implementation**
@@ -85,6 +125,14 @@ shared/Core/          # Shared core classes
 - **Views** - HTML templates in `views/`
 - **Controllers** - Request handling in `controllers/`
 - **BaseController** - Common functionality for all controllers
+
+### **Directory Organization**
+- **`scripts/`** - Development and maintenance scripts (excluded from git)
+- **`migrations/`** - Database schema changes and migrations (excluded from git)
+- **`docs/`** - Comprehensive project documentation
+- **`uploads/`** - User uploaded files with security controls
+- **`backups/`** - Database backup files
+- **`logs/`** - System and error logs
 
 ## 🚀 Installation
 

@@ -12,13 +12,13 @@ Utilities::requireLogin();
 $programId = intval($_GET['id'] ?? 0);
 if (!$programId) {
     $_SESSION['error'] = "Invalid program ID.";
-    Utilities::redirect('/admin/programs.php');
+    Utilities::redirect('/admin/public/programs.php');
 }
 
 $pageTitle = "Edit Program";
 $breadcrumbs = [
-    ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
-    ['title' => 'Programs', 'url' => BASE_URL . '/admin/programs.php'],
+    ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/public/'],
+    ['title' => 'Programs', 'url' => BASE_URL . '/admin/public/programs.php'],
     ['title' => 'Edit Program']
 ];
 
@@ -208,6 +208,57 @@ require_once __DIR__ . '/../includes/header.php';
                         <input type="number" class="form-control" id="max_participants" name="max_participants"
                                value="<?= $formData['max_participants'] ?>" min="1">
                         <div class="form-text">Leave empty for unlimited participants</div>
+                    </div>
+
+                    <!-- Enhanced Program Information -->
+                    <hr>
+                    <h6>Detailed Program Information</h6>
+                    
+                    <div class="mb-3">
+                        <label for="introduction" class="form-label">Program Introduction</label>
+                        <textarea class="form-control" id="introduction" name="introduction" rows="4"
+                                  placeholder="Detailed introduction to the program, what it covers, and its benefits"><?= htmlspecialchars($_POST['introduction'] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="objectives" class="form-label">Learning Objectives</label>
+                        <textarea class="form-control" id="objectives" name="objectives" rows="4"
+                                  placeholder="List the key learning objectives participants will achieve"><?= htmlspecialchars($_POST['objectives'] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="target_audience" class="form-label">Target Audience</label>
+                                <textarea class="form-control" id="target_audience" name="target_audience" rows="3"
+                                          placeholder="Who is this program designed for?"><?= htmlspecialchars($_POST['target_audience'] ?? '') ?></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="prerequisites" class="form-label">Prerequisites</label>
+                                <textarea class="form-control" id="prerequisites" name="prerequisites" rows="3"
+                                          placeholder="Any prerequisites or requirements for participants"><?= htmlspecialchars($_POST['prerequisites'] ?? '') ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="course_content" class="form-label">Course Content (Modules)</label>
+                        <textarea class="form-control" id="course_content" name="course_content" rows="5"
+                                  placeholder="Outline the course modules and content structure"><?= htmlspecialchars($_POST['course_content'] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="general_notes" class="form-label">General Notes</label>
+                        <textarea class="form-control" id="general_notes" name="general_notes" rows="3"
+                                  placeholder="Additional notes, requirements, or important information"><?= htmlspecialchars($_POST['general_notes'] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="certification_details" class="form-label">Certification Details</label>
+                        <textarea class="form-control" id="certification_details" name="certification_details" rows="3"
+                                  placeholder="Information about certificates, credentials, or completion recognition"><?= htmlspecialchars($_POST['certification_details'] ?? '') ?></textarea>
                     </div>
 
                     <div class="mb-3">

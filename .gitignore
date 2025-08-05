@@ -1,0 +1,86 @@
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Composer
+vendor/
+composer.phar
+
+# Scripts and migrations (development tools)
+scripts/
+migrations/
+
+# Logs
+logs/*.log
+logs/error.log
+logs/access.log
+logs/debug.log
+
+# Cache files
+cache/
+*.cache
+
+# Upload files (depending on your deployment strategy)
+uploads/*
+!uploads/.htaccess
+!uploads/index.html
+
+# Backup files
+backups/*.sql
+backups/*.sql.gz
+!backups/.htaccess
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.old
+
+# Node modules (if using any frontend build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+*.bat
+*.cmd
+
+# Documentation build files
+docs/build/
+
+# Test files and directories
+test*/
+debug*/
+fixes*/
+*.test.php
+
+# Performance and configuration backups
+*.performance
+*.ini.backup
+*.conf.backup

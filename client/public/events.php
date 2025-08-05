@@ -1,19 +1,20 @@
 <?php
 require_once '../includes/config.php';
 
-$page_title = 'Events & Workshops';
+$page_title = 'Events  Workshops';
 $page_description = 'Join our upcoming events, workshops, webinars, and training sessions. Stay updated with the latest skills development opportunities at Chania Skills for Africa.';
 $page_keywords = 'events, workshops, webinars, training, seminars, networking, skills development, Africa';
 
 // Pagination
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$per_page = 12;
+$per_page = 9; // Reduced for better mobile experience
 $offset = ($page - 1) * $per_page;
 
 // Filtering
 $category_filter = $_GET['category'] ?? '';
 $type_filter = $_GET['type'] ?? '';
 $search_query = $_GET['search'] ?? '';
+$view_mode = $_GET['view'] ?? 'grid';
 
 // Build the query
 $where_conditions = ["e.deleted_at IS NULL"];
@@ -54,12 +55,17 @@ try {
     $count_stmt->execute($params);
     $total_events = $count_stmt->fetchColumn();
     
-    // Get events
+    // Get events with better ordering
     $events_query = "
-        SELECT e.* 
+        SELECT e.*, 
+               CASE 
+                   WHEN e.event_date >= NOW() THEN 0 
+                   ELSE 1 
+               END as is_past,
+               DATEDIFF(e.event_date, NOW()) as days_until
         FROM events e 
         WHERE $where_clause 
-        ORDER BY e.event_date ASC, e.created_at DESC 
+        ORDER BY is_past ASC, e.event_date ASC, e.created_at DESC 
         LIMIT $per_page OFFSET $offset
     ";
     $events_stmt = $db->prepare($events_query);
@@ -77,7 +83,8 @@ $total_pages = ceil($total_events / $per_page);
 // Fetch featured/upcoming events for hero section
 try {
     $featured_query = "
-        SELECT * FROM events 
+        SELECT *, DATEDIFF(event_date, NOW()) as days_until
+        FROM events 
         WHERE event_date >= NOW() AND deleted_at IS NULL 
         ORDER BY event_date ASC 
         LIMIT 3
@@ -85,6 +92,204 @@ try {
     $featured_events = $db->query($featured_query)->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $featured_events = [];
+}
+
+// Helper function to render event cards consistently
+function renderEventCard($event, $featured = false, $view_mode = 'grid') {
+    $days_until = $event['days_until'] ?? null;
+    $is_past = isset($event['is_past']) ? $event['is_past'] : (strtotime($event['event_date']) < time());
+    
+    $card_class = $view_mode === 'list' ? 'event-card-list' : 'h-100';
+    $col_class = $view_mode === 'list' ? 'col-12' : 'col-lg-4 col-md-6';
+    
+    if ($view_mode === 'list') {
+        return renderEventListItem($event, $days_until, $is_past);
+    }
+    
+    ob_start();
+    ?>
+    <div class="<?php echo $col_class; ?>" data-aos="fade-up">
+        <div class="event-card card border-0 shadow-sm <?php echo $card_class; ?> hover-lift">
+            <div class="position-relative overflow-hidden">
+                <img src="<?php echo !empty($event['image_url']) ? ASSETS_URL . 'images/events/' . $event['image_url'] : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=250&fit=crop'; ?>" 
+                     alt="<?php echo htmlspecialchars($event['title']); ?>" 
+                     class="card-img-top event-image" 
+                     loading="lazy">
+                
+                <!-- Event Type Badge -->
+                <div class="position-absolute top-0 end-0 m-3">
+                    <span class="badge event-type-badge">
+                        <?php echo ucfirst($event['event_type'] ?? 'Event'); ?>
+                    </span>
+                </div>
+                
+                <!-- Timing Badge -->
+                <?php if ($days_until !== null): ?>
+                    <div class="position-absolute top-0 start-0 m-3">
+                        <?php if ($days_until <= 0): ?>
+                            <span class="badge bg-secondary">
+                                <i class="fas fa-history me-1"></i>Past
+                            </span>
+                        <?php elseif ($days_until <= 7): ?>
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-clock me-1"></i><?php echo $days_until; ?> day<?php echo $days_until > 1 ? 's' : ''; ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            
+            <div class="card-body d-flex flex-column">
+                <!-- Event Meta -->
+                <div class="event-meta mb-3">
+                    <div class="d-flex align-items-center text-muted mb-2 small">
+                        <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                        <span><?php echo date('M j, Y', strtotime($event['event_date'])); ?></span>
+                        <?php if (!empty($event['event_time'])): ?>
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-clock me-1 text-primary"></i>
+                            <span><?php echo date('g:i A', strtotime($event['event_time'])); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (!empty($event['location'])): ?>
+                        <div class="d-flex align-items-center text-muted small">
+                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                            <span><?php echo htmlspecialchars($event['location']); ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Category -->
+                <?php if (!empty($event['category'])): ?>
+                    <div class="mb-3">
+                        <span class="badge category-badge"><?php echo ucfirst($event['category']); ?></span>
+                    </div>
+                <?php endif; ?>
+                
+                <!-- Event Title & Description -->
+                <h5 class="card-title event-title"><?php echo htmlspecialchars($event['title']); ?></h5>
+                <p class="card-text text-muted flex-grow-1 event-description">
+                    <?php echo htmlspecialchars(strlen($event['description']) > 100 ? substr($event['description'], 0, 100) . '...' : $event['description']); ?>
+                </p>
+                
+                <!-- Event Actions -->
+                <div class="event-actions mt-auto">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <?php if (!empty($event['max_participants'])): ?>
+                                <i class="fas fa-users me-1"></i>
+                                <?php echo $event['max_participants']; ?> seats
+                            <?php endif; ?>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary btn-sm" onclick="showEventDetails(<?php echo $event['id']; ?>)">
+                                <i class="fas fa-info-circle me-1"></i>Details
+                            </button>
+                            <?php if (!$is_past): ?>
+                                <button class="btn btn-primary btn-sm" onclick="registerForEvent(<?php echo $event['id']; ?>)">
+                                    <i class="fas fa-ticket-alt me-1"></i>Register
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
+}
+
+function renderEventListItem($event, $days_until, $is_past) {
+    ob_start();
+    ?>
+    <div class="col-12" data-aos="fade-up">
+        <div class="event-list-item card border-0 shadow-sm hover-lift">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <div class="position-relative overflow-hidden h-100">
+                        <img src="<?php echo !empty($event['image_url']) ? ASSETS_URL . 'images/events/' . $event['image_url'] : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=300&h=200&fit=crop'; ?>" 
+                             alt="<?php echo htmlspecialchars($event['title']); ?>" 
+                             class="list-event-image" 
+                             loading="lazy">
+                        
+                        <!-- Timing Badge -->
+                        <?php if ($days_until !== null): ?>
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <?php if ($days_until <= 0): ?>
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-history me-1"></i>Past
+                                    </span>
+                                <?php elseif ($days_until <= 7): ?>
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-clock me-1"></i><?php echo $days_until; ?> day<?php echo $days_until > 1 ? 's' : ''; ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body d-flex flex-column h-100">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="event-badges">
+                                <span class="badge event-type-badge me-2">
+                                    <?php echo ucfirst($event['event_type'] ?? 'Event'); ?>
+                                </span>
+                                <?php if (!empty($event['category'])): ?>
+                                    <span class="badge category-badge"><?php echo ucfirst($event['category']); ?></span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <h5 class="event-title mb-2"><?php echo htmlspecialchars($event['title']); ?></h5>
+                        <p class="text-muted mb-3 flex-grow-1">
+                            <?php echo htmlspecialchars(strlen($event['description']) > 150 ? substr($event['description'], 0, 150) . '...' : $event['description']); ?>
+                        </p>
+                        
+                        <div class="event-meta-list mb-3">
+                            <div class="row g-2 text-muted small">
+                                <div class="col-md-6">
+                                    <i class="fas fa-calendar-alt me-2 text-primary"></i>
+                                    <?php echo date('M j, Y', strtotime($event['event_date'])); ?>
+                                    <?php if (!empty($event['event_time'])): ?>
+                                        at <?php echo date('g:i A', strtotime($event['event_time'])); ?>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if (!empty($event['location'])): ?>
+                                    <div class="col-md-6">
+                                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+                                        <?php echo htmlspecialchars($event['location']); ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted small">
+                                <?php if (!empty($event['max_participants'])): ?>
+                                    <i class="fas fa-users me-1"></i>
+                                    <?php echo $event['max_participants']; ?> seats available
+                                <?php endif; ?>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm" onclick="showEventDetails(<?php echo $event['id']; ?>)">
+                                    <i class="fas fa-info-circle me-1"></i>Details
+                                </button>
+                                <?php if (!$is_past): ?>
+                                    <button class="btn btn-primary btn-sm" onclick="registerForEvent(<?php echo $event['id']; ?>)">
+                                        <i class="fas fa-ticket-alt me-1"></i>Register
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php
+    return ob_get_clean();
 }
 
 include '../includes/header.php';
@@ -105,8 +310,8 @@ include '../includes/header.php';
                         <li class="breadcrumb-item active" aria-current="page">Events & Workshops</li>
                     </ol>
                 </nav>
-                <h1 class="text-white mb-4" data-aos="fade-up">Events & Workshops</h1>
-                <p class="text-white-50 fs-5 mb-0" data-aos="fade-up" data-aos-delay="200">
+                <h1 class="text-black mb-4" data-aos="fade-up">Events & Workshops</h1>
+                <p class="text-black-50 fs-5 mb-0" data-aos="fade-up" data-aos-delay="200">
                     Join our community events, workshops, and training sessions designed to accelerate your skills development journey.
                 </p>
             </div>
@@ -141,84 +346,6 @@ include '../includes/header.php';
     </div>
 </section>
 
-<!-- Featured Events Section -->
-<?php if (!empty($featured_events)): ?>
-<section class="py-5">
-    <div class="container">
-        <div class="row mb-5">
-            <div class="col-lg-8 mx-auto text-center" data-aos="fade-up">
-                <h2 class="section-title">Upcoming Highlights</h2>
-                <p class="section-subtitle text-muted">
-                    Don't miss these featured events happening soon
-                </p>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            <?php foreach (array_slice($featured_events, 0, 3) as $index => $event): ?>
-                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?php echo ($index + 1) * 100; ?>">
-                    <div class="card border-0 shadow-sm h-100 hover-lift">
-                        <div class="position-relative">
-                            <img src="<?php echo !empty($event['image_url']) ? ASSETS_URL . 'images/events/' . $event['image_url'] : 'https://via.placeholder.com/400x250?text=' . urlencode($event['title']); ?>" 
-                                 alt="<?php echo htmlspecialchars($event['title']); ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
-                            <div class="position-absolute top-0 end-0 m-3">
-                                <span class="badge bg-primary px-3 py-2 rounded-pill">
-                                    <?php echo ucfirst($event['event_type'] ?? 'Event'); ?>
-                                </span>
-                            </div>
-                            <?php if (strtotime($event['event_date']) <= strtotime('+7 days')): ?>
-                                <div class="position-absolute top-0 start-0 m-3">
-                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
-                                        <i class="fas fa-clock me-1"></i>Soon
-                                    </span>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <div class="mb-3">
-                                <div class="d-flex align-items-center text-muted mb-2">
-                                    <i class="fas fa-calendar-alt me-2 text-primary"></i>
-                                    <span><?php echo date('M j, Y', strtotime($event['event_date'])); ?></span>
-                                    <?php if (!empty($event['event_time'])): ?>
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-clock me-1 text-primary"></i>
-                                        <span><?php echo date('g:i A', strtotime($event['event_time'])); ?></span>
-                                    <?php endif; ?>
-                                </div>
-                                <?php if (!empty($event['location'])): ?>
-                                    <div class="d-flex align-items-center text-muted">
-                                        <i class="fas fa-map-marker-alt me-2 text-primary"></i>
-                                        <span><?php echo htmlspecialchars($event['location']); ?></span>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <h5 class="card-title"><?php echo htmlspecialchars($event['title']); ?></h5>
-                            <p class="card-text text-muted flex-grow-1">
-                                <?php echo htmlspecialchars(substr($event['description'], 0, 120)) . '...'; ?>
-                            </p>
-                            
-                            <div class="mt-auto">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="text-muted small">
-                                        <?php if (!empty($event['max_participants'])): ?>
-                                            <i class="fas fa-users me-1"></i>
-                                            Max <?php echo $event['max_participants']; ?> seats
-                                        <?php endif; ?>
-                                    </div>
-                                    <a href="#" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-info-circle me-1"></i>Learn More
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
-<?php endif; ?>
 
 <!-- Search and Filter Section -->
 <section class="py-5 bg-light-gray">
@@ -288,117 +415,45 @@ include '../includes/header.php';
     </div>
 </section>
 
-<!-- Events Grid -->
+        <!-- Events Grid/List -->
 <section class="py-5">
     <div class="container">
-        <div class="row mb-4">
-            <div class="col-lg-8">
-                <h3>
+        <div class="row mb-4 align-items-center">
+            <div class="col-lg-6">
+                <h3 class="mb-0">
                     <?php if ($total_events > 0): ?>
-                        Showing <?php echo min($per_page, $total_events - $offset); ?> of <?php echo $total_events; ?> events
+                        <span class="text-primary"><?php echo $total_events; ?></span> Event<?php echo $total_events > 1 ? 's' : ''; ?> Found
                     <?php else: ?>
                         All Events
                     <?php endif; ?>
                 </h3>
+                <?php if ($total_events > 0): ?>
+                    <p class="text-muted mb-0 small">
+                        Showing <?php echo $offset + 1; ?>-<?php echo min($offset + $per_page, $total_events); ?> of <?php echo $total_events; ?> results
+                    </p>
+                <?php endif; ?>
             </div>
-            <div class="col-lg-4 text-lg-end">
-                <div class="btn-group" role="group" aria-label="View options">
-                    <button type="button" class="btn btn-outline-secondary active">
-                        <i class="fas fa-th"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <i class="fas fa-list"></i>
-                    </button>
+            <div class="col-lg-6 text-lg-end mt-3 mt-lg-0">
+                <div class="d-flex align-items-center justify-content-lg-end gap-3">
+                    <span class="text-muted small d-none d-sm-inline">View:</span>
+                    <div class="btn-group view-toggle" role="group" aria-label="View options">
+                        <input type="radio" class="btn-check" name="view-mode" id="grid-view" value="grid" <?php echo $view_mode === 'grid' ? 'checked' : ''; ?>>
+                        <label class="btn btn-outline-secondary" for="grid-view" title="Grid View">
+                            <i class="fas fa-th"></i>
+                        </label>
+                        <input type="radio" class="btn-check" name="view-mode" id="list-view" value="list" <?php echo $view_mode === 'list' ? 'checked' : ''; ?>>
+                        <label class="btn btn-outline-secondary" for="list-view" title="List View">
+                            <i class="fas fa-list"></i>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
         
         <?php if (!empty($events)): ?>
-            <div class="row g-4">
+            <div class="events-container row g-4" id="events-container">
                 <?php foreach ($events as $index => $event): ?>
-                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?php echo ($index % 6 + 1) * 100; ?>">
-                        <div class="card border-0 shadow-sm h-100 hover-lift">
-                            <div class="position-relative">
-                                <img src="<?php echo !empty($event['image_url']) ? ASSETS_URL . 'images/events/' . $event['image_url'] : 'https://via.placeholder.com/400x250?text=' . urlencode($event['title']); ?>" 
-                                     alt="<?php echo htmlspecialchars($event['title']); ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 m-3">
-                                    <span class="badge bg-primary px-3 py-2 rounded-pill">
-                                        <?php echo ucfirst($event['event_type'] ?? 'Event'); ?>
-                                    </span>
-                                </div>
-                                <?php 
-                                $event_date = strtotime($event['event_date']);
-                                $now = time();
-                                $days_until = ceil(($event_date - $now) / 86400);
-                                ?>
-                                <?php if ($days_until <= 7 && $days_until > 0): ?>
-                                    <div class="position-absolute top-0 start-0 m-3">
-                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
-                                            <i class="fas fa-clock me-1"></i>
-                                            <?php echo $days_until; ?> day<?php echo $days_until > 1 ? 's' : ''; ?>
-                                        </span>
-                                    </div>
-                                <?php elseif ($days_until <= 0): ?>
-                                    <div class="position-absolute top-0 start-0 m-3">
-                                        <span class="badge bg-secondary px-3 py-2 rounded-pill">
-                                            <i class="fas fa-history me-1"></i>Past
-                                        </span>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center text-muted mb-2 small">
-                                        <i class="fas fa-calendar-alt me-2 text-primary"></i>
-                                        <span><?php echo date('M j, Y', strtotime($event['event_date'])); ?></span>
-                                        <?php if (!empty($event['event_time'])): ?>
-                                            <span class="mx-2">•</span>
-                                            <i class="fas fa-clock me-1 text-primary"></i>
-                                            <span><?php echo date('g:i A', strtotime($event['event_time'])); ?></span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <?php if (!empty($event['location'])): ?>
-                                        <div class="d-flex align-items-center text-muted small">
-                                            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
-                                            <span><?php echo htmlspecialchars($event['location']); ?></span>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                                
-                                <?php if (!empty($event['category'])): ?>
-                                    <div class="mb-3">
-                                        <span class="badge bg-light text-primary"><?php echo ucfirst($event['category']); ?></span>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <h5 class="card-title"><?php echo htmlspecialchars($event['title']); ?></h5>
-                                <p class="card-text text-muted flex-grow-1">
-                                    <?php echo htmlspecialchars(substr($event['description'], 0, 100)) . '...'; ?>
-                                </p>
-                                
-                                <div class="mt-auto">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="text-muted small">
-                                            <?php if (!empty($event['max_participants'])): ?>
-                                                <i class="fas fa-users me-1"></i>
-                                                <?php echo $event['max_participants']; ?> seats
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <a href="#" class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-info-circle me-1"></i>Details
-                                            </a>
-                                            <?php if ($days_until > 0): ?>
-                                                <a href="#" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-ticket-alt me-1"></i>Register
-                                                </a>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <?php echo renderEventCard($event, false, $view_mode); ?>
                 <?php endforeach; ?>
             </div>
             
@@ -476,7 +531,7 @@ include '../includes/header.php';
                     Subscribe to our newsletter and be the first to know about upcoming workshops, webinars, and training sessions.
                 </p>
                 <form class="row g-3 justify-content-center">
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-md-8 col-lg-6">
                         <input type="email" class="form-control form-control-lg" placeholder="Enter your email address" required>
                     </div>
                     <div class="col-auto">
@@ -505,17 +560,58 @@ include '../includes/header.php';
     box-shadow: 0 15px 35px rgba(0,0,0,0.15) !important;
 }
 
-.card-img-top {
+.event-image, .list-event-image {
+    height: 200px;
+    object-fit: cover;
     transition: all 0.3s ease;
 }
 
-.card:hover .card-img-top {
+.list-event-image {
+    height: 100%;
+    min-height: 200px;
+}
+
+.card:hover .event-image,
+.card:hover .list-event-image {
     transform: scale(1.05);
 }
 
-.badge {
+.event-type-badge {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
     font-size: 0.75rem;
     font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+}
+
+.category-badge {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    color: var(--primary-color);
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+}
+
+.event-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--dark-color);
+}
+
+.event-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.event-meta .text-muted {
+    color: #6c757d !important;
+}
+
+.view-toggle .btn {
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
 }
 
 .pagination .page-link {
@@ -528,4 +624,73 @@ include '../includes/header.php';
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
+
+.empty-state {
+    padding: 4rem 2rem;
+}
+
+.empty-icon i {
+    opacity: 0.3;
+}
+
+@media (max-width: 768px) {
+    .events-container .col-lg-4 {
+        margin-bottom: 1.5rem;
+    }
+    
+    .event-list-item .row {
+        flex-direction: column;
+    }
+    
+    .list-event-image {
+        height: 200px;
+        min-height: 200px;
+    }
+}
 </style>
+
+<script>
+// View mode toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const viewToggle = document.querySelectorAll('input[name="view-mode"]');
+    const eventsContainer = document.getElementById('events-container');
+    
+    viewToggle.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                const currentUrl = new URL(window.location);
+                currentUrl.searchParams.set('view', this.value);
+                window.location.href = currentUrl.toString();
+            }
+        });
+    });
+});
+
+// Event details function
+function showEventDetails(eventId) {
+    window.location.href = `<?php echo BASE_URL; ?>event-details.php?id=${eventId}`;
+}
+
+// Event registration function
+function registerForEvent(eventId) {
+    window.location.href = `<?php echo BASE_URL; ?>event_register.php?event_id=${eventId}`;
+}
+
+// Add loading state for buttons
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.btn')) {
+        const btn = e.target.closest('.btn');
+        if (btn.onclick && (btn.onclick.toString().includes('showEventDetails') || btn.onclick.toString().includes('registerForEvent'))) {
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Loading...';
+            
+            // Re-enable after a short delay in case navigation fails
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }, 3000);
+        }
+    }
+});
+</script>

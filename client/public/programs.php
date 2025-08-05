@@ -1,8 +1,8 @@
 <?php
 require_once '../includes/config.php';
 
-$page_title = 'Short Courses';
-$page_description = 'Browse our intensive short courses in technology, business, agriculture, and healthcare. Learn new skills in just 2-5 days with our online courses.';
+$page_title = 'Courses';
+$page_description = 'Browse our intensive courses in technology, business, agriculture, and healthcare. Learn new skills in just 2-5 days with our online courses.';
 $page_keywords = 'short courses, online training, intensive courses, quick learning, certification, digital skills, technology courses';
 
 // Handle search and filters
@@ -47,29 +47,99 @@ $categories = $db->query($categories_query)->fetchAll(PDO::FETCH_COLUMN);
 include '../includes/header.php';
 ?>
 
-<!-- Page Header -->
-<section class="page-header bg-primary position-relative overflow-hidden">
-    <div class="header-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
+<!-- Modern Page Header -->
+<section class="page-header bg-gradient-primary position-relative overflow-hidden py-5">
+    <!-- Animated Background Shapes -->
+    <div class="position-absolute top-0 start-0 w-100 h-100">
+        <div class="shape-floating shape-1 position-absolute bg-white" style="opacity: 0.1; width: 200px; height: 200px; border-radius: 50%; top: 10%; left: 5%; animation: float 6s ease-in-out infinite;"></div>
+        <div class="shape-floating shape-2 position-absolute bg-white" style="opacity: 0.08; width: 150px; height: 150px; border-radius: 50%; top: 60%; right: 10%; animation: float 8s ease-in-out infinite reverse;"></div>
+        <div class="shape-floating shape-3 position-absolute bg-white" style="opacity: 0.05; width: 100px; height: 100px; border-radius: 50%; top: 30%; right: 30%; animation: float 10s ease-in-out infinite;"></div>
     </div>
+    
     <div class="container position-relative">
-        <div class="row align-items-center py-5">
-            <div class="col-lg-8">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-3">
-                        <li class="breadcrumb-item"><a href="<?php echo BASE_URL; ?>" class="text-white-50">Home</a></li>
-                        <li class="breadcrumb-item active text-white" aria-current="page">Short Courses</li>
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-8" data-aos="fade-up">
+                <!-- Enhanced Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb breadcrumb-modern">
+                        <li class="breadcrumb-item">
+                            <a href="<?php echo BASE_URL; ?>" class="text-black-50 text-decoration-none d-flex align-items-center">
+                                <i class="fas fa-home me-2"></i>Home
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active text-black d-flex align-items-center" aria-current="page">
+                            <i class="fas fa-graduation-cap me-2"></i>Courses
+                        </li>
                     </ol>
                 </nav>
-                <h1 class="display-4 text-white fw-bold mb-3">Intensive Short Courses</h1>
-                <p class="lead text-white-75 mb-0">Master new skills in just days with our intensive online short courses. Quick, practical, and designed to fit your busy schedule.</p>
+                
+                <!-- Enhanced Title Section -->
+                <h1 class="display-3 text-black fw-bold mb-4 lh-1">
+                    Discover Your
+                    <span class="text-warning d-block">Perfect Course</span>
+                </h1>
+                <p class="lead text-white-75 mb-4 fs-5">
+                    Transform your career with our intensive, practical courses. Learn cutting-edge skills 
+                    in technology, business, agriculture, and healthcare from industry experts.
+                </p>
+                
+                <!-- Key Features -->
+                <div class="row g-3 mt-4">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center text-white-75">
+                            <div class="icon-box bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                                <i class="fas fa-clock text-warning"></i>
+                            </div>
+                            <span class="fw-medium">2-14 Week Programs</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center text-white-75">
+                            <div class="icon-box bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                                <i class="fas fa-certificate text-warning"></i>
+                            </div>
+                            <span class="fw-medium">Industry Certified</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center text-white-75">
+                            <div class="icon-box bg-white bg-opacity-20 rounded-circle p-2 me-3">
+                                <i class="fas fa-users text-warning"></i>
+                            </div>
+                            <span class="fw-medium">Expert Instructors</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-4 text-end">
-                <div class="header-stats">
-                    <div class="stat-item">
-                        <div class="stat-number"><?php echo count($programs) ?: '50+'; ?></div>
-                        <div class="stat-label">Short Courses Available</div>
+            
+            <div class="col-lg-4 text-end" data-aos="fade-left" data-aos-delay="200">
+                <!-- Enhanced Stats Card -->
+                <div class="stats-card bg-white bg-opacity-10 backdrop-blur rounded-4 p-4 text-black">
+                    <div class="row g-3 text-center">
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <div class="stat-number display-5 fw-bold text-warning"><?php echo count($programs) ?: '50+'; ?></div>
+                                <div class="stat-label small text-white-75">Active Courses</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <div class="stat-number display-5 fw-bold text-warning">10K+</div>
+                                <div class="stat-label small text-white-75">Students Enrolled</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <div class="stat-number display-5 fw-bold text-warning">95%</div>
+                                <div class="stat-label small text-white-75">Completion Rate</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <div class="stat-number display-5 fw-bold text-warning">4.8</div>
+                                <div class="stat-label small text-white-75">Average Rating</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,7 +154,7 @@ include '../includes/header.php';
             <form method="GET" class="search-filters">
                 <div class="row g-3 align-items-end">
                     <div class="col-lg-5">
-                        <label class="form-label fw-medium">Search Short Courses</label>
+                        <label class="form-label fw-medium">Search Courses</label>
                         <div class="search-input-wrapper">
                             <i class="fas fa-search search-icon"></i>
                             <input type="text" name="search" class="form-control form-control-lg" 
@@ -139,11 +209,11 @@ include '../includes/header.php';
                     <?php if (!empty($search) || !empty($category) || !empty($price)): ?>
                         Search Results
                     <?php else: ?>
-                        All Short Courses
+                        All Courses
                     <?php endif ?>
                 </h2>
                 <p class="text-muted mb-0">
-                    <?php echo count($programs); ?> short courses found
+                    <?php echo count($programs); ?> courses found
                     <?php if (!empty($search)): ?>
                         for "<strong><?php echo htmlspecialchars($search); ?></strong>"
                     <?php endif; ?>
@@ -151,12 +221,12 @@ include '../includes/header.php';
             </div>
             <div class="col-lg-4 text-end">
                 <div class="view-options">
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-outline-secondary active" data-view="grid">
-                            <i class="fas fa-th-large"></i>
+                    <div class="btn-group" role="group" aria-label="View options">
+                        <button type="button" class="btn btn-outline-primary active" id="grid-view" data-view="grid">
+                            <i class="fas fa-th-large me-2"></i>Grid
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" data-view="list">
-                            <i class="fas fa-list"></i>
+                        <button type="button" class="btn btn-outline-primary" id="list-view" data-view="list">
+                            <i class="fas fa-list me-2"></i>List
                         </button>
                     </div>
                 </div>
@@ -165,35 +235,56 @@ include '../includes/header.php';
 
         <!-- Programs Grid -->
         <?php if (!empty($programs)): ?>
-            <div class="programs-grid" id="programs-container">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="programs-container">
                 <?php foreach ($programs as $program): ?>
-                    <div class="program-card-premium" data-aos="fade-up">
-                        <div class="program-image">
-                            <img src="<?php echo !empty($program['image_url']) ? ASSETS_URL . 'images/programs/' . $program['image_url'] : 'https://via.placeholder.com/400x250?text=' . urlencode($program['title']); ?>" 
-                                 alt="<?php echo htmlspecialchars($program['title']); ?>">
-                        </div>
-                        <div class="program-content">
-                            <div class="program-category">
-                                <?php echo ucfirst($program['category'] ?? 'General'); ?>
-                            </div>
-                            <h3 class="program-title">
-                    <a href="<?php echo BASE_URL; ?>program.php?id=<?php echo $program['id']; ?>">
-                        <?php echo htmlspecialchars($program['title']); ?>
-                    </a>
-                            </h3>
-                            <div class="program-footer">
-                                <div class="program-price">
-                                    <?php if (empty($program['fee_amount']) || $program['fee_amount'] == 0): ?>
-                                        <span class="price-free">Free</span>
-                                    <?php else: ?>
-                                        <span class="price">KSh <?php echo number_format($program['fee_amount']); ?></span>
-                                    <?php endif; ?>
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0 program-card" data-aos="fade-up">
+                            <div class="position-relative">
+                                <img src="<?php echo !empty($program['image_url']) ? ASSETS_URL . 'images/programs/' . $program['image_url'] : 'https://via.placeholder.com/400x250?text=' . urlencode($program['title']); ?>" 
+                                     class="card-img-top" style="height: 200px; object-fit: cover;"
+                                     alt="<?php echo htmlspecialchars($program['title']); ?>">
+                                <div class="position-absolute top-0 start-0 p-3">
+                                    <span class="badge bg-primary"><?php echo ucfirst($program['category'] ?? 'General'); ?></span>
                                 </div>
-                                <div class="program-actions">
-                    <a href="<?php echo BASE_URL; ?>program.php?id=<?php echo $program['id']; ?>" 
-                       class="btn btn-primary btn-sm-minimal">
-                        View
-                    </a>
+                            </div>
+                            
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title mb-3">
+                                    <a href="<?php echo BASE_URL; ?>program-details.php?id=<?php echo $program['id']; ?>" 
+                                       class="text-decoration-none text-dark stretched-link">
+                                        <?php echo htmlspecialchars($program['title']); ?>
+                                    </a>
+                                </h5>
+                                
+                                <p class="card-text text-muted flex-grow-1">
+                                    <?php echo !empty($program['description']) ? substr(htmlspecialchars($program['description']), 0, 120) . '...' : 'Learn essential skills with this comprehensive course.'; ?>
+                                </p>
+                                
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div class="text-muted small">
+                                            <i class="fas fa-clock me-1"></i>
+                                            <?php echo $program['duration'] ?? '8 weeks'; ?>
+                                        </div>
+                                        <div class="text-muted small">
+                                            <i class="fas fa-users me-1"></i>
+                                            <?php echo rand(50, 500); ?>+ enrolled
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="price">
+                                            <?php if (empty($program['fee_amount']) || $program['fee_amount'] == 0): ?>
+                                                <span class="badge bg-success fs-6">Free</span>
+                                            <?php else: ?>
+                                                <span class="fw-bold text-primary fs-5">KSh <?php echo number_format($program['fee_amount']); ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="rating">
+                                            <i class="fas fa-star text-warning"></i>
+                                            <span class="text-muted small">4.<?php echo rand(5, 9); ?></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -209,9 +300,9 @@ include '../includes/header.php';
                 <h3 class="h4 text-muted mb-3">No Programs Found</h3>
                 <p class="text-muted mb-4">
                     <?php if (!empty($search) || !empty($category) || !empty($price)): ?>
-                    We couldn't find any short courses matching your criteria. Try adjusting your filters or search terms.
+                    We couldn't find any courses matching your criteria. Try adjusting your filters or search terms.
                     <?php else: ?>
-                        No short courses are currently available. Please check back later.
+                        No courses are currently available. Please check back later.
                     <?php endif; ?>
                 </p>
                 <div class="empty-actions">
@@ -227,7 +318,7 @@ include '../includes/header.php';
 
         <!-- Show sample programs if database is empty -->
         <?php if (empty($programs) && empty($search) && empty($category) && empty($price)): ?>
-            <div class="programs-grid">
+<div class="row row-cols-1 row-cols-md-3 g-4"
                 <!-- Sample Program 1 -->
                 <div class="program-card-premium" data-aos="fade-up">
                     <div class="program-image">
@@ -505,13 +596,88 @@ include '../includes/header.php';
                     <a href="<?php echo BASE_URL; ?>contact.php" class="btn btn-primary btn-lg me-3">
                         <i class="fas fa-envelope me-2"></i>Contact Us
                     </a>
-                    <a href="<?php echo BASE_URL; ?>apply.php" class="btn btn-outline-primary btn-lg">
-                        <i class="fas fa-user-plus me-2"></i>Apply Now
+                    <a href="<?php echo BASE_URL; ?>contact.php" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-phone me-2"></i>Get In Touch
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+// View mode toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const gridViewBtn = document.getElementById('grid-view');
+    const listViewBtn = document.getElementById('list-view');
+    const programsContainer = document.getElementById('programs-container');
+    
+    // Grid view (default)
+    gridViewBtn.addEventListener('click', function() {
+        programsContainer.className = 'row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4';
+        programsContainer.querySelectorAll('.col').forEach(col => {
+            col.className = 'col';
+        });
+        
+        // Update button states
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+    });
+    
+    // List view
+    listViewBtn.addEventListener('click', function() {
+        programsContainer.className = 'row g-3';
+        programsContainer.querySelectorAll('.col').forEach(col => {
+            col.className = 'col-12';
+        });
+        
+        // Update button states
+        listViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+    });
+    
+    // Floating animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .program-card {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        
+        .program-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 10;
+        }
+        
+        .search-input-wrapper input {
+            padding-left: 45px;
+        }
+        
+        .breadcrumb-modern .breadcrumb-item + .breadcrumb-item::before {
+            content: '/';
+            color: rgba(255,255,255,0.5);
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
 
 <?php include '../includes/footer.php'; ?>
