@@ -41,7 +41,6 @@
                                     <option value="">Select Mode</option>
                                     <option value="online">Online</option>
                                     <option value="physical">Physical</option>
-                                    <option value="hybrid">Hybrid</option>
                                 </select>
                             </div>
                         </div>
@@ -166,7 +165,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="meeting_link" class="form-label">Meeting Link (for online/hybrid)</label>
+                                <label for="meeting_link" class="form-label">Meeting Link (for online)</label>
                                 <input type="url" class="form-control" id="meeting_link" name="meeting_link"
                                        placeholder="https://zoom.us/j/...">
                             </div>
@@ -234,7 +233,7 @@
                                 <?php foreach ($schedules as $schedule): ?>
                                     <tr>
                                         <td>
-                                            <span class="badge bg-<?= $schedule['delivery_mode'] === 'online' ? 'info' : ($schedule['delivery_mode'] === 'physical' ? 'success' : 'warning') ?>">
+                                            <span class="badge bg-<?= $schedule['delivery_mode'] === 'online' ? 'info' : 'success' ?>">
                                                 <?= ucfirst($schedule['delivery_mode']) ?>
                                             </span>
                                         </td>

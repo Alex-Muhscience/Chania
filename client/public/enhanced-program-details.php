@@ -188,7 +188,7 @@ include '../includes/header.php';
                                             <h6 class="schedule-title"><?= htmlspecialchars($schedule['title']) ?></h6>
                                             
                                             <!-- Delivery Mode Badge -->
-                                            <span class="badge bg-<?= $schedule['delivery_mode'] === 'online' ? 'info' : ($schedule['delivery_mode'] === 'physical' ? 'success' : 'warning') ?>">
+                                            <span class="badge bg-<?= $schedule['delivery_mode'] === 'online' ? 'info' : 'success' ?>">
                                                 <?= ucfirst($schedule['delivery_mode']) ?>
                                             </span>
                                             
@@ -250,7 +250,7 @@ include '../includes/header.php';
                                                         <span class="visually-hidden">Toggle Dropdown</span>
                                                     </button>
                                                     <ul class="dropdown-menu w-100">
-                                                        <?php if ($schedule['delivery_mode'] === 'online' || $schedule['delivery_mode'] === 'hybrid'): ?>
+                                                        <?php if ($schedule['delivery_mode'] === 'online'): ?>
                                                             <?php if ($schedule['online_fee'] >= 0): ?>
                                                                 <li><a class="dropdown-item" href="apply.php?schedule_id=<?= $schedule['id'] ?>&mode=online">
                                                                     Apply for Online (<?= $schedule['currency'] ?> <?= number_format($schedule['online_fee'], 2) ?>)
@@ -258,7 +258,7 @@ include '../includes/header.php';
                                                             <?php endif; ?>
                                                         <?php endif; ?>
                                                         
-                                                        <?php if ($schedule['delivery_mode'] === 'physical' || $schedule['delivery_mode'] === 'hybrid'): ?>
+                                                        <?php if ($schedule['delivery_mode'] === 'physical'): ?>
                                                             <?php if ($schedule['physical_fee'] >= 0): ?>
                                                                 <li><a class="dropdown-item" href="apply.php?schedule_id=<?= $schedule['id'] ?>&mode=physical">
                                                                     Apply for Physical (<?= $schedule['currency'] ?> <?= number_format($schedule['physical_fee'], 2) ?>)
@@ -321,7 +321,6 @@ function showDeliveryOptions(scheduleId, deliveryMode) {
     } else if (deliveryMode === 'physical') {
         window.location.href = `apply.php?schedule_id=${scheduleId}&mode=physical`;
     }
-    // For hybrid, the dropdown will handle the options
 }
 
 // Auto-scroll to schedules if no schedules are visible

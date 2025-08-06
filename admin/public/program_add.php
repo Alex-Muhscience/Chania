@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $formData = [
         'title' => trim($_POST['title'] ?? ''),
         'description' => trim($_POST['description'] ?? ''),
+        'category' => trim($_POST['category'] ?? ''),
         'duration' => trim($_POST['duration'] ?? ''),
         'fee' => floatval($_POST['fee'] ?? 0),
         'start_date' => $_POST['start_date'] ?? '',
@@ -67,10 +68,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $db = (new Database())->connect();
 
-            $stmt = $db->prepare("INSERT INTO programs (title, description, duration, fee, start_date, end_date, max_participants, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+            // Generate slug from title
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $formData['title'])));
+            
+            $stmt = $db->prepare("INSERT INTO programs (title, slug, description, short_description, category, duration, fee, start_date, end_date, max_participants, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
             $stmt->execute([
                 $formData['title'],
+                $slug,
                 $formData['description'],
+                substr($formData['description'], 0, 500), // Use first 500 chars as short description
+                $formData['category'] ?? 'General', // Default category
                 $formData['duration'],
                 $formData['fee'],
                 $formData['start_date'] ?: null,
@@ -119,6 +126,13 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="mb-3">
                         <label for="description" class="form-label">Description *</label>
                         <textarea class="form-control" id="description" name="description" rows="4" required><?= htmlspecialchars($formData['description']) ?></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category *</label>
+                        <input type="text" class="form-control" id="category" name="category"
+                               value="<?= htmlspecialchars($formData['category'] ?? '') ?>" 
+                               placeholder="e.g., Technology, Business, Health" required>
                     </div>
 
                     <div class="row">

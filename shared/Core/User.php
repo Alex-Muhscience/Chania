@@ -78,7 +78,7 @@ class User {
 
     public function create($data) {
         $stmt = $this->db->prepare("
-            INSERT INTO users (username, email, password, first_name, last_name, role_id, is_active) 
+            INSERT INTO users (username, email, password_hash, first_name, last_name, role_id, is_active) 
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
         
@@ -99,7 +99,7 @@ class User {
 
         foreach ($data as $key => $value) {
             if ($key === 'password' && !empty($value)) {
-                $fields[] = "password = ?";
+                $fields[] = "password_hash = ?";
                 $params[] = password_hash($value, PASSWORD_DEFAULT);
             } elseif (in_array($key, ['username', 'email', 'first_name', 'last_name', 'role_id', 'is_active', 'avatar_path'])) {
                 $fields[] = "{$key} = ?";
@@ -193,7 +193,7 @@ class User {
 
     public function changePassword($userId, $newPassword) {
         $stmt = $this->db->prepare("
-            UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+            UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
         ");
         return $stmt->execute([password_hash($newPassword, PASSWORD_DEFAULT), $userId]);
     }
@@ -379,7 +379,7 @@ class User {
 
         // Update password
         $stmt = $this->db->prepare("
-            UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+            UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
         ");
         $passwordUpdated = $stmt->execute([password_hash($newPassword, PASSWORD_DEFAULT), $resetData['user_id']]);
 

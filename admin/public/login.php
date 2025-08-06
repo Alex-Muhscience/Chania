@@ -53,16 +53,15 @@ $logger->log(
             );
             AdminLogger::log('admin_login_2fa', 'user', $user['id'], 'User logged in with 2FA verification', $user['id']);
             
-            // Only redirect to stored URL if it's an admin page, otherwise go to dashboard
+            // Clear any problematic redirect URLs and ensure clean redirect
+            unset($_SESSION['redirect_url']); // Clear any stored redirect URL
+            
+            // Always redirect to dashboard after successful 2FA login
             $redirectUrl = '/admin/public/index.php';
-            if (isset($_SESSION['redirect_url'])) {
-                $storedUrl = $_SESSION['redirect_url'];
-                // Only use stored URL if it's an admin page
-                if (strpos($storedUrl, '/admin/') !== false || strpos($storedUrl, '/chania/admin/') !== false) {
-                    $redirectUrl = $storedUrl;
-                }
-                unset($_SESSION['redirect_url']);
-            }
+            
+            // Debug logging
+            error_log('2FA Login successful, redirecting to: ' . BASE_URL . $redirectUrl);
+            
             Utilities::redirect($redirectUrl);
         } else {
 $logger->log(
@@ -114,16 +113,15 @@ $logger->log(
                     );
                     AdminLogger::log('admin_login', 'user', $user['id'], 'User logged in without 2FA', $user['id']);
 
-                    // Only redirect to stored URL if it's an admin page, otherwise go to dashboard
+                    // Clear any problematic redirect URLs and ensure clean redirect
+                    unset($_SESSION['redirect_url']); // Clear any stored redirect URL
+                    
+                    // Always redirect to dashboard after successful login
                     $redirectUrl = '/admin/public/index.php';
-                    if (isset($_SESSION['redirect_url'])) {
-                        $storedUrl = $_SESSION['redirect_url'];
-                        // Only use stored URL if it's an admin page
-                        if (strpos($storedUrl, '/admin/') !== false || strpos($storedUrl, '/chania/admin/') !== false) {
-                            $redirectUrl = $storedUrl;
-                        }
-                        unset($_SESSION['redirect_url']);
-                    }
+                    
+                    // Debug logging
+                    error_log('Login successful, redirecting to: ' . BASE_URL . $redirectUrl);
+                    
                     Utilities::redirect($redirectUrl);
                 }
             } else {

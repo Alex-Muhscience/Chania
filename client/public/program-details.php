@@ -127,27 +127,35 @@ $curriculum = getCourseCurriculum($program_id);
 include '../includes/header.php';
 ?>
 
-<section class="py-5">
-    <div class="container">
-        <!-- Program Header -->
+<!-- Program Hero Section -->
+<section class="hero-section py-5" style="background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%); position: relative; overflow: hidden;">
+    <div class="position-absolute top-0 start-0 w-100 h-100 hero-pattern"></div>
+    <div class="container position-relative">
         <div class="row mb-5">
             <div class="col-lg-10 mx-auto" data-aos="fade-up">
-                <div class="program-detail-header text-center">
-                    <h1 class="program-title mb-3"><?php echo htmlspecialchars($program['title']); ?></h1>
-                    <p class="program-description lead mb-4"><?php echo htmlspecialchars($program['description']); ?></p>
-                    <div class="program-meta d-flex justify-content-center flex-wrap gap-4 mb-4">
-                        <span class="badge bg-primary fs-6">Category: <?php echo htmlspecialchars($program['category']); ?></span>
-                        <span class="badge bg-success fs-6">Duration: <?php echo htmlspecialchars($program['duration']); ?></span>
+                <div class="program-detail-header text-center text-white">
+                    <h1 class="display-4 fw-bold mb-3 text-white"><?php echo htmlspecialchars($program['title']); ?></h1>
+                    <p class="lead mb-4 text-white-50"><?php echo htmlspecialchars($program['description']); ?></p>
+                    <div class="program-meta d-flex justify-content-center flex-wrap gap-3 mb-4">
+                        <span class="badge bg-light text-dark px-3 py-2 fs-6 rounded-pill">
+                            <i class="fas fa-tag me-2"></i>Category: <?php echo htmlspecialchars($program['category']); ?>
+                        </span>
+                        <span class="badge bg-light text-dark px-3 py-2 fs-6 rounded-pill">
+                            <i class="fas fa-clock me-2"></i>Duration: <?php echo htmlspecialchars($program['duration']); ?>
+                        </span>
                         <?php if ($program['fee']): ?>
-                            <span class="badge bg-info fs-6">Fee: $<?php echo number_format($program['fee'], 2); ?></span>
+                            <span class="badge bg-warning text-dark px-3 py-2 fs-6 rounded-pill">
+                                <i class="fas fa-dollar-sign me-2"></i>Fee: $<?php echo number_format($program['fee'], 2); ?>
+                            </span>
                         <?php else: ?>
-                            <span class="badge bg-warning fs-6">Free</span>
+                            <span class="badge bg-success px-3 py-2 fs-6 rounded-pill">
+                                <i class="fas fa-gift me-2"></i>Free
+                            </span>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </section>
 
@@ -172,7 +180,8 @@ include '../includes/header.php';
                         <div class="brochure-page brochure-cover">
                             <div class="cover-header">
                                 <div class="logo-section">
-                                    <img src="<?php echo ASSETS_URL; ?>images/logo.png" alt="Chania College" class="brochure-logo">
+                                    <?php $brochure_logo_url = getLogoUrl(); ?>
+                                    <img src="<?php echo $brochure_logo_url; ?>" alt="Chania College" class="brochure-logo">
                                     <h1 class="college-name">Chania Technical Training Institute</h1>
                                 </div>
                             </div>
@@ -465,6 +474,13 @@ include '../includes/header.php';
 </section>
 
 <style>
+/* Hero Pattern */
+.hero-pattern {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.8" fill="white" opacity="0.08"/><circle cx="10" cy="90" r="0.8" fill="white" opacity="0.08"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
 /* Brochure Styles */
 .brochure-wrapper {
     background: #f8f9fa;
@@ -490,7 +506,7 @@ include '../includes/header.php';
 
 /* Cover Page Styles */
 .brochure-cover {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
     color: white;
     display: flex;
     flex-direction: column;
@@ -602,11 +618,11 @@ include '../includes/header.php';
     text-align: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 3px solid #667eea;
+    border-bottom: 3px solid #DA2525;
 }
 
 .page-title {
-    color: #667eea;
+    color: #DA2525;
     font-size: 2rem;
     font-weight: 600;
     margin: 0;
@@ -623,12 +639,12 @@ include '../includes/header.php';
     background: #f8f9fa;
     padding: 1.5rem;
     border-radius: 8px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #DA2525;
 }
 
 .content-section h4,
 .info-section h4 {
-    color: #667eea;
+    color: #DA2525;
     font-size: 1.3rem;
     margin-bottom: 1rem;
     display: flex;
@@ -1037,7 +1053,7 @@ include '../includes/header.php';
 
 /* Contact Section */
 .contact-section {
-    background: #667eea;
+    background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
     color: white;
     padding: 2rem;
     border-radius: 12px;

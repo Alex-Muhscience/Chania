@@ -284,19 +284,19 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="card-body">
                 <div class="row text-center">
                     <div class="col-6">
-                        <div class="h4 font-weight-bold text-primary"><?= number_format($stats['total']) ?></div>
+                        <div class="h4 font-weight-bold text-primary"><?= number_format($stats['total'] ?? 0) ?></div>
                         <div class="text-xs text-gray-500">Total</div>
                     </div>
                     <div class="col-6">
-                        <div class="h4 font-weight-bold text-success"><?= number_format($stats['featured']) ?></div>
+                        <div class="h4 font-weight-bold text-success"><?= number_format($stats['featured'] ?? 0) ?></div>
                         <div class="text-xs text-gray-500">Featured</div>
                     </div>
                     <div class="col-6">
-                        <div class="h4 font-weight-bold text-info"><?= number_format($stats['approved']) ?></div>
+                        <div class="h4 font-weight-bold text-info"><?= number_format($stats['approved'] ?? 0) ?></div>
                         <div class="text-xs text-gray-500">Approved</div>
                     </div>
                     <div class="col-6">
-                        <div class="h4 font-weight-bold text-warning"><?= number_format($stats['avg_rating'], 1) ?></div>
+                        <div class="h4 font-weight-bold text-warning"><?= number_format($stats['avg_rating'] ?? 0, 1) ?></div>
                         <div class="text-xs text-gray-500">Avg Rating</div>
                     </div>
                 </div>

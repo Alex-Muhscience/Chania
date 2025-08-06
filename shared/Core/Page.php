@@ -33,8 +33,8 @@ class Page {
 
     public function create($data) {
         $stmt = $this->db->prepare("
-            INSERT INTO pages (title, slug, content, meta_title, meta_description, is_published, template) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO pages (title, slug, content, meta_title, meta_description, is_published, template, created_by) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ");
         
         return $stmt->execute([
@@ -44,7 +44,8 @@ class Page {
             $data['meta_title'] ?? '',
             $data['meta_description'] ?? '',
             $data['is_published'] ?? 1,
-            $data['template'] ?? 'default'
+            $data['template'] ?? 'default',
+            $data['created_by'] ?? 1
         ]);
     }
 

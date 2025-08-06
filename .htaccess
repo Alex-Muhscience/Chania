@@ -1,3 +1,4 @@
+# Enable URL rewriting
 RewriteEngine On
 
 # Set default charset
@@ -6,9 +7,14 @@ AddDefaultCharset UTF-8
 # Prevent directory listing
 Options -Indexes
 
+# Simple approach: rewrite everything to client/public/
+# Root access goes to client/public/index.php
+RewriteRule ^$ client/public/index.php [L]
 
-# Redirect root to client/public/ 
-RewriteRule ^$ /chania/client/public/ [L,R=301]
+# All other requests go to client/public/ directory
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ client/public/$1 [L]
 
 # Security headers
 Header always set X-Content-Type-Options nosniff

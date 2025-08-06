@@ -247,7 +247,7 @@ return [
     'cost_question' => 'What is the cost of the programs?',
     'cost_answer' => 'We offer both free and paid programs. Many of our foundational courses are completely free, while specialized and advanced programs have fees ranging from KSh 15,000 to KSh 35,000. We also offer payment plans and scholarships for qualified applicants.',
     'online_in_person_question' => 'Do you offer online or in-person classes?',
-    'online_in_person_answer' => 'We offer flexible learning options including in-person classes at our Kiambu center, live online sessions, and self-paced online courses. Many programs offer a hybrid approach combining online learning with practical in-person workshops.',
+    'online_in_person_answer' => 'We offer flexible learning options including in-person classes at our Kiambu center, live online sessions, and self-paced online courses. You can choose between online and physical delivery modes based on your preference and schedule.',
     'certificate_question' => 'Will I receive a certificate upon completion?',
     'certificate_answer' => 'Yes! All our programs include certificates of completion. Our certificates are recognized by industry partners and can be verified online. Some programs also offer the opportunity to earn additional industry-recognized certifications.',
     'stay_connected' => 'Stay Connected',

@@ -5,8 +5,11 @@ RewriteCond %{REQUEST_URI} ^/admin/?$
 RewriteRule ^(.*)$ /admin/public/ [L,R=301]
 
 # Handle requests within admin/public
+# Only redirect to index.php if the requested file doesn't exist AND it's not an asset file
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$
+RewriteCond %{REQUEST_URI} !/assets/
 RewriteRule ^(.*)$ index.php [QSA,L]
 
 # Security headers

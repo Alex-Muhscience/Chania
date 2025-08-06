@@ -44,19 +44,26 @@
         $(document).ready(function() {
             // Pages Table
             if ($('#pagesTable').length > 0) {
-                $('#pagesTable').DataTable({
-                    "paging": true,
-                    "lengthChange": true,
-                    "searching": true,
-                    "ordering": true,
-                    "info": true,
-                    "autoWidth": false,
-                    "responsive": true,
-                    "pageLength": 10,
-                    "columnDefs": [
-                        { "orderable": false, "targets": [5] } // Actions column not sortable
-                    ]
-                });
+                var $pagesTable = $('#pagesTable');
+                var columnCount = $pagesTable.find('thead tr:first th').length;
+                
+                try {
+                    $pagesTable.DataTable({
+                        "paging": true,
+                        "lengthChange": true,
+                        "searching": true,
+                        "ordering": true,
+                        "info": true,
+                        "autoWidth": false,
+                        "responsive": true,
+                        "pageLength": 10,
+                        "columnDefs": [
+                            { "orderable": false, "targets": [columnCount - 1] } // Actions column not sortable
+                        ]
+                    });
+                } catch (e) {
+                    console.warn('Could not initialize DataTable on pagesTable:', e);
+                }
             }
             
             // Media Table
@@ -128,5 +135,44 @@
                 darkModeIcon.classList.add('fa-moon');
                 localStorage.setItem('darkMode', 'disabled');
             }
+        });
+
+        // Navigation Enhancement
+        $(document).ready(function() {
+            // Handle sidebar navigation clicks
+            $('.sidebar .nav-link').on('click', function(e) {
+                const href = $(this).attr('href');
+                
+                // Only handle internal admin links
+                if (href && href.indexOf('/admin/public/') !== -1) {
+                    console.log('Navigating to:', href);
+                    
+                    // Remove active class from all nav items
+                    $('.sidebar .nav-item').removeClass('active');
+                    
+                    // Add active class to clicked item
+                    $(this).closest('.nav-item').addClass('active');
+                    
+                    // Let the browser handle the navigation normally
+                    return true;
+                }
+            });
+            
+            // Sidebar toggle functionality
+            $('#sidebarToggle, #sidebarToggleTop').on('click', function(e) {
+                e.preventDefault();
+                $('body').toggleClass('sidebar-toggled');
+                $('.sidebar').toggleClass('toggled');
+            });
+            
+            // Auto-close sidebar on mobile when clicking outside
+            $(document).on('click', function(e) {
+                if ($(window).width() < 768) {
+                    if (!$(e.target).closest('.sidebar, #sidebarToggleTop').length) {
+                        $('body').removeClass('sidebar-toggled');
+                        $('.sidebar').removeClass('toggled');
+                    }
+                }
+            });
         });
     </script>

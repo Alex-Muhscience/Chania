@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS program_schedules (
     start_date DATE NOT NULL,
     end_date DATE,
     location VARCHAR(255) DEFAULT 'Online',
-    delivery_mode ENUM('online', 'physical', 'hybrid') DEFAULT 'online',
+    delivery_mode ENUM('online', 'physical') DEFAULT 'online',
     max_participants INT NULL,
     current_participants INT DEFAULT 0,
     online_fee DECIMAL(10,2) DEFAULT 0.00,
@@ -76,7 +76,7 @@ INSERT INTO program_schedules (program_id, title, start_date, end_date, location
 -- Assuming program ID 1 exists
 (1, 'March 2024 Cohort', '2024-03-15', '2024-06-15', 'Online', 'online', 4500.00, 6500.00, 30, '2024-03-10'),
 (1, 'April 2024 Cohort', '2024-04-20', '2024-07-20', 'Nairobi Campus', 'physical', 4500.00, 6500.00, 25, '2024-04-15'),
-(1, 'May 2024 Cohort', '2024-05-10', '2024-08-10', 'Hybrid', 'hybrid', 4500.00, 6500.00, 35, '2024-05-05');
+(1, 'May 2024 Cohort', '2024-05-10', '2024-08-10', 'Online', 'online', 4500.00, 6500.00, 35, '2024-05-05');
 
 -- Sample curriculum data
 INSERT INTO program_curriculum (program_id, module_title, module_description, module_order, duration_hours, learning_objectives) VALUES

@@ -1,4 +1,4 @@
-<?php if (isset($_SESSION['success'])): ?>
+    <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         <?= htmlspecialchars($_SESSION['success']) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -14,12 +14,21 @@
     <?php unset($_SESSION['error']); ?>
 <?php endif; ?>
 
+<?php
+// CSRF Protection
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+?>
+
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Site Settings</h1>
     </div>
     
     <form action="" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
         <?php foreach ($groupedSettings as $group => $settings): ?>
             <div class="card shadow mb-4">
                 <div class="card-header py-3">

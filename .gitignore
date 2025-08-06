@@ -79,6 +79,10 @@ test*/
 debug*/
 fixes*/
 *.test.php
+test.php
+test_*.php
+check_*.php
+reset_*.php
 
 # Performance and configuration backups
 *.performance

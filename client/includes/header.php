@@ -26,6 +26,9 @@
     <meta property="og:title" content="<?php echo sanitizeOutput($page_title); ?>">
     <meta property="og:description" content="<?php echo sanitizeOutput($page_description); ?>">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="<?php echo getFaviconUrl(); ?>">
+    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -515,7 +518,14 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
                 <a class="navbar-brand" href="<?php echo BASE_URL; ?>">
-                    <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                    <?php 
+                    $logo_url = getLogoUrl();
+                    if (!empty($logo_url) && $logo_url !== ASSETS_URL . 'images/logo.png'):
+                    ?>
+                        <img src="<?php echo $logo_url; ?>" alt="<?php echo SITE_NAME; ?>" style="height: 40px; width: auto; margin-right: 0.5rem;">
+                    <?php else: ?>
+                        <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                    <?php endif; ?>
                     <span class="text-primary fw-bold"><?php echo SITE_NAME; ?></span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

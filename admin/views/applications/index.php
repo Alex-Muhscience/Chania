@@ -59,19 +59,19 @@
                     <tbody>
                         <?php foreach ($applications as $application): ?>
                             <tr>
-                                <td><?= $application['id'] ?></td>
+                                <td><?= $application['id'] ?? 'N/A' ?></td>
                                 <td><?= htmlspecialchars($application['full_name'] ?? '') ?></td>
-                                <td><?= htmlspecialchars($application['email']) ?></td>
+                                <td><?= htmlspecialchars($application['email'] ?? 'N/A') ?></td>
                                 <td><?= htmlspecialchars($application['program_title'] ?? 'N/A') ?></td>
                                 <td>
-                                    <span class="badge bg-<?= $application['status'] === 'approved' ? 'success' : ($application['status'] === 'rejected' ? 'danger' : 'warning') ?>">
-                                        <?= ucfirst($application['status']) ?>
+                                    <span class="badge bg-<?= ($application['status'] ?? 'pending') === 'approved' ? 'success' : (($application['status'] ?? 'pending') === 'rejected' ? 'danger' : 'warning') ?>">
+                                        <?= ucfirst($application['status'] ?? 'pending') ?>
                                     </span>
                                 </td>
-                                <td><?= date('M j, Y', strtotime($application['submitted_at'])) ?></td>
+                                <td><?= isset($application['submitted_at']) && $application['submitted_at'] ? date('M j, Y', strtotime($application['submitted_at'])) : 'N/A' ?></td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="<?= BASE_URL ?>\admin\public\application_view.php?id=<?= $application['id'] ?>"
+                                        <a href="<?= BASE_URL ?>\admin\public\application_view.php?id=<?= $application['id'] ?? '' ?>"
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye"></i>
                                         </a>
@@ -85,7 +85,7 @@
                                                 <li>
                                                     <form method="POST" style="display: inline;">
                                                         <input type="hidden" name="action" value="update_status">
-                                                        <input type="hidden" name="application_id" value="<?= $application['id'] ?>">
+                                                        <input type="hidden" name="application_id" value="<?= $application['id'] ?? '' ?>">
                                                         <input type="hidden" name="status" value="approved">
                                                         <button type="submit" class="dropdown-item">
                                                             <i class="fas fa-check text-success"></i> Approve
@@ -95,7 +95,7 @@
                                                 <li>
                                                     <form method="POST" style="display: inline;">
                                                         <input type="hidden" name="action" value="update_status">
-                                                        <input type="hidden" name="application_id" value="<?= $application['id'] ?>">
+                                                        <input type="hidden" name="application_id" value="<?= $application['id'] ?? '' ?>">
                                                         <input type="hidden" name="status" value="rejected">
                                                         <button type="submit" class="dropdown-item">
                                                             <i class="fas fa-times text-danger"></i> Reject
@@ -107,7 +107,7 @@
 
                                         <form method="POST" style="display: inline;">
                                             <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="application_id" value="<?= $application['id'] ?>">
+                                            <input type="hidden" name="application_id" value="<?= $application['id'] ?? '' ?>">
                                             <button type="submit" class="btn btn-sm btn-outline-danger"
                                                     onclick="return confirm('Are you sure you want to delete this application?')">
                                                 <i class="fas fa-trash"></i>

@@ -191,14 +191,12 @@ document.addEventListener('DOMContentLoaded', function() {
 function updateStatus(id, type, status, element) {
     const originalValue = element.getAttribute('data-original-value');
     
-    fetch(`${window.location.origin}/chania/admin/public/api/update-status.php`, {
-        method: 'POST',
+    fetch(`${window.location.origin}/chania/api/v1/${type}/${id}`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            id: id,
-            type: type,
             status: status
         })
     })

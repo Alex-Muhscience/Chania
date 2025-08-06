@@ -45,7 +45,7 @@ INSERT INTO program_sessions (program_id, start_date, end_date, location, max_pa
 
 -- Digital Marketing sessions
 (3, '2024-02-01', '2024-03-15', 'Online', 60, 45, 1, 1, '6-week accelerated course'),
-(3, '2024-03-20', '2024-05-05', 'Johannesburg, South Africa', 35, 28, 1, 1, 'Hybrid learning model'),
+(3, '2024-03-20', '2024-05-05', 'Johannesburg, South Africa', 35, 28, 1, 1, 'In-person program with practical workshops'),
 (3, '2024-04-15', '2024-05-30', 'Online', 80, 15, 1, 1, 'Self-paced with mentor support'),
 
 -- Financial Literacy sessions

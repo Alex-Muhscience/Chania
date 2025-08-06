@@ -377,7 +377,7 @@ include '../includes/header.php';
                         </h2>
                         <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                             <div class="accordion-body">
-                                We offer flexible learning options including in-person classes at our Kiambu center, live online sessions, and self-paced online courses. Many programs offer a hybrid approach combining online learning with practical in-person workshops.
+                                We offer flexible learning options including in-person classes at our Kiambu center, live online sessions, and self-paced online courses. You can choose between online and physical delivery modes based on your preference and schedule.
                             </div>
                         </div>
                     </div>

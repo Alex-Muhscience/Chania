@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const email = subscribeForm.querySelector('input[name="email"]').value;
             const name = subscribeForm.querySelector('input[name="name"]').value;
-            await postData('/api/subscriptions/newsletter', { email, name });
+await postData('/api/v1/newsletter/subscribe', { name, email });
         });
     }
 
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const data = new FormData(applyForm);
             const formData = Object.fromEntries(data.entries());
-            await postData('/api/applications/course', formData);
+await postData('/api/v1/applications', formData);
         });
     }
 
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const data = new FormData(contactForm);
             const formData = Object.fromEntries(data.entries());
-            await postData('/api/contact', formData);
+await postData('/api/v1/contacts', formData);
         });
     }
 
@@ -39,12 +39,21 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const data = new FormData(registerForm);
             const formData = Object.fromEntries(data.entries());
-            await postData('/api/registrations/event', formData);
+await postData('/api/v1/events', formData);
         });
     }
 
     // Utility function to POST data to API
-    async function postData(url = '', data = {}) {
+    async function postData(url = '', data = {}, formElement = null) {
+        let submitButton = null;
+        if (formElement) {
+            submitButton = formElement.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+            }
+        }
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
@@ -53,11 +62,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify(data)
             });
+            
             const result = await response.json();
-            console.log(result);
+            
+            if (response.ok && result.status === 'success') {
+                showMessage(result.message || 'Success!', 'success');
+                if (formElement) formElement.reset();
+            } else {
+                showMessage(result.message || 'An error occurred', 'error');
+            }
+            
         } catch (error) {
             console.error('Error posting data:', error);
+            showMessage('Network error. Please try again.', 'error');
+        } finally {
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit';
+            }
         }
+    }
+
+    // Function to show user messages
+    function showMessage(message, type = 'info') {
+        // Create message element if it doesn't exist
+        let messageContainer = document.getElementById('api-message');
+        if (!messageContainer) {
+            messageContainer = document.createElement('div');
+            messageContainer.id = 'api-message';
+            messageContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+                z-index: 10000;
+                max-width: 400px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            `;
+            document.body.appendChild(messageContainer);
+        }
+
+        // Set message content and style
+        messageContainer.textContent = message;
+        
+        const colors = {
+            success: '#28a745',
+            error: '#dc3545',
+            info: '#17a2b8',
+            warning: '#ffc107'
+        };
+        
+        messageContainer.style.backgroundColor = colors[type] || colors.info;
+        messageContainer.style.display = 'block';
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            messageContainer.style.display = 'none';
+        }, 5000);
     }
 });
 

@@ -179,7 +179,7 @@ class ProgramsController extends BaseController {
     }
 
     private function handleProgramCreation() {
-        $requiredFields = ['title', 'description', 'duration'];
+        $requiredFields = ['title', 'slug', 'description', 'short_description', 'category', 'duration'];
         $errors = $this->validateRequired($_POST, $requiredFields);
 
         if (empty($errors)) {
@@ -189,12 +189,15 @@ class ProgramsController extends BaseController {
                 // Create basic program
                 $programData = $this->sanitizeInput($_POST);
                 $stmt = $this->db->prepare("
-                    INSERT INTO programs (title, description, duration, fee, is_active, created_at) 
-                    VALUES (?, ?, ?, ?, 1, NOW())
+                    INSERT INTO programs (title, slug, description, short_description, category, duration, fee, is_active, created_at) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 1, NOW())
                 ");
                 $result = $stmt->execute([
                     $programData['title'],
+                    $programData['slug'],
                     $programData['description'],
+                    $programData['short_description'],
+                    $programData['category'],
                     $programData['duration'],
                     $programData['fee'] ?? 0
                 ]);

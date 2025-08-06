@@ -53,27 +53,30 @@
                         <?php else: ?>
                             <?php foreach ($roles as $role): ?>
                                 <tr>
-                                    <td><?= $role['id'] ?></td>
-                                    <td><strong><?= htmlspecialchars($role['name']) ?></strong></td>
-                                    <td><?= htmlspecialchars($role['description']) ?></td>
+                                    <td><?= $role['id'] ?? 'N/A' ?></td>
+                                    <td><strong><?= htmlspecialchars($role['name'] ?? '') ?></strong></td>
+                                    <td><?= htmlspecialchars($role['description'] ?? '') ?></td>
                                     <td>
-                                        <?php if (in_array('*', $role['permissions'])): ?>
+                                        <?php $permissions = $role['permissions'] ?? []; ?>
+                                        <?php if (in_array('*', $permissions)): ?>
                                             <span class="badge bg-danger">All Permissions</span>
-                                        <?php else: ?>
-                                            <?php foreach (array_slice($role['permissions'], 0, 3) as $permission): ?>
+                                        <?php elseif (!empty($permissions)): ?>
+                                            <?php foreach (array_slice($permissions, 0, 3) as $permission): ?>
                                                 <span class="badge bg-secondary me-1"><?= htmlspecialchars($permission) ?></span>
                                             <?php endforeach; ?>
-                                            <?php if (count($role['permissions']) > 3): ?>
-                                                <span class="text-muted">+<?= count($role['permissions']) - 3 ?> more</span>
+                                            <?php if (count($permissions) > 3): ?>
+                                                <span class="text-muted">+<?= count($permissions) - 3 ?> more</span>
                                             <?php endif; ?>
+                                        <?php else: ?>
+                                            <span class="text-muted">No permissions</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <?php if ($role['is_default']): ?>
+                                        <?php if (isset($role['is_default']) && $role['is_default']): ?>
                                             <span class="badge bg-success">Default</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= date('M j, Y', strtotime($role['created_at'])) ?></td>
+                                    <td><?= isset($role['created_at']) ? date('M j, Y', strtotime($role['created_at'])) : 'N/A' ?></td>
                                     <td>
                                         <div class="btn-group">
                                             <a href="role_edit.php?id=<?= $role['id'] ?>" class="btn btn-sm btn-outline-primary" title="Edit">

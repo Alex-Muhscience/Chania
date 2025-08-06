@@ -19,7 +19,6 @@ class UsersController extends BaseController {
     }
 
     public function index() {
-        // Check permissions
         if (!$this->hasPermission('users') && !$this->hasPermission('*')) {
             $this->setFlashMessage('error', 'Access denied. You do not have permission to manage users.');
             header('Location: index.php');

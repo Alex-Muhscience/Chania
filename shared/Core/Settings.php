@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/Database.php';
+
 class Settings {
     private static $settings = null;
     private static $db = null;
@@ -100,14 +102,26 @@ class Settings {
             self::$db->beginTransaction();
             
             $stmt = self::$db->prepare("UPDATE site_settings SET setting_value = ?, updated_at = NOW() WHERE setting_key = ?");
+            $updated = 0;
             
             foreach ($settings as $key => $value) {
-                $stmt->execute([$value, $key]);
-                self::$settings[$key] = $value;
+                $result = $stmt->execute([$value, $key]);
+                if ($result && $stmt->rowCount() > 0) {
+                    self::$settings[$key] = $value;
+                    $updated++;
+                } else {
+                    error_log("Settings update failed for key: $key");
+                }
             }
             
-            self::$db->commit();
-            return true;
+            if ($updated > 0) {
+                self::$db->commit();
+                return true;
+            } else {
+                self::$db->rollBack();
+                error_log("No settings were updated");
+                return false;
+            }
         } catch (Exception $e) {
             self::$db->rollBack();
             error_log("Settings updateMultiple error: " . $e->getMessage());

@@ -35,12 +35,34 @@
         </a>
     </li>
 
-    <!-- Nav Item - Programs -->
-    <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'programs.php' || basename($_SERVER['PHP_SELF']) === 'program_edit.php' ? 'active' : '' ?>">
-        <a class="nav-link" href="<?= BASE_URL ?>/admin/public/programs.php">
+    <!-- Nav Item - Programs Dropdown -->
+    <li class="nav-item <?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_edit.php', 'program_add.php', 'program_categories.php', 'manage_schedules.php', 'schedule_add.php', 'schedule_edit.php']) ? 'active' : '' ?>">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePrograms" aria-expanded="<?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_edit.php', 'program_add.php', 'program_categories.php', 'manage_schedules.php', 'schedule_add.php', 'schedule_edit.php']) ? 'true' : 'false' ?>">
             <i class="fas fa-fw fa-graduation-cap"></i>
             <span>Programs</span>
         </a>
+        <div id="collapsePrograms" class="collapse <?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_edit.php', 'program_add.php', 'program_categories.php', 'manage_schedules.php', 'schedule_add.php', 'schedule_edit.php']) ? 'show' : '' ?>" data-bs-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Program Management:</h6>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'programs.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/programs.php">
+                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>All Programs
+                </a>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'program_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/program_add.php">
+                    <i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Program
+                </a>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'program_categories.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/program_categories.php">
+                    <i class="fas fa-tags fa-sm fa-fw mr-2 text-gray-400"></i>Categories
+                </a>
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">Scheduling:</h6>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'manage_schedules.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/manage_schedules.php">
+                    <i class="fas fa-calendar-alt fa-sm fa-fw mr-2 text-gray-400"></i>Manage Schedules
+                </a>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'schedule_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/schedule_add.php">
+                    <i class="fas fa-calendar-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add Schedule
+                </a>
+            </div>
+        </div>
     </li>
 
     <!-- Nav Item - Applications -->

@@ -365,7 +365,20 @@ require_once __DIR__ . '/../includes/header.php';
                                         <p><strong>Entity:</strong> <?= htmlspecialchars($log['entity_type'] ?? 'N/A') ?></p>
                                         <a href="#" class="details-toggle" onclick="toggleDetails(this)">Show Details</a>
                                         <div class="timeline-details">
-                                            <pre><?= htmlspecialchars($log['details'] ?? 'No additional details.') ?></pre>
+                                            <?php 
+                                            $details = '';
+                                            if (!empty($log['old_values']) || !empty($log['new_values'])) {
+                                                if (!empty($log['old_values'])) {
+                                                    $details .= 'Old Values: ' . $log['old_values'] . "\n";
+                                                }
+                                                if (!empty($log['new_values'])) {
+                                                    $details .= 'New Values: ' . $log['new_values'];
+                                                }
+                                            } else {
+                                                $details = 'No additional details.';
+                                            }
+                                            ?>
+                                            <pre><?= htmlspecialchars($details) ?></pre>
                                         </div>
                                     </div>
                                 </div>
@@ -416,7 +429,7 @@ require_once __DIR__ . '/../includes/header.php';
                                             <small class="text-muted"><?= htmlspecialchars($log['ip_address']) ?></small>
                                         </td>
                                         <td>
-                                            <?php if ($log['details']): ?>
+                                            <?php if (!empty($log['old_values']) || !empty($log['new_values'])): ?>
                                                 <button type="button" class="btn btn-outline-primary btn-sm"
                                                         data-toggle="modal" data-target="#logModal<?= $log['id'] ?>">
                                                     <i class="fas fa-eye"></i>
@@ -453,7 +466,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <!-- Log Details Modals -->
 <?php foreach ($logs as $log): ?>
-    <?php if ($log['details']): ?>
+    <?php if (!empty($log['old_values']) || !empty($log['new_values'])): ?>
         <div class="modal fade" id="logModal<?= $log['id'] ?>" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
@@ -470,7 +483,8 @@ require_once __DIR__ . '/../includes/header.php';
                                 <p><strong>User:</strong> <?= htmlspecialchars($log['user_name']) ?></p>
                                 <p><strong>Action:</strong> <?= htmlspecialchars($log['action']) ?></p>
                                 <p><strong>Entity:</strong> <?= htmlspecialchars($log['entity_type'] ?? 'N/A') ?></p>
-                                <p><strong>Details:</strong> <?= htmlspecialchars($log['details'] ?? 'N/A') ?></p>
+                                <p><strong>Entity ID:</strong> <?= htmlspecialchars($log['entity_id'] ?? 'N/A') ?></p>
+                                <p><strong>Severity:</strong> <?= htmlspecialchars($log['severity'] ?? 'N/A') ?></p>
                                 <p><strong>Date:</strong> <?= date('M j, Y g:i A', strtotime($log['created_at'])) ?></p>
                                 <p><strong>IP Address:</strong> <?= htmlspecialchars($log['ip_address']) ?></p>
                             </div>
@@ -480,9 +494,16 @@ require_once __DIR__ . '/../includes/header.php';
                             </div>
                         </div>
 
-                        <?php if ($log['details']): ?>
-                            <h6>Additional Details</h6>
-                            <pre class="bg-light p-3 rounded"><?= htmlspecialchars($log['details']) ?></pre>
+                        <?php if (!empty($log['old_values']) || !empty($log['new_values'])): ?>
+                            <h6>Change Details</h6>
+                            <?php if (!empty($log['old_values'])): ?>
+                                <h6>Old Values:</h6>
+                                <pre class="bg-light p-3 rounded"><?= htmlspecialchars($log['old_values']) ?></pre>
+                            <?php endif; ?>
+                            <?php if (!empty($log['new_values'])): ?>
+                                <h6>New Values:</h6>
+                                <pre class="bg-light p-3 rounded"><?= htmlspecialchars($log['new_values']) ?></pre>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                     <div class="modal-footer">

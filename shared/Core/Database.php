@@ -1,10 +1,18 @@
 <?php
 class Database {
-    private $host = '127.0.0.1';
-    private $db_name = 'chania_db';
-    private $username = 'root';
-    private $password = '';
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
     private $conn;
+    
+    public function __construct() {
+        // Use environment variables or fallback to defaults
+        $this->host = $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: '127.0.0.1';
+        $this->db_name = $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: 'chania_db';
+        $this->username = $_ENV['DB_USER'] ?? getenv('DB_USER') ?: 'root';
+        $this->password = $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '';
+    }
 
     public function connect(): PDO
     {

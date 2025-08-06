@@ -31,9 +31,24 @@ class Utilities {
         }
         
         if (!self::isLoggedIn()) {
-            // Store the current URL for redirect after login
+            // Clear any existing problematic redirect URLs
+            unset($_SESSION['redirect_url']);
+            
+            // Only store valid admin page URLs for redirect after login
             if (isset($_SERVER['REQUEST_URI'])) {
-                $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
+                $requestUri = $_SERVER['REQUEST_URI'];
+                // Only store URLs that are admin pages and not assets
+                if (strpos($requestUri, '/admin/public/') !== false && 
+                    !strpos($requestUri, '.css') && 
+                    !strpos($requestUri, '.js') && 
+                    !strpos($requestUri, '.png') && 
+                    !strpos($requestUri, '.jpg') && 
+                    !strpos($requestUri, '.jpeg') && 
+                    !strpos($requestUri, '.gif') && 
+                    !strpos($requestUri, '.ico') && 
+                    !strpos($requestUri, '/assets/')) {
+                    $_SESSION['redirect_url'] = $requestUri;
+                }
             }
             self::redirect('/admin/public/login.php');
         }

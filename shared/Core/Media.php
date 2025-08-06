@@ -29,20 +29,33 @@ class Media {
             mkdir($uploadPath, 0755, true);
         }
 
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'video/mp4', 'video/avi'];
+        $allowedTypes = [
+            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+            'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'video/mp4', 'video/avi', 'video/mov', 'video/wmv',
+            'audio/mp3', 'audio/wav', 'audio/ogg'
+        ];
         $maxSize = 10 * 1024 * 1024; // 10MB
 
         if (!in_array($file['type'], $allowedTypes)) {
-            throw new Exception('File type not allowed');
+            throw new Exception('File type not allowed. Allowed types: ' . implode(', ', $allowedTypes));
         }
 
         if ($file['size'] > $maxSize) {
-            throw new Exception('File size too large');
+            throw new Exception('File size too large. Maximum size: ' . $this->formatFileSize($maxSize));
         }
 
-        $fileName = time() . '_' . basename($file['name']);
+        // Generate unique filename
+        $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $fileName = time() . '_' . uniqid() . '.' . $fileExtension;
         $filePath = $uploadPath . $fileName;
-        $relativePath = '/uploads/media/' . $fileName;
+        
+        // Calculate relative path from uploads directory
+        $uploadsDir = __DIR__ . '/../../uploads/';
+        $relativePath = '/' . str_replace($uploadsDir, 'uploads/', $uploadPath) . $fileName;
+        $relativePath = str_replace('\\', '/', $relativePath); // Fix Windows path separators
 
         if (move_uploaded_file($file['tmp_name'], $filePath)) {
             $stmt = $this->db->prepare("

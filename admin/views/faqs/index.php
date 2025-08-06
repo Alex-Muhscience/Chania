@@ -35,13 +35,13 @@
             <!-- Filter Form -->
             <form method="GET" class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <input type="text" name="search" class="form-control" placeholder="Search questions or answers..." value="<?= htmlspecialchars($filters['search']) ?>">
+                    <input type="text" name="search" class="form-control" placeholder="Search questions or answers..." value="<?= htmlspecialchars($filters['search'] ?? '') ?>">
                 </div>
                 <div class="col-md-3">
                     <select name="category" class="form-select">
                         <option value="">All Categories</option>
                         <?php foreach ($categories as $cat): ?>
-                            <option value="<?= htmlspecialchars($cat) ?>" <?= $filters['category'] === $cat ? 'selected' : '' ?>><?= htmlspecialchars($cat) ?></option>
+                            <option value="<?= htmlspecialchars($cat ?? '') ?>" <?= ($filters['category'] ?? '') === $cat ? 'selected' : '' ?>><?= htmlspecialchars($cat ?? '') ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -81,15 +81,15 @@
                             <?php foreach ($faqs as $faq): ?>
                                 <tr>
                                     <td><?= $faq['id'] ?></td>
-                                    <td><?= htmlspecialchars($faq['question']) ?></td>
-                                    <td><?= htmlspecialchars($faq['category']) ?></td>
+                                    <td><?= htmlspecialchars($faq['question'] ?? '') ?></td>
+                                    <td><?= htmlspecialchars($faq['category'] ?? '') ?></td>
                                     <td>
                                         <span class="badge bg-<?= $faq['is_active'] ? 'success' : 'secondary' ?>">
                                             <?= $faq['is_active'] ? 'Active' : 'Inactive' ?>
                                         </span>
                                     </td>
                                     <td><?= $faq['display_order'] ?></td>
-                                    <td><?= htmlspecialchars($faq['created_by_username']) ?></td>
+                                    <td><?= htmlspecialchars($faq['created_by_username'] ?? 'Unknown') ?></td>
                                     <td><?= date('M j, Y', strtotime($faq['created_at'])) ?></td>
                                     <td>
                                         <div class="btn-group">
@@ -120,7 +120,7 @@
                     <ul class="pagination justify-content-center">
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <li class="page-item <?= $i === $currentPage ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?>&category=<?= urlencode($filters['category']) ?>&status=<?= $filters['status'] ?>&search=<?= urlencode($filters['search']) ?>"><?= $i ?></a>
+                                <a class="page-link" href="?page=<?= $i ?>&category=<?= urlencode($filters['category'] ?? '') ?>&status=<?= $filters['status'] ?? '' ?>&search=<?= urlencode($filters['search'] ?? '') ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
                     </ul>

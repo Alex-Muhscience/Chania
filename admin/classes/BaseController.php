@@ -13,7 +13,7 @@ abstract class BaseController {
     protected $success = '';
     
     public function __construct() {
-        // Ensure session is started
+        // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -29,20 +29,8 @@ abstract class BaseController {
     }
     
     private function checkAuthentication() {
-        if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
-            // Store the current URL for redirect after login
-            if (isset($_SERVER['REQUEST_URI'])) {
-                $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
-            }
-            
-            // Redirect to login page using clean header redirect
-            $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-            $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-            $loginUrl = $protocol . $host . '/chania/admin/public/login.php';
-            
-            header('Location: ' . $loginUrl);
-            exit;
-        }
+        // Use Utilities::requireLogin() instead of custom logic
+        Utilities::requireLogin();
     }
     
     protected function handleFlashMessages() {
