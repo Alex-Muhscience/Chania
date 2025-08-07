@@ -8,7 +8,7 @@
   ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4.svg)
   ![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1.svg)
   ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple.svg)
-  ![License](https://img.shields.io/badge/license-MIT-green.svg)
+  ![License](https://img.shields.io/badge/license-Proprietary-red.svg)
   ![Status](https://img.shields.io/badge/status-Active%20Development-green.svg)
 </div>
 
@@ -150,10 +150,10 @@ chania/
 
 ### **Setup Instructions**
 
-1. **Clone the repository**
+1. **Access the repository** (authorized personnel only)
    ```bash
-   git clone https://github.com/your-org/digital-empowerment-network.git
-   cd digital-empowerment-network
+   git clone https://github.com/Alex-Muhscience/Chania.git
+   cd chania
    ```
 
 2. **Configure the database**
@@ -306,12 +306,12 @@ $mail->Port = 587;
 - **Security testing** for vulnerabilities
 - **Performance testing** for optimization
 
-### **Contributing**
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### **Development Notes**
+- This is a proprietary client project
+- All development is done under client contract
+- Code modifications require client approval
+- Internal development follows established coding standards
+- Security and performance are prioritized throughout
 
 ## 📈 Performance
 
@@ -352,14 +352,16 @@ $mail->Port = 587;
 - **FAQ Section** - Common questions and answers
 
 ### **Getting Help**
-- **Issue Tracker** - Report bugs and feature requests
-- **Community Forum** - Ask questions and share knowledge
-- **Email Support** - Direct support for critical issues
-- **Professional Services** - Custom development and consulting
+- **Internal Issue Tracking** - Report bugs and feature requests to development team
+- **Client Support Portal** - Direct access to support resources
+- **Technical Documentation** - Comprehensive system documentation
+- **Direct Developer Contact** - For critical issues and support needs
 
-## 📄 License
+## 📄 License & Copyright
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**© 2024 Digital Empowerment Network - All Rights Reserved**
+
+This is a proprietary software project developed for Digital Empowerment Network. All rights reserved. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited without explicit written permission from the copyright holder.
 
 ## 🙏 Acknowledgments
 
@@ -372,7 +374,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Digital Empowerment Network Admin Panel v2.0**  
-*Empowering organizations to manage their digital transformation initiatives effectively.*
+**Digital Empowerment Network Platform v3.0**  
+*A comprehensive digital empowerment management system developed for Digital Empowerment Network.*
 
-For more information, visit our [website](https://digital-empowerment.network) or contact us at admin@digital-empowerment.network.
+**Proprietary Software** - Developed under contract for Digital Empowerment Network.  
+For technical support or inquiries, contact the development team directly.
