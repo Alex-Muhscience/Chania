@@ -116,16 +116,18 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="online_fee" class="form-label">Online Fee</label>
+                                <label for="online_fee" class="form-label">Online Fee *</label>
                                 <input type="number" class="form-control" id="online_fee" name="online_fee" 
-                                       min="0" step="0.01" value="0">
+                                       min="0.01" step="0.01" required>
+                                <small class="form-text text-muted">All courses must be available online</small>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label for="physical_fee" class="form-label">Physical Fee</label>
+                                <label for="physical_fee" class="form-label">Physical Fee *</label>
                                 <input type="number" class="form-control" id="physical_fee" name="physical_fee" 
-                                       min="0" step="0.01" value="0">
+                                       min="0.01" step="0.01" required>
+                                <small class="form-text text-muted">All courses must be available physically</small>
                             </div>
                         </div>
                         <div class="col-md-3">

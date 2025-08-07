@@ -194,14 +194,27 @@ function initNewsletterForm() {
         submitBtn.disabled = true;
 
         try {
-            // Simulate API call (replace with actual endpoint when ready)
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Call the actual newsletter subscription endpoint
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('source', 'website_footer');
             
-            showAlert('Thank you for subscribing to our newsletter!', 'success');
-            this.reset();
+            const response = await fetch('/chania/client/public/newsletter_subscribe.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.status === 'success' || result.status === 'info') {
+                showAlert(result.message, result.status === 'success' ? 'success' : 'info');
+                this.reset();
+            } else {
+                showAlert(result.message || 'An error occurred. Please try again later.', 'danger');
+            }
         } catch (error) {
             console.error('Newsletter subscription error:', error);
-            showAlert('An error occurred. Please try again later.', 'danger');
+            showAlert('Unable to connect to server. Please check your internet connection and try again.', 'danger');
         } finally {
             // Restore button state
             submitBtn.innerHTML = originalText;

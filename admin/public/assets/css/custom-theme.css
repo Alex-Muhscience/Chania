@@ -78,14 +78,106 @@
   background-color: var(--primary-dark) !important;
 }
 
+/* Sidebar text styling - high visibility with bright colors and shadows */
+.sidebar .nav-item .nav-link {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+  font-weight: 500 !important;
+}
+
+.sidebar .nav-item .nav-link i {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+  filter: brightness(1.2) !important;
+}
+
+.sidebar .nav-item .nav-link span {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+.sidebar .sidebar-heading {
+  color: #f8f9fa !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9) !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.5px !important;
+}
+
+.sidebar .sidebar-brand-text {
+  color: #ffffff !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+  font-weight: 700 !important;
+}
+
+.sidebar .sidebar-brand-icon {
+  color: #ffffff !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8) !important;
+  filter: brightness(1.3) drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8)) !important;
+}
+
+/* Collapse dropdown items styling */
+.sidebar .collapse-inner .collapse-item {
+  color: #212529 !important;
+  font-weight: 500 !important;
+}
+
+.sidebar .collapse-inner .collapse-item:hover {
+  color: #000000 !important;
+  background-color: rgba(218, 37, 37, 0.1) !important;
+}
+
+.sidebar .collapse-inner .collapse-item.active {
+  color: #ffffff !important;
+  background-color: var(--primary-color) !important;
+}
+
+.sidebar .collapse-inner .collapse-header {
+  color: #6c757d !important;
+  font-weight: 600 !important;
+}
+
 /* Active nav link in sidebar */
 .sidebar .nav-item .nav-link.active {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  color: #fff !important;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9) !important;
+  font-weight: 600 !important;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1) !important;
+}
+
+.sidebar .nav-item .nav-link.active i {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9) !important;
+  filter: brightness(1.4) !important;
 }
 
 .sidebar .nav-item .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9) !important;
+  transform: translateX(2px) !important;
+  transition: all 0.3s ease !important;
+}
+
+.sidebar .nav-item .nav-link:hover i {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9) !important;
+  filter: brightness(1.3) !important;
+}
+
+.sidebar .nav-item .nav-link:hover span {
+  color: #ffffff !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Notification badges on sidebar */
+.sidebar .nav-item .nav-link .notification-badge {
+  background-color: #ffc107 !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Progress bars */

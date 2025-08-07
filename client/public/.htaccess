@@ -1,0 +1,16 @@
+# Client Public Directory .htaccess
+# This handles routing for the public-facing site
+
+# Enable URL rewriting
+RewriteEngine On
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# Handle existing files and directories normally
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# For non-existent files, return 404
+RewriteRule ^(.*)$ - [R=404]

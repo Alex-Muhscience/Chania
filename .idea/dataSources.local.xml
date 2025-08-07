@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="dataSourceStorageLocal" created-in="PS-251.27812.52">
+  <component name="dataSourceStorageLocal" created-in="PS-252.23892.419">
     <data-source name="chania_db@localhost" uuid="2607924d-872a-4672-af22-d94f7bb51ebd">
       <database-info product="MariaDB" version="10.4.32-MariaDB" jdbc-version="4.2" driver-name="MariaDB Connector/J" driver-version="3.3.3" dbms="MARIADB" exact-version="10.4.32" exact-driver-version="3.3">
         <extra-name-characters>#@</extra-name-characters>

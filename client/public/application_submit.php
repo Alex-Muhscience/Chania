@@ -9,13 +9,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Get form data
-$name = $_POST['first_name'] . ' ' . ($_POST['last_name'] ?? '');
+$first_name = $_POST['first_name'] ?? '';
+$last_name = $_POST['last_name'] ?? '';
 $email = $_POST['email'] ?? '';
 $phone = $_POST['phone'] ?? '';
 $program_id = $_POST['program_id'] ?? '';
 $mode = $_POST['mode'] ?? $_POST['delivery_mode'] ?? ''; // Handle both field names
 $schedule_id = $_POST['schedule_id'] ?? null;
-$message = $_POST['motivation'] ?? '';
+$address = $_POST['address'] ?? '';
+$message = $_POST['motivation'] ?? $_POST['reason'] ?? '';
 $newsletter_subscription = isset($_POST['newsletter']) && $_POST['newsletter'] === 'on';
 $education_level = $_POST['education_level'] ?? '';
 $current_occupation = $_POST['current_occupation'] ?? '';
@@ -44,15 +46,14 @@ try {
     
     $stmt = $db->prepare("
         INSERT INTO applications (
-            program_id, schedule_id, delivery_mode, application_number, first_name, last_name, email, phone, 
+            program_id, schedule_id, preferred_delivery_mode, application_number, first_name, last_name, email, phone, 
             address, education_details, motivation, status, ip_address, submitted_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, NOW())
     ");
     
-    // Split name into first and last name
-    $nameParts = explode(' ', trim($name), 2);
-    $firstName = $nameParts[0];
-    $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
+    // Use the individual name fields
+    $firstName = trim($first_name);
+    $lastName = trim($last_name);
     
     // Prepare education details
     $education_details = $education_level ? "Education Level: $education_level" : 'Not provided';
@@ -69,7 +70,7 @@ try {
         $lastName,
         $email,
         $phone,
-        '', // address (empty for now)
+        $address,
         $education_details,
         $message, // motivation
         $_SERVER['REMOTE_ADDR'] ?? ''

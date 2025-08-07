@@ -5,6 +5,44 @@ class SecurityLogger {
 
     public function __construct($db) {
         $this->db = $db;
+        $this->ensureTableExists();
+    }
+    
+    /**
+     * Ensure the security_audit_logs table exists
+     */
+    private function ensureTableExists() {
+        try {
+            // Check if table exists
+            $stmt = $this->db->query("SHOW TABLES LIKE 'security_audit_logs'");
+            if (!$stmt->fetch()) {
+                // Create the table
+                $sql = "
+                    CREATE TABLE security_audit_logs (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        user_id INT NULL,
+                        username VARCHAR(255) NULL,
+                        event_type VARCHAR(100) NOT NULL,
+                        severity ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium',
+                        description TEXT NOT NULL,
+                        details JSON NULL,
+                        ip_address VARCHAR(45) NULL,
+                        user_agent TEXT NULL,
+                        session_id VARCHAR(255) NULL,
+                        affected_user_id INT NULL,
+                        affected_resource VARCHAR(255) NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        INDEX idx_event_type (event_type),
+                        INDEX idx_severity (severity),
+                        INDEX idx_user_id (user_id),
+                        INDEX idx_created_at (created_at)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                ";
+                $this->db->exec($sql);
+            }
+        } catch (Exception $e) {
+            error_log('SecurityLogger table creation error: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -60,9 +98,10 @@ class SecurityLogger {
      * @param string $severity
      * @param string $dateFrom
      * @param string $dateTo
+     * @param string $searchTerm
      * @return array
      */
-    public function getLogs($limit = 50, $offset = 0, $eventType = '', $severity = '', $dateFrom = '', $dateTo = '') {
+    public function getLogs($limit = 50, $offset = 0, $eventType = '', $severity = '', $dateFrom = '', $dateTo = '', $searchTerm = '') {
         $sql = "SELECT * FROM security_audit_logs WHERE 1=1";
         $params = [];
 
@@ -84,6 +123,15 @@ class SecurityLogger {
         if (!empty($dateTo)) {
             $sql .= " AND DATE(created_at) <= ?";
             $params[] = $dateTo;
+        }
+
+        if (!empty($searchTerm)) {
+            $sql .= " AND (description LIKE ? OR username LIKE ? OR ip_address LIKE ? OR event_type LIKE ?)";
+            $searchPattern = '%' . $searchTerm . '%';
+            $params[] = $searchPattern;
+            $params[] = $searchPattern;
+            $params[] = $searchPattern;
+            $params[] = $searchPattern;
         }
 
         $sql .= " ORDER BY created_at DESC LIMIT ? OFFSET ?";
@@ -133,6 +181,21 @@ class SecurityLogger {
         return (int) $stmt->fetchColumn();
     }
 
+    /**
+     * Log a security event (legacy method for backward compatibility).
+     *
+     * @param int|null $userId
+     * @param string $username
+     * @param string $eventType
+     * @param string $severity
+     * @param string $description
+     * @param array $details
+     */
+    public function logEvent($userId, $username, $eventType, $severity, $description, $details = []) {
+        // Call the main log method with adjusted parameters
+        $this->log($eventType, $severity, $description, $userId, $details);
+    }
+    
     /**
      * Get unique event types from security logs
      * 

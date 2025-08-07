@@ -48,7 +48,7 @@ class MediaController extends BaseController {
 
             $totalPages = ceil($totalItems / $limit);
 
-            $this->renderView(__DIR__ . '/../views/media/index.php', [
+            $this->render('media/index', [
                 'mediaItems' => $mediaItems,
                 'totalItems' => $totalItems,
                 'totalPages' => $totalPages,
@@ -56,13 +56,14 @@ class MediaController extends BaseController {
                 'search' => $search,
                 'filter' => $filter,
                 'sort' => $sort,
-                'limit' => $limit
+                'limit' => $limit,
+                'media' => $this->media
             ]);
 
         } catch (Exception $e) {
             error_log("Media fetch error: " . $e->getMessage());
             $this->addError('Error loading media files.');
-            $this->renderView(__DIR__ . '/../views/media/index.php', [
+            $this->render('media/index', [
                 'mediaItems' => [],
                 'totalItems' => 0,
                 'totalPages' => 0,
@@ -70,7 +71,8 @@ class MediaController extends BaseController {
                 'search' => $search,
                 'filter' => $filter,
                 'sort' => $sort,
-                'limit' => $limit
+                'limit' => $limit,
+                'media' => $this->media
             ]);
         }
     }

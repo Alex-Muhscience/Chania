@@ -19,15 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Load configuration
 try {
     require_once '../includes/config.php';
+    require_once __DIR__ . '/../../shared/Core/Database.php';
     require_once __DIR__ . '/../../shared/Core/ApiConfig.php';
+    
+    // Initialize database connection
+    $database = new Database();
+    $db = $database->connect();
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(ApiConfig::createResponse(
-        ApiConfig::STATUS_ERROR,
-        'System configuration error. Please try again later.',
-        null,
-        'CONFIG_ERROR'
-    ));
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'System configuration error. Please try again later.',
+        'error_code' => 'CONFIG_ERROR',
+        'timestamp' => date('Y-m-d H:i:s')
+    ]);
     exit;
 }
 

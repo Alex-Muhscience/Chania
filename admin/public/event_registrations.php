@@ -42,9 +42,8 @@ try {
     $params = [];
 
     if ($search) {
-        $conditions[] = "(er.first_name LIKE ? OR er.last_name LIKE ? OR er.email LIKE ?)";
+        $conditions[] = "(CONCAT(er.first_name, ' ', er.last_name) LIKE ? OR er.email LIKE ?)";
         $searchTerm = "%$search%";
-        $params[] = $searchTerm;
         $params[] = $searchTerm;
         $params[] = $searchTerm;
     }
@@ -74,11 +73,12 @@ try {
 
     // Get registrations
     $stmt = $db->prepare("
-        SELECT er.*, e.title as event_title, e.event_date
+        SELECT er.*, e.title as event_title, e.event_date,
+               CONCAT(er.first_name, ' ', er.last_name) as full_name
         FROM event_registrations er
         JOIN events e ON er.event_id = e.id
         $whereClause
-        ORDER BY er.registration_date DESC
+        ORDER BY er.registered_at DESC
         LIMIT ? OFFSET ?
     ");
     $stmt->execute([...$params, $limit, $offset]);
@@ -353,12 +353,12 @@ require_once __DIR__ . '/../includes/header.php';
                                             <td>
                                                 <input type="checkbox" name="registration_ids[]" value="<?= $registration['id'] ?>">
                                             </td>
-                                            <td>
-                                                <strong><?= htmlspecialchars($registration['first_name'] . ' ' . $registration['last_name']) ?></strong>
-                                                <?php if ($registration['organization']): ?>
-                                                    <br><small class="text-muted"><?= htmlspecialchars($registration['organization']) ?></small>
-                                                <?php endif; ?>
-                                            </td>
+                                        <td>
+                                            <strong><?= htmlspecialchars($registration['full_name']) ?></strong>
+                                            <?php if ($registration['organization']): ?>
+                                                <br><small class="text-muted"><?= htmlspecialchars($registration['organization']) ?></small>
+                                            <?php endif; ?>
+                                        </td>
                                             <td>
                                                 <strong><?= htmlspecialchars($registration['event_title']) ?></strong>
                                                 <br><small class="text-muted"><?= date('M j, Y', strtotime($registration['event_date'])) ?></small>
@@ -381,19 +381,19 @@ require_once __DIR__ . '/../includes/header.php';
                                                     <?= ucfirst(str_replace('_', ' ', $registration['status'])) ?>
                                                 </span>
                                             </td>
-                                            <td>
-                                                <small class="text-muted">
-                                                    <?= date('M j, Y', strtotime($registration['registration_date'])) ?>
-                                                </small>
-                                            </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                <?= date('M j, Y', strtotime($registration['registered_at'])) ?>
+                                            </small>
+                                        </td>
                                             <td>
                                                 <div class="btn-group btn-group-sm" role="group">
                                                     <button type="button" class="btn btn-outline-primary"
-                                                            data-toggle="modal" data-target="#statusModal<?= $registration['id'] ?>">
+                                                            data-bs-toggle="modal" data-bs-target="#statusModal<?= $registration['id'] ?>">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-outline-info"
-                                                            data-toggle="modal" data-target="#viewModal<?= $registration['id'] ?>">
+                                                            data-bs-toggle="modal" data-bs-target="#viewModal<?= $registration['id'] ?>">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                 </div>
@@ -432,16 +432,14 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Update Status</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form method="POST">
                     <div class="modal-body">
                         <input type="hidden" name="action" value="update_status">
                         <input type="hidden" name="registration_id" value="<?= $registration['id'] ?>">
 
-                        <p><strong>Participant:</strong> <?= htmlspecialchars($registration['first_name'] . ' ' . $registration['last_name']) ?></p>
+                        <p><strong>Participant:</strong> <?= htmlspecialchars($registration['full_name']) ?></p>
                         <p><strong>Event:</strong> <?= htmlspecialchars($registration['event_title']) ?></p>
 
                         <div class="form-group">
@@ -456,7 +454,7 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Update Status</button>
                     </div>
                 </form>
@@ -470,15 +468,13 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Registration Details</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <h6>Participant Information</h6>
-                            <p><strong>Name:</strong> <?= htmlspecialchars($registration['first_name'] . ' ' . $registration['last_name']) ?></p>
+                            <p><strong>Name:</strong> <?= htmlspecialchars($registration['full_name']) ?></p>
                             <p><strong>Email:</strong> <?= htmlspecialchars($registration['email']) ?></p>
                             <p><strong>Phone:</strong> <?= htmlspecialchars($registration['phone'] ?? 'N/A') ?></p>
                             <p><strong>Organization:</strong> <?= htmlspecialchars($registration['organization'] ?? 'N/A') ?></p>
@@ -496,7 +492,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     <?= ucfirst(str_replace('_', ' ', $registration['status'])) ?>
                                 </span>
                             </p>
-                            <p><strong>Registered:</strong> <?= date('M j, Y g:i A', strtotime($registration['registration_date'])) ?></p>
+                            <p><strong>Registered:</strong> <?= date('M j, Y g:i A', strtotime($registration['registered_at'])) ?></p>
                         </div>
                     </div>
 
@@ -511,7 +507,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <?php endif; ?>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>

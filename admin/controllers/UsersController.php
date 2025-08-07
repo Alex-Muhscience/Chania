@@ -52,7 +52,7 @@ class UsersController extends BaseController {
             // Get statistics
             $stats = $this->userModel->getStatistics();
 
-            $this->renderView(__DIR__ . '/../views/users/index.php', [
+            $this->render('users/index', [
                 'users' => $users,
                 'roles' => $roles,
                 'stats' => $stats,
@@ -68,7 +68,7 @@ class UsersController extends BaseController {
         } catch (Exception $e) {
             error_log("Users fetch error: " . $e->getMessage());
             $this->addError('Error loading users.');
-            $this->renderView(__DIR__ . '/../views/users/index.php', [
+            $this->render('users/index', [
                 'users' => [],
                 'roles' => [],
                 'stats' => ['total' => 0, 'active' => 0, 'this_month' => 0],

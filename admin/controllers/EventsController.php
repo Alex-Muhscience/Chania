@@ -41,7 +41,7 @@ class EventsController extends BaseController {
         // Get events data via API
         $events = $this->fetchEventsFromApi($page, $limit, $search);
 
-        $this->renderView(__DIR__ . '/../views/events/index.php', [
+        $this->render('events/index', [
             'events' => $events['data']['data'] ?? [],
             'search' => $search,
             'pagination' => [

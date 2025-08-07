@@ -46,10 +46,21 @@ include '../includes/header.php';
                         <form id="applicationForm" method="POST" action="application_submit.php">
                             <input type="hidden" name="program_id" value="<?= $program_id ?>">
                             <input type="hidden" name="schedule_id" value="<?= $schedule_id ?>">
+                            <input type="hidden" name="mode" value="physical">
 
-                            <div class="mb-3">
-                                <label for="fullName" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="fullName" name="fullName" required>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="mb-3">
@@ -72,7 +83,10 @@ include '../includes/header.php';
                                 <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Submit Application</button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                Submit Application
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -98,6 +112,49 @@ include '../includes/header.php';
 
     </div>
 </section>
+
+<script>
+document.getElementById('applicationForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    
+    // Disable submit button and show spinner
+    submitBtn.disabled = true;
+    spinner.classList.remove('d-none');
+    
+    // Create FormData object
+    const formData = new FormData(this);
+    
+    // Submit form via fetch
+    fetch('application_submit.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            alert('Success: ' + data.message);
+            // Optionally redirect or reset form
+            this.reset();
+        } else {
+            // Show error message
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An unexpected error occurred. Please try again.');
+    })
+    .finally(() => {
+        // Re-enable submit button and hide spinner
+        submitBtn.disabled = false;
+        spinner.classList.add('d-none');
+    });
+});
+</script>
 
 <?php include '../includes/footer.php'; ?>
 

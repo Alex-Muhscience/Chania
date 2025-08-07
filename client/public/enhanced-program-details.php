@@ -187,9 +187,12 @@ include '../includes/header.php';
                                         <div class="schedule-item mb-4 p-3 border rounded" data-schedule-id="<?= $schedule['id'] ?>">
                                             <h6 class="schedule-title"><?= htmlspecialchars($schedule['title']) ?></h6>
                                             
-                                            <!-- Delivery Mode Badge -->
-                                            <span class="badge bg-<?= $schedule['delivery_mode'] === 'online' ? 'info' : 'success' ?>">
-                                                <?= ucfirst($schedule['delivery_mode']) ?>
+                                            <!-- Delivery Mode Badge - Show both options available -->
+                                            <span class="badge bg-primary me-1">
+                                                <i class="fas fa-laptop"></i> Online Available
+                                            </span>
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-building"></i> Physical Available
                                             </span>
                                             
                                             <!-- Schedule Details -->
@@ -250,20 +253,17 @@ include '../includes/header.php';
                                                         <span class="visually-hidden">Toggle Dropdown</span>
                                                     </button>
                                                     <ul class="dropdown-menu w-100">
-                                                        <?php if ($schedule['delivery_mode'] === 'online'): ?>
-                                                            <?php if ($schedule['online_fee'] >= 0): ?>
-                                                                <li><a class="dropdown-item" href="apply.php?schedule_id=<?= $schedule['id'] ?>&mode=online">
-                                                                    Apply for Online (<?= $schedule['currency'] ?> <?= number_format($schedule['online_fee'], 2) ?>)
-                                                                </a></li>
-                                                            <?php endif; ?>
+                                                        <!-- Both modes available for all schedules -->
+                                                        <?php if ($schedule['online_fee'] > 0): ?>
+                                                            <li><a class="dropdown-item" href="apply.php?schedule_id=<?= $schedule['id'] ?>&mode=online">
+                                                                <i class="fas fa-laptop"></i> Apply for Online (<?= $schedule['currency'] ?> <?= number_format($schedule['online_fee'], 2) ?>)
+                                                            </a></li>
                                                         <?php endif; ?>
                                                         
-                                                        <?php if ($schedule['delivery_mode'] === 'physical'): ?>
-                                                            <?php if ($schedule['physical_fee'] >= 0): ?>
-                                                                <li><a class="dropdown-item" href="apply.php?schedule_id=<?= $schedule['id'] ?>&mode=physical">
-                                                                    Apply for Physical (<?= $schedule['currency'] ?> <?= number_format($schedule['physical_fee'], 2) ?>)
-                                                                </a></li>
-                                                            <?php endif; ?>
+                                                        <?php if ($schedule['physical_fee'] > 0): ?>
+                                                            <li><a class="dropdown-item" href="apply.php?schedule_id=<?= $schedule['id'] ?>&mode=physical">
+                                                                <i class="fas fa-building"></i> Apply for Physical (<?= $schedule['currency'] ?> <?= number_format($schedule['physical_fee'], 2) ?>)
+                                                            </a></li>
                                                         <?php endif; ?>
                                                     </ul>
                                                 </div>
@@ -315,12 +315,9 @@ include '../includes/header.php';
 
 <script>
 function showDeliveryOptions(scheduleId, deliveryMode) {
-    // If it's a single mode, redirect directly
-    if (deliveryMode === 'online') {
-        window.location.href = `apply.php?schedule_id=${scheduleId}&mode=online`;
-    } else if (deliveryMode === 'physical') {
-        window.location.href = `apply.php?schedule_id=${scheduleId}&mode=physical`;
-    }
+    // Show dropdown with both options by default
+    // The dropdown will automatically show when clicked due to Bootstrap behavior
+    // No need to redirect immediately - let users choose their preferred mode
 }
 
 // Auto-scroll to schedules if no schedules are visible

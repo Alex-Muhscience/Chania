@@ -438,6 +438,27 @@ class User {
         return $stmt->execute([$secret, $userId]);
     }
     
+    public function setTwoFactorSecret($userId, $secret) {
+        $stmt = $this->db->prepare("
+            UPDATE users SET 
+            two_factor_secret = ?,
+            two_factor_enabled = 0,
+            updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        ");
+        return $stmt->execute([$secret, $userId]);
+    }
+    
+    public function confirmTwoFactorSetup($userId) {
+        $stmt = $this->db->prepare("
+            UPDATE users SET 
+            two_factor_enabled = 1,
+            updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        ");
+        return $stmt->execute([$userId]);
+    }
+    
     public function disableTwoFactor($userId) {
         $stmt = $this->db->prepare("
             UPDATE users SET 

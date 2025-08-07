@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/../controllers/ApplicationsController.php';
+require_once __DIR__ . '/../controllers/EnhancedApplicationsController.php';
 
-$controller = new ApplicationsController();
+$controller = new EnhancedApplicationsController();
 $controller->index();
+?>

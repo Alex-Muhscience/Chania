@@ -24,12 +24,12 @@
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="text-white mb-3">Quick Links</h6>
                     <ul class="footer-links list-unstyled">
-                        <li><a href="<?php echo BASE_URL; ?>">Home</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>about">About Us</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>programs">Programs</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>events">Events</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>contact">Contact</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>apply">Apply Now</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>index.php">Home</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>about.php">About Us</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>programs.php">Programs</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>events.php">Events</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>contact.php">Contact</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>training-fields.php">Training Fields</a></li>
                     </ul>
                 </div>
 
@@ -37,11 +37,11 @@
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="text-white mb-3">Programs</h6>
                     <ul class="footer-links list-unstyled">
-                        <li><a href="<?php echo BASE_URL; ?>programs?category=technology">Technology</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>programs?category=business">Business</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>programs?category=agriculture">Agriculture</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>programs?category=healthcare">Healthcare</a></li>
-                        <li><a href="<?php echo BASE_URL; ?>programs?featured=1">Featured Programs</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>programs.php?category=technology">Technology</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>programs.php?category=business">Business</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>programs.php?category=agriculture">Agriculture</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>programs.php?category=healthcare">Healthcare</a></li>
+                        <li><a href="<?php echo BASE_URL; ?>programs.php?featured=1">Featured Programs</a></li>
                     </ul>
                 </div>
 
@@ -78,7 +78,7 @@
                 <div class="col-lg-4 col-md-5">
                     <form id="newsletter-form" class="newsletter-form">
                         <div class="input-group">
-                            <input type="email" class="form-control" placeholder="Enter your email" required>
+                            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
                             <button class="btn btn-primary" type="submit">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
@@ -94,8 +94,8 @@
                 </div>
                 <div class="col-md-6 text-md-end d-flex align-items-center justify-content-md-end">
                     <div class="footer-legal-links me-3">
-                        <a href="<?php echo BASE_URL; ?>privacy" class="text-light-gray me-3">Privacy Policy</a>
-                        <a href="<?php echo BASE_URL; ?>terms" class="text-light-gray">Terms of Service</a>
+                        <a href="<?php echo BASE_URL; ?>privacy.php" class="text-light-gray me-3">Privacy Policy</a>
+                        <a href="<?php echo BASE_URL; ?>terms.php" class="text-light-gray">Terms of Service</a>
                     </div>
                     <!-- Back to Top Button in Footer -->
                     <button id="back-to-top-footer" class="btn btn-primary btn-sm rounded-circle d-flex align-items-center justify-content-center" 

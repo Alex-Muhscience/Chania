@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Edit Enhanced Program</h5>
+                <h5 class="mb-0">Edit Enhanced Program: <?= htmlspecialchars($program['title']) ?></h5>
             </div>
             <div class="card-body">
                 <?php if (!empty($this->errors)): ?>
@@ -14,22 +14,28 @@
                         </ul>
                     </div>
                 <?php endif; ?>
+                
+                <?php if (!empty($this->success)): ?>
+                    <div class="alert alert-success">
+                        <?= htmlspecialchars($this->success) ?>
+                    </div>
+                <?php endif; ?>
 
-                <form method="POST">
-                    <!-- Program Details -->
+                <form method="POST" enctype="multipart/form-data">
+                    <!-- Basic Program Information -->
                     <div class="row">
                         <div class="col-md-8">
                             <div class="mb-3">
                                 <label for="title" class="form-label">Program Title *</label>
                                 <input type="text" class="form-control" id="title" name="title"
-                                       value="<?= htmlspecialchars($program['title']) ?>" required>
+                                       value="<?= htmlspecialchars($_POST['title'] ?? $program['title']) ?>" required>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="duration" class="form-label">Duration *</label>
                                 <input type="text" class="form-control" id="duration" name="duration"
-                                       value="<?= htmlspecialchars($program['duration']) ?>"
+                                       value="<?= htmlspecialchars($_POST['duration'] ?? $program['duration']) ?>"
                                        placeholder="e.g., 3 days, 2 weeks" required>
                             </div>
                         </div>
@@ -37,34 +43,84 @@
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Short Description *</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" required><?= htmlspecialchars($program['description']) ?></textarea>
+                        <textarea class="form-control" id="description" name="description" rows="3" required><?= htmlspecialchars($_POST['description'] ?? $program['description']) ?></textarea>
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-control" id="category" name="category">
+                                    <?php 
+                                    $categories = ['General', 'Technology', 'Business', 'Leadership', 'Skills'];
+                                    $selected_category = $_POST['category'] ?? $program['category'];
+                                    foreach ($categories as $category): ?>
+                                        <option value="<?= $category ?>" <?= $selected_category === $category ? 'selected' : '' ?>><?= $category ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="difficulty_level" class="form-label">Difficulty Level</label>
+                                <select class="form-control" id="difficulty_level" name="difficulty_level">
+                                    <?php 
+                                    $levels = ['beginner' => 'Beginner', 'intermediate' => 'Intermediate', 'advanced' => 'Advanced'];
+                                    $selected_level = $_POST['difficulty_level'] ?? $program['difficulty_level'];
+                                    foreach ($levels as $value => $label): ?>
+                                        <option value="<?= $value ?>" <?= $selected_level === $value ? 'selected' : '' ?>><?= $label ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="fee" class="form-label">Base Fee ($)</label>
                                 <input type="number" class="form-control" id="fee" name="fee"
-                                       value="<?= $program['fee'] ?: 0 ?>" min="0" step="0.01">
+                                       value="<?= $_POST['fee'] ?? $program['fee'] ?>" min="0" step="0.01">
                                 <div class="form-text">This is the base fee. Individual schedules can have different fees.</div>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="max_participants" class="form-label">Max Participants</label>
+                                <input type="number" class="form-control" id="max_participants" name="max_participants"
+                                       value="<?= $_POST['max_participants'] ?? $program['max_participants'] ?>" min="1">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date"
+                                       value="<?= $_POST['start_date'] ?? $program['start_date'] ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date"
+                                       value="<?= $_POST['end_date'] ?? $program['end_date'] ?>">
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- Enhanced Program Info -->
+                    <!-- Enhanced Program Information -->
                     <hr>
                     <h6>Detailed Program Information</h6>
-
+                    
                     <div class="mb-3">
                         <label for="introduction" class="form-label">Program Introduction</label>
                         <textarea class="form-control" id="introduction" name="introduction" rows="4"
-                                  placeholder="Detailed introduction to the program, what it covers, and its benefits"><?= htmlspecialchars($program_info['introduction'] ?? '') ?></textarea>
+                                  placeholder="Detailed introduction to the program, what it covers, and its benefits"><?= htmlspecialchars($_POST['introduction'] ?? $program['introduction']) ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="objectives" class="form-label">Learning Objectives</label>
                         <textarea class="form-control" id="objectives" name="objectives" rows="4"
-                                  placeholder="List the key learning objectives participants will achieve"><?= htmlspecialchars($program_info['objectives'] ?? '') ?></textarea>
+                                  placeholder="List the key learning objectives participants will achieve"><?= htmlspecialchars($_POST['objectives'] ?? $program['objectives']) ?></textarea>
                     </div>
 
                     <div class="row">
@@ -72,14 +128,14 @@
                             <div class="mb-3">
                                 <label for="target_audience" class="form-label">Target Audience</label>
                                 <textarea class="form-control" id="target_audience" name="target_audience" rows="3"
-                                          placeholder="Who is this program designed for?"><?= htmlspecialchars($program_info['target_audience'] ?? '') ?></textarea>
+                                          placeholder="Who is this program designed for?"><?= htmlspecialchars($_POST['target_audience'] ?? $program['target_audience']) ?></textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="prerequisites" class="form-label">Prerequisites</label>
                                 <textarea class="form-control" id="prerequisites" name="prerequisites" rows="3"
-                                          placeholder="Any prerequisites or requirements for participants"><?= htmlspecialchars($program_info['prerequisites'] ?? '') ?></textarea>
+                                          placeholder="Any prerequisites or requirements for participants"><?= htmlspecialchars($_POST['prerequisites'] ?? $program['prerequisites']) ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -87,27 +143,178 @@
                     <div class="mb-3">
                         <label for="course_content" class="form-label">Course Content (Modules)</label>
                         <textarea class="form-control" id="course_content" name="course_content" rows="5"
-                                  placeholder="Outline the course modules and content structure"><?= htmlspecialchars($program_info['course_content'] ?? '') ?></textarea>
+                                  placeholder="Outline the course modules and content structure"><?= htmlspecialchars($_POST['course_content'] ?? $program['course_content']) ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="general_notes" class="form-label">General Notes</label>
                         <textarea class="form-control" id="general_notes" name="general_notes" rows="3"
-                                  placeholder="Additional notes, requirements, or important information"><?= htmlspecialchars($program_info['general_notes'] ?? '') ?></textarea>
+                                  placeholder="Additional notes, requirements, or important information"><?= htmlspecialchars($_POST['general_notes'] ?? $program['general_notes']) ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="certification_details" class="form-label">Certification Details</label>
                         <textarea class="form-control" id="certification_details" name="certification_details" rows="3"
-                                  placeholder="Information about certificates, credentials, or completion recognition"><?= htmlspecialchars($program_info['certification_details'] ?? '') ?></textarea>
+                                  placeholder="Information about certificates, credentials, or completion recognition"><?= htmlspecialchars($_POST['certification_details'] ?? $program['certification_details']) ?></textarea>
                     </div>
+
+                    <!-- Media and Additional Information -->
+                    <hr>
+                    <h6>Media & Additional Information</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Main Program Image</label>
+                                <?php if (!empty($program['image_path'])): ?>
+                                    <div class="current-image mb-2">
+                                        <img src="<?= BASE_URL ?>/uploads/<?= htmlspecialchars($program['image_path']) ?>" 
+                                             class="img-thumbnail" style="max-width: 200px; max-height: 150px;" 
+                                             alt="Current program image">
+                                        <div class="form-check mt-1">
+                                            <input type="checkbox" class="form-check-input" id="remove_image" name="remove_image" value="1">
+                                            <label class="form-check-label text-danger" for="remove_image">
+                                                Remove current image
+                                            </label>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                                <input type="file" class="form-control" id="image" name="image" 
+                                       accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                                <div class="form-text">Upload new main program image (JPEG, PNG, GIF, WebP. Max: 10MB)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="video_url" class="form-label">Video URL</label>
+                                <input type="url" class="form-control" id="video_url" name="video_url"
+                                       value="<?= htmlspecialchars($_POST['video_url'] ?? $program['video_url']) ?>"
+                                       placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
+                                <div class="form-text">Optional. Link to program intro/overview video</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gallery Images Management -->
+                    <div class="mb-3">
+                        <label class="form-label">Gallery Images</label>
+                        
+                        <!-- Current Gallery Images -->
+                        <?php 
+                        $gallery_images = !empty($program['gallery_images']) ? json_decode($program['gallery_images'], true) : [];
+                        if (!empty($gallery_images) && is_array($gallery_images)): 
+                        ?>
+                            <div class="current-gallery mb-3">
+                                <h6>Current Gallery Images</h6>
+                                <div class="row" id="current-gallery">
+                                    <?php foreach ($gallery_images as $index => $image): ?>
+                                        <div class="col-md-3 mb-3" data-image="<?= htmlspecialchars($image) ?>">
+                                            <div class="card">
+                                                <img src="<?= BASE_URL ?>/uploads/programs/gallery/<?= htmlspecialchars($image) ?>" 
+                                                     class="card-img-top" style="height: 150px; object-fit: cover;" 
+                                                     alt="Gallery image">
+                                                <div class="card-body p-2">
+                                                    <button type="button" class="btn btn-danger btn-sm w-100" 
+                                                            onclick="removeGalleryImage('<?= htmlspecialchars($image) ?>', this)">
+                                                        <i class="fas fa-trash"></i> Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <!-- Add New Gallery Images -->
+                        <div class="mb-3">
+                            <label for="gallery_images" class="form-label">Add New Gallery Images</label>
+                            <input type="file" class="form-control" id="gallery_images" name="gallery_images[]" 
+                                   accept="image/jpeg,image/jpg,image/png,image/gif,image/webp" multiple>
+                            <div class="form-text">Upload additional images for the program gallery (JPEG, PNG, GIF, WebP. Max: 10MB each)</div>
+                            <div id="gallery-preview" class="mt-3"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="instructor_name" class="form-label">Instructor Name</label>
+                                <input type="text" class="form-control" id="instructor_name" name="instructor_name"
+                                       value="<?= htmlspecialchars($_POST['instructor_name'] ?? $program['instructor_name']) ?>"
+                                       placeholder="Name of the primary instructor">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Default Location</label>
+                                <input type="text" class="form-control" id="location" name="location"
+                                       value="<?= htmlspecialchars($_POST['location'] ?? $program['location']) ?>"
+                                       placeholder="Default location for in-person sessions">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="tags" class="form-label">Tags</label>
+                                <input type="text" class="form-control" id="tags" name="tags"
+                                       value="<?= htmlspecialchars($_POST['tags'] ?? $program['tags']) ?>"
+                                       placeholder="programming, web development, php, mysql">
+                                <div class="form-text">Comma-separated tags for better searchability</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check mt-4">
+                                    <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1"
+                                           <?= (isset($_POST['is_featured']) ? $_POST['is_featured'] : $program['is_featured']) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="is_featured">
+                                        <strong>Featured Program</strong>
+                                    </label>
+                                    <div class="form-text">Featured programs appear prominently on the website</div>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="is_online" name="is_online" value="1"
+                                           <?= (isset($_POST['is_online']) ? $_POST['is_online'] : $program['is_online']) ? 'checked' : '' ?>>
+                                    <label class="form-check-label" for="is_online">
+                                        <strong>Online Program</strong>
+                                    </label>
+                                    <div class="form-text">Check if this is primarily an online program</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SEO Section -->
+                    <hr>
+                    <h6>SEO Information</h6>
+                    
+                    <div class="mb-3">
+                        <label for="meta_title" class="form-label">Meta Title</label>
+                        <input type="text" class="form-control" id="meta_title" name="meta_title"
+                               value="<?= htmlspecialchars($_POST['meta_title'] ?? $program['meta_title']) ?>"
+                               placeholder="SEO title for search engines (optional)">
+                        <div class="form-text">If left blank, program title will be used</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="meta_description" class="form-label">Meta Description</label>
+                        <textarea class="form-control" id="meta_description" name="meta_description" rows="2"
+                                  placeholder="Brief description for search engines (optional)"><?= htmlspecialchars($_POST['meta_description'] ?? $program['meta_description']) ?></textarea>
+                        <div class="form-text">If left blank, short description will be used</div>
+                    </div>
+
+                    <!-- Hidden input to track removed gallery images -->
+                    <input type="hidden" id="removed_gallery_images" name="removed_gallery_images" value="">
 
                     <div class="d-flex justify-content-between">
                         <a href="<?= BASE_URL ?>/admin/enhanced_programs.php" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back to Programs
                         </a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Changes
+                            <i class="fas fa-save"></i> Update Program
                         </button>
                     </div>
                 </form>
@@ -126,6 +333,116 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.height = this.scrollHeight + 'px';
         });
     });
+    
+    // Gallery images preview
+    const galleryInput = document.getElementById('gallery_images');
+    const galleryPreview = document.getElementById('gallery-preview');
+    
+    galleryInput.addEventListener('change', function() {
+        galleryPreview.innerHTML = '';
+        
+        if (this.files.length === 0) return;
+        
+        const previewContainer = document.createElement('div');
+        previewContainer.className = 'row';
+        
+        Array.from(this.files).forEach((file, index) => {
+            if (file.type.startsWith('image/')) {
+                const col = document.createElement('div');
+                col.className = 'col-md-3 mb-3';
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                const img = document.createElement('img');
+                img.className = 'card-img-top';
+                img.style.height = '150px';
+                img.style.objectFit = 'cover';
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                const cardBody = document.createElement('div');
+                cardBody.className = 'card-body p-2';
+                cardBody.innerHTML = `<small class="text-muted">${file.name}<br>Size: ${(file.size / 1024 / 1024).toFixed(2)}MB</small>`;
+                
+                card.appendChild(img);
+                card.appendChild(cardBody);
+                col.appendChild(card);
+                previewContainer.appendChild(col);
+            }
+        });
+        
+        galleryPreview.appendChild(previewContainer);
+    });
+    
+    // Main image preview
+    const mainImageInput = document.getElementById('image');
+    if (mainImageInput) {
+        mainImageInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && file.type.startsWith('image/')) {
+                let preview = document.getElementById('main-image-preview');
+                if (!preview) {
+                    preview = document.createElement('div');
+                    preview.id = 'main-image-preview';
+                    preview.className = 'mt-2';
+                    this.parentNode.appendChild(preview);
+                }
+                
+                const img = document.createElement('img');
+                img.className = 'img-thumbnail';
+                img.style.maxWidth = '200px';
+                img.style.maxHeight = '150px';
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                preview.innerHTML = '';
+                preview.appendChild(img);
+            }
+        });
+    }
 });
+
+// Track removed gallery images
+let removedImages = [];
+
+function removeGalleryImage(imageName, button) {
+    if (confirm('Are you sure you want to remove this image?')) {
+        // Add to removed images list
+        removedImages.push(imageName);
+        document.getElementById('removed_gallery_images').value = JSON.stringify(removedImages);
+        
+        // Remove the image card from DOM
+        button.closest('.col-md-3').remove();
+        
+        // Send AJAX request to delete the image immediately
+        fetch('<?= BASE_URL ?>/admin/enhanced_programs.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=delete_gallery_image&id=<?= $program['id'] ?>&image=${encodeURIComponent(imageName)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Image deleted successfully');
+            } else {
+                console.error('Error deleting image:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+}
 </script>
 

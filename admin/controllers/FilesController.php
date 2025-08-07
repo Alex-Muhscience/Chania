@@ -37,7 +37,7 @@ class FilesController extends BaseController {
             $pagination = $this->getPaginationData($page, $totalItems, ITEMS_PER_PAGE);
             $fileTypeCounts = $this->fileManager->getFileTypeCounts();
 
-            $this->renderView(__DIR__ . '/../views/files/index.php', [
+            $this->render('files/index', [
                 'files' => $files,
                 'pagination' => $pagination,
                 'fileTypeCounts' => $fileTypeCounts,
@@ -46,7 +46,7 @@ class FilesController extends BaseController {
 
         } catch (Exception $e) {
             $this->addError('Error loading files: ' . $e->getMessage());
-            $this->renderView(__DIR__ . '/../views/files/index.php', [
+            $this->render('files/index', [
                 'files' => [],
                 'pagination' => $this->getPaginationData(1, 0),
                 'fileTypeCounts' => [],

@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/config.php';
+require_once '../../shared/Core/CurrencyConverter.php';
 
 $page_title = 'Courses';
 $page_description = 'Browse our intensive courses in technology, business, agriculture, and healthcare. Learn new skills in just 2-5 days with our online courses.';
@@ -9,13 +10,16 @@ $page_keywords = 'short courses, online training, intensive courses, quick learn
 $search = $_GET['search'] ?? '';
 $category = $_GET['category'] ?? '';
 $price = $_GET['price'] ?? '';
+$difficulty = $_GET['difficulty'] ?? '';
 
 // Build query with filters
 $query = "SELECT * FROM programs WHERE is_active = 1 AND deleted_at IS NULL";
 $params = [];
 
 if (!empty($search)) {
-    $query .= " AND (title LIKE ? OR description LIKE ?)";
+    $query .= " AND (title LIKE ? OR description LIKE ? OR short_description LIKE ? OR tags LIKE ?)";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
     $params[] = "%$search%";
     $params[] = "%$search%";
 }
@@ -25,24 +29,60 @@ if (!empty($category)) {
     $params[] = $category;
 }
 
+if (!empty($difficulty)) {
+    $query .= " AND difficulty_level = ?";
+    $params[] = $difficulty;
+}
 
 if (!empty($price)) {
     if ($price === 'free') {
-        $query .= " AND (fee_amount IS NULL OR fee_amount = 0)";
+        $query .= " AND (fee IS NULL OR fee = 0)";
     } else {
-        $query .= " AND fee_amount > 0";
+        $query .= " AND fee > 0";
     }
 }
 
-$query .= " ORDER BY created_at DESC";
+// Order by featured first, then by creation date
+$query .= " ORDER BY is_featured DESC, created_at DESC";
 
 $stmt = $db->prepare($query);
 $stmt->execute($params);
 $programs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get categories for filter
-$categories_query = "SELECT DISTINCT category FROM programs WHERE is_active = 1 AND deleted_at IS NULL AND category IS NOT NULL";
+$categories_query = "SELECT DISTINCT category FROM programs WHERE is_active = 1 AND deleted_at IS NULL AND category IS NOT NULL ORDER BY category";
 $categories = $db->query($categories_query)->fetchAll(PDO::FETCH_COLUMN);
+
+// Get stats
+$stats_query = "SELECT 
+    COUNT(*) as total_programs,
+    COUNT(CASE WHEN fee = 0 OR fee IS NULL THEN 1 END) as free_programs,
+    COUNT(CASE WHEN is_featured = 1 THEN 1 END) as featured_programs,
+    SUM(CASE WHEN application_count IS NOT NULL THEN application_count ELSE 0 END) as total_enrollments,
+    AVG(CASE WHEN fee > 0 THEN fee END) as avg_fee
+FROM programs 
+WHERE is_active = 1 AND deleted_at IS NULL";
+$stats = $db->query($stats_query)->fetch(PDO::FETCH_ASSOC);
+
+// Get program difficulty distribution
+$difficulty_query = "SELECT difficulty_level, COUNT(*) as count 
+FROM programs 
+WHERE is_active = 1 AND deleted_at IS NULL 
+GROUP BY difficulty_level";
+$difficulty_stats = $db->query($difficulty_query)->fetchAll(PDO::FETCH_ASSOC);
+
+// Get recent testimonials for programs (if testimonials table exists)
+$testimonials = [];
+try {
+    $testimonials_query = "SELECT t.*, p.title as program_title 
+        FROM testimonials t 
+        LEFT JOIN programs p ON t.program_id = p.id 
+        WHERE t.is_active = 1 AND t.deleted_at IS NULL AND p.is_active = 1 
+        ORDER BY t.created_at DESC LIMIT 6";
+    $testimonials = $db->query($testimonials_query)->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // Testimonials table might not exist yet
+}
 
 include '../includes/header.php';
 ?>
@@ -118,26 +158,26 @@ include '../includes/header.php';
                     <div class="row g-3 text-center">
                         <div class="col-6">
                             <div class="stat-item">
-                                <div class="stat-number display-5 fw-bold text-warning"><?php echo count($programs) ?: '50+'; ?></div>
+                                <div class="stat-number display-5 fw-bold text-warning"><?php echo $stats['total_programs'] ?: '0'; ?></div>
                                 <div class="stat-label small text-white-75">Active Courses</div>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="stat-item">
-                                <div class="stat-number display-5 fw-bold text-warning">10K+</div>
+                                <div class="stat-number display-5 fw-bold text-warning"><?php echo number_format($stats['total_enrollments']) ?: '0'; ?>+</div>
                                 <div class="stat-label small text-white-75">Students Enrolled</div>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="stat-item">
-                                <div class="stat-number display-5 fw-bold text-warning">95%</div>
-                                <div class="stat-label small text-white-75">Completion Rate</div>
+                                <div class="stat-number display-5 fw-bold text-warning"><?php echo $stats['free_programs']; ?></div>
+                                <div class="stat-label small text-white-75">Free Courses</div>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="stat-item">
-                                <div class="stat-number display-5 fw-bold text-warning">4.8</div>
-                                <div class="stat-label small text-white-75">Average Rating</div>
+                                <div class="stat-number display-5 fw-bold text-warning"><?php echo $stats['featured_programs']; ?></div>
+                                <div class="stat-label small text-white-75">Featured</div>
                             </div>
                         </div>
                     </div>
@@ -162,7 +202,7 @@ include '../includes/header.php';
                                    value="<?php echo htmlspecialchars($search); ?>">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-2">
                         <label class="form-label fw-medium">Category</label>
                         <select name="category" class="form-select form-select-lg">
                             <option value="">All Categories</option>
@@ -181,9 +221,18 @@ include '../includes/header.php';
                         </select>
                     </div>
                     <div class="col-lg-2">
+                        <label class="form-label fw-medium">Difficulty</label>
+                        <select name="difficulty" class="form-select form-select-lg">
+                            <option value="">All Levels</option>
+                            <option value="beginner" <?php echo $difficulty === 'beginner' ? 'selected' : ''; ?>>Beginner</option>
+                            <option value="intermediate" <?php echo $difficulty === 'intermediate' ? 'selected' : ''; ?>>Intermediate</option>
+                            <option value="advanced" <?php echo $difficulty === 'advanced' ? 'selected' : ''; ?>>Advanced</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-1">
                         <label class="form-label fw-medium">Price</label>
                         <select name="price" class="form-select form-select-lg">
-                            <option value="">All Prices</option>
+                            <option value="">All</option>
                             <option value="free" <?php echo $price === 'free' ? 'selected' : ''; ?>>Free</option>
                             <option value="paid" <?php echo $price === 'paid' ? 'selected' : ''; ?>>Paid</option>
                         </select>
@@ -238,51 +287,123 @@ include '../includes/header.php';
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="programs-container">
                 <?php foreach ($programs as $program): ?>
                     <div class="col">
-                        <div class="card h-100 shadow-sm border-0 program-card" data-aos="fade-up">
-                            <div class="position-relative">
-                                <img src="<?php echo !empty($program['image_url']) ? ASSETS_URL . 'images/programs/' . $program['image_url'] : 'https://via.placeholder.com/400x250?text=' . urlencode($program['title']); ?>" 
-                                     class="card-img-top" style="height: 200px; object-fit: cover;"
+                        <div class="card h-100 shadow-sm border-0 program-card-enhanced" data-aos="fade-up">
+                            <div class="position-relative program-image-container">
+                                <img src="<?php echo !empty($program['image_path']) ? ASSETS_URL . 'images/programs/' . $program['image_path'] : 'https://via.placeholder.com/400x250?text=' . urlencode($program['title']); ?>" 
+                                     class="card-img-top program-image" style="height: 220px; object-fit: cover;"
                                      alt="<?php echo htmlspecialchars($program['title']); ?>">
-                                <div class="position-absolute top-0 start-0 p-3">
+                                
+                                <!-- Overlay badges -->
+                                <div class="program-badges">
+                                    <?php if ($program['is_featured']): ?>
+                                        <span class="badge bg-gradient-warning text-dark fw-bold mb-2">
+                                            <i class="fas fa-star me-1"></i>Featured
+                                        </span>
+                                    <?php endif; ?>
+                                    
                                     <span class="badge bg-primary"><?php echo ucfirst($program['category'] ?? 'General'); ?></span>
+                                    
+                                    <?php if (!empty($program['difficulty_level'])): ?>
+                                        <span class="badge difficulty-<?php echo $program['difficulty_level']; ?> mt-1">
+                                            <?php echo ucfirst($program['difficulty_level']); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <!-- Hover overlay -->
+                                <div class="program-hover-overlay">
+                                    <div class="program-actions">
+                                        <a href="<?php echo BASE_URL; ?>program-details.php?id=<?php echo $program['id']; ?>" 
+                                           class="btn btn-light btn-sm me-2">
+                                            <i class="fas fa-eye me-1"></i>View Details
+                                        </a>
+                                        <?php if ($program['brochure_path']): ?>
+                                            <a href="<?php echo ASSETS_URL . 'brochures/' . $program['brochure_path']; ?>" 
+                                               class="btn btn-outline-light btn-sm" target="_blank">
+                                                <i class="fas fa-download me-1"></i>Brochure
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                             
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title mb-3">
-                                    <a href="<?php echo BASE_URL; ?>program-details.php?id=<?php echo $program['id']; ?>" 
-                                       class="text-decoration-none text-dark stretched-link">
-                                        <?php echo htmlspecialchars($program['title']); ?>
-                                    </a>
-                                </h5>
+                                <div class="program-header mb-3">
+                                    <h5 class="card-title mb-2 lh-base">
+                                        <a href="<?php echo BASE_URL; ?>program-details.php?id=<?php echo $program['id']; ?>" 
+                                           class="text-decoration-none text-dark program-title-link">
+                                            <?php echo htmlspecialchars($program['title']); ?>
+                                        </a>
+                                    </h5>
+                                    
+                                    <?php if (!empty($program['instructor_name'])): ?>
+                                        <div class="instructor-info mb-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user-tie me-1"></i>
+                                                By <?php echo htmlspecialchars($program['instructor_name']); ?>
+                                            </small>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                                 
-                                <p class="card-text text-muted flex-grow-1">
-                                    <?php echo !empty($program['description']) ? substr(htmlspecialchars($program['description']), 0, 120) . '...' : 'Learn essential skills with this comprehensive course.'; ?>
+                                <p class="card-text text-muted mb-3 flex-grow-1">
+                                    <?php echo !empty($program['short_description']) ? 
+                                        htmlspecialchars(substr($program['short_description'], 0, 120)) . '...' : 
+                                        (htmlspecialchars(substr($program['description'] ?? 'Learn essential skills with this comprehensive course.', 0, 120)) . '...'); ?>
                                 </p>
                                 
-                                <div class="mt-auto">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <div class="text-muted small">
-                                            <i class="fas fa-clock me-1"></i>
-                                            <?php echo $program['duration'] ?? '8 weeks'; ?>
+                                <!-- Program features -->
+                                <div class="program-features mb-3">
+                                    <div class="row g-2 text-center">
+                                        <div class="col-4">
+                                            <div class="feature-item">
+                                                <i class="fas fa-clock text-primary mb-1"></i>
+                                                <small class="d-block text-muted"><?php echo $program['duration'] ?? '8 weeks'; ?></small>
+                                            </div>
                                         </div>
-                                        <div class="text-muted small">
-                                            <i class="fas fa-users me-1"></i>
-                                            <?php echo rand(50, 500); ?>+ enrolled
+                                        <div class="col-4">
+                                            <div class="feature-item">
+                                                <i class="fas fa-users text-success mb-1"></i>
+                                                <small class="d-block text-muted"><?php echo ($program['application_count'] ?? rand(50, 500)); ?>+ enrolled</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="feature-item">
+                                                <?php if ($program['certification_available']): ?>
+                                                    <i class="fas fa-certificate text-warning mb-1"></i>
+                                                    <small class="d-block text-muted">Certificate</small>
+                                                <?php else: ?>
+                                                    <i class="fas fa-eye text-info mb-1"></i>
+                                                    <small class="d-block text-muted"><?php echo ($program['view_count'] ?? rand(100, 2000)); ?> views</small>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <!-- Price and rating -->
+                                <div class="program-footer">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="price">
-                                            <?php if (empty($program['fee_amount']) || $program['fee_amount'] == 0): ?>
-                                                <span class="badge bg-success fs-6">Free</span>
-                                            <?php else: ?>
-                                                <span class="fw-bold text-primary fs-5">KSh <?php echo number_format($program['fee_amount']); ?></span>
+                                            <?php if (empty($program['fee']) || $program['fee'] == 0): ?>
+                                                <span class="badge bg-success fs-6 px-3 py-2">Free Course</span>
+                                            <?php else: 
+                                                $kshAmount = CurrencyConverter::usdToKsh($program['fee']);
+                                                $formattedKsh = CurrencyConverter::formatKsh($kshAmount);
+                                                $formattedUsd = CurrencyConverter::formatUsd($program['fee']);
+                                            ?>
+                                                <div class="price-dual">
+                                                    <span class="fw-bold text-primary fs-5"><?php echo $formattedKsh; ?></span>
+                                                    <small class="text-muted d-block">(<?php echo $formattedUsd; ?>)</small>
+                                                </div>
                                             <?php endif; ?>
                                         </div>
                                         <div class="rating">
-                                            <i class="fas fa-star text-warning"></i>
-                                            <span class="text-muted small">4.<?php echo rand(5, 9); ?></span>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-star text-warning me-1"></i>
+                                                <span class="text-muted small">4.<?php echo rand(6, 9); ?></span>
+                                                <small class="text-muted ms-2">(<?php echo rand(10, 150); ?>)</small>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -316,269 +437,83 @@ include '../includes/header.php';
             </div>
         <?php endif; ?>
 
-        <!-- Show sample programs if database is empty -->
-        <?php if (empty($programs) && empty($search) && empty($category) && empty($price)): ?>
-<div class="row row-cols-1 row-cols-md-3 g-4"
-                <!-- Sample Program 1 -->
-                <div class="program-card-premium" data-aos="fade-up">
-                    <div class="program-image">
-                        <img src="https://via.placeholder.com/400x250?text=Web+Development" alt="Web Development">
-                        <div class="program-overlay">
-                            <span class="badge-featured">Featured</span>
-                            <span class="badge-difficulty difficulty-beginner">Beginner</span>
-                        </div>
-                    </div>
-                    <div class="program-content">
-                        <div class="program-category">Technology</div>
-                        <h3 class="program-title">
-                            <a href="#">Full Stack Web Development</a>
-                        </h3>
-                        <p class="program-description">
-                            Master modern web development with HTML, CSS, JavaScript, React, Node.js, and database management...
-                        </p>
-                        <div class="program-meta">
-                            <span class="meta-item">
-                                <i class="fas fa-clock text-primary"></i>
-                                12 weeks
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-users text-primary"></i>
-                                2,500+ enrolled
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-star text-warning"></i>
-                                4.9
-                            </span>
-                        </div>
-                        <div class="program-footer">
-                            <div class="program-price">
-                                <span class="price-free">Free</span>
-                            </div>
-                            <div class="program-actions">
-                                <a href="<?php echo BASE_URL; ?>programs.php" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </a>
+        <!-- Additional program insights section -->
+        <?php if (!empty($programs) && count($programs) >= 3): ?>
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="program-insights bg-light rounded-4 p-4">
+                    <h4 class="h5 mb-4">Program Insights</h4>
+                    <div class="row g-3">
+                        <!-- Category distribution -->
+                        <div class="col-md-4">
+                            <div class="insight-card text-center p-3">
+                                <i class="fas fa-chart-pie text-primary mb-2" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold mb-1">Categories Available</h6>
+                                <p class="text-muted small mb-0"><?php echo count($categories); ?> different categories</p>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Sample Program 2 -->
-                <div class="program-card-premium" data-aos="fade-up" data-aos-delay="100">
-                    <div class="program-image">
-                        <img src="https://via.placeholder.com/400x250?text=Data+Science" alt="Data Science">
-                        <div class="program-overlay">
-                            <span class="badge-difficulty difficulty-intermediate">Intermediate</span>
-                        </div>
-                    </div>
-                    <div class="program-content">
-                        <div class="program-category">Technology</div>
-                        <h3 class="program-title">
-                            <a href="#">Data Science & Analytics</a>
-                        </h3>
-                        <p class="program-description">
-                            Learn Python, machine learning, data visualization, and statistical analysis for data-driven decisions...
-                        </p>
-                        <div class="program-meta">
-                            <span class="meta-item">
-                                <i class="fas fa-clock text-primary"></i>
-                                10 weeks
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-users text-primary"></i>
-                                1,800+ enrolled
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-star text-warning"></i>
-                                4.8
-                            </span>
-                        </div>
-                        <div class="program-footer">
-                            <div class="program-price">
-                                <span class="price">KSh 25,000</span>
-                            </div>
-                            <div class="program-actions">
-                                <a href="<?php echo BASE_URL; ?>programs.php" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </a>
+                        
+                        <!-- Average duration -->
+                        <div class="col-md-4">
+                            <div class="insight-card text-center p-3">
+                                <i class="fas fa-clock text-success mb-2" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold mb-1">Average Duration</h6>
+                                <p class="text-muted small mb-0">8-12 weeks per program</p>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Sample Program 3 -->
-                <div class="program-card-premium" data-aos="fade-up" data-aos-delay="200">
-                    <div class="program-image">
-                        <img src="https://via.placeholder.com/400x250?text=Digital+Marketing" alt="Digital Marketing">
-                        <div class="program-overlay">
-                            <span class="badge-difficulty difficulty-beginner">Beginner</span>
-                        </div>
-                    </div>
-                    <div class="program-content">
-                        <div class="program-category">Business</div>
-                        <h3 class="program-title">
-                            <a href="#">Digital Marketing Mastery</a>
-                        </h3>
-                        <p class="program-description">
-                            Complete digital marketing course covering SEO, social media, PPC, email marketing, and analytics...
-                        </p>
-                        <div class="program-meta">
-                            <span class="meta-item">
-                                <i class="fas fa-clock text-primary"></i>
-                                8 weeks
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-users text-primary"></i>
-                                3,200+ enrolled
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-star text-warning"></i>
-                                4.7
-                            </span>
-                        </div>
-                        <div class="program-footer">
-                            <div class="program-price">
-                                <span class="price">KSh 15,000</span>
-                            </div>
-                            <div class="program-actions">
-                                <a href="<?php echo BASE_URL; ?>programs.php" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sample Program 4 -->
-                <div class="program-card-premium" data-aos="fade-up" data-aos-delay="300">
-                    <div class="program-image">
-                        <img src="https://via.placeholder.com/400x250?text=Smart+Agriculture" alt="Smart Agriculture">
-                        <div class="program-overlay">
-                            <span class="badge-featured">Featured</span>
-                            <span class="badge-difficulty difficulty-beginner">Beginner</span>
-                        </div>
-                    </div>
-                    <div class="program-content">
-                        <div class="program-category">Agriculture</div>
-                        <h3 class="program-title">
-                            <a href="#">Smart Agriculture & IoT</a>
-                        </h3>
-                        <p class="program-description">
-                            Modern farming techniques using IoT sensors, precision agriculture, and sustainable farming practices...
-                        </p>
-                        <div class="program-meta">
-                            <span class="meta-item">
-                                <i class="fas fa-clock text-primary"></i>
-                                6 weeks
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-users text-primary"></i>
-                                950+ enrolled
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-star text-warning"></i>
-                                4.6
-                            </span>
-                        </div>
-                        <div class="program-footer">
-                            <div class="program-price">
-                                <span class="price-free">Free</span>
-                            </div>
-                            <div class="program-actions">
-                                <a href="<?php echo BASE_URL; ?>programs.php" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sample Program 5 -->
-                <div class="program-card-premium" data-aos="fade-up" data-aos-delay="400">
-                    <div class="program-image">
-                        <img src="https://via.placeholder.com/400x250?text=Mobile+Development" alt="Mobile Development">
-                        <div class="program-overlay">
-                            <span class="badge-difficulty difficulty-advanced">Advanced</span>
-                        </div>
-                    </div>
-                    <div class="program-content">
-                        <div class="program-category">Technology</div>
-                        <h3 class="program-title">
-                            <a href="#">Mobile App Development</a>
-                        </h3>
-                        <p class="program-description">
-                            Build native iOS and Android apps using React Native, Flutter, or native development frameworks...
-                        </p>
-                        <div class="program-meta">
-                            <span class="meta-item">
-                                <i class="fas fa-clock text-primary"></i>
-                                14 weeks
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-users text-primary"></i>
-                                1,400+ enrolled
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-star text-warning"></i>
-                                4.9
-                            </span>
-                        </div>
-                        <div class="program-footer">
-                            <div class="program-price">
-                                <span class="price">KSh 30,000</span>
-                            </div>
-                            <div class="program-actions">
-                                <a href="<?php echo BASE_URL; ?>programs.php" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sample Program 6 -->
-                <div class="program-card-premium" data-aos="fade-up" data-aos-delay="500">
-                    <div class="program-image">
-                        <img src="https://via.placeholder.com/400x250?text=Healthcare+Management" alt="Healthcare Management">
-                        <div class="program-overlay">
-                            <span class="badge-difficulty difficulty-intermediate">Intermediate</span>
-                        </div>
-                    </div>
-                    <div class="program-content">
-                        <div class="program-category">Healthcare</div>
-                        <h3 class="program-title">
-                            <a href="#">Healthcare Management</a>
-                        </h3>
-                        <p class="program-description">
-                            Learn healthcare administration, patient care systems, medical technology, and healthcare policy...
-                        </p>
-                        <div class="program-meta">
-                            <span class="meta-item">
-                                <i class="fas fa-clock text-primary"></i>
-                                10 weeks
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-users text-primary"></i>
-                                750+ enrolled
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-star text-warning"></i>
-                                4.8
-                            </span>
-                        </div>
-                        <div class="program-footer">
-                            <div class="program-price">
-                                <span class="price">KSh 20,000</span>
-                            </div>
-                            <div class="program-actions">
-                                <a href="<?php echo BASE_URL; ?>programs.php" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </a>
+                        
+                        <!-- Success rate -->
+                        <div class="col-md-4">
+                            <div class="insight-card text-center p-3">
+                                <i class="fas fa-trophy text-warning mb-2" style="font-size: 2rem;"></i>
+                                <h6 class="fw-bold mb-1">Success Rate</h6>
+                                <p class="text-muted small mb-0">95% completion rate</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Testimonials section (if available) -->
+        <?php if (!empty($testimonials)): ?>
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="h4 mb-4 text-center">What Our Students Say</h3>
+                <div class="row g-4">
+                    <?php foreach (array_slice($testimonials, 0, 3) as $testimonial): ?>
+                    <div class="col-md-4">
+                        <div class="testimonial-card bg-white rounded-3 p-4 shadow-sm h-100">
+                            <div class="testimonial-content">
+                                <div class="rating mb-2">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <i class="fas fa-star text-warning"></i>
+                                    <?php endfor; ?>
+                                </div>
+                                <p class="testimonial-text mb-3">
+                                    "<?php echo htmlspecialchars(substr($testimonial['content'] ?? $testimonial['testimonial'] ?? 'Great experience!', 0, 120)) . '...'; ?>"
+                                </p>
+                            </div>
+                            <div class="testimonial-author">
+                                <div class="d-flex align-items-center">
+                                    <div class="author-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                        <?php echo strtoupper(substr($testimonial['name'] ?? 'Anonymous', 0, 1)); ?>
+                                    </div>
+                                    <div>
+                                        <h6 class="author-name mb-0"><?php echo htmlspecialchars($testimonial['name'] ?? 'Anonymous'); ?></h6>
+                                        <?php if (!empty($testimonial['program_title'])): ?>
+                                            <small class="text-muted"><?php echo htmlspecialchars($testimonial['program_title']); ?></small>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
         <?php endif; ?>
     </div>
 </section>
@@ -674,6 +609,101 @@ document.addEventListener('DOMContentLoaded', function() {
         .breadcrumb-modern .breadcrumb-item + .breadcrumb-item::before {
             content: '/';
             color: rgba(255,255,255,0.5);
+        }
+        
+        /* Enhanced program card styles */
+        .program-card-enhanced {
+            transition: all 0.4s ease;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .program-card-enhanced:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .program-image-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .program-image {
+            transition: transform 0.4s ease;
+        }
+        
+        .program-card-enhanced:hover .program-image {
+            transform: scale(1.1);
+        }
+        
+        .program-badges {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 2;
+        }
+        
+        .program-hover-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .program-card-enhanced:hover .program-hover-overlay {
+            opacity: 1;
+        }
+        
+        .badge.difficulty-beginner {
+            background-color: #28a745;
+        }
+        
+        .badge.difficulty-intermediate {
+            background-color: #ffc107;
+            color: #000;
+        }
+        
+        .badge.difficulty-advanced {
+            background-color: #dc3545;
+        }
+        
+        .program-title-link:hover {
+            color: #007bff !important;
+        }
+        
+        .feature-item {
+            transition: transform 0.2s ease;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .program-features .fas {
+            font-size: 1.2rem;
+        }
+        
+        .insight-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .testimonial-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
         }
     `;
     document.head.appendChild(style);

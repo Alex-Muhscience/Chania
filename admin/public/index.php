@@ -24,23 +24,23 @@ try {
             (SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND is_active = 1) as new_users_month,
             (SELECT COUNT(*) FROM programs WHERE deleted_at IS NULL) as total_programs,
             (SELECT COUNT(*) FROM programs WHERE deleted_at IS NULL AND is_active = 1) as active_programs,
-            (SELECT COUNT(*) FROM applications) as total_applications,
-            (SELECT COUNT(*) FROM applications WHERE status = 'pending') as pending_applications,
-            (SELECT COUNT(*) FROM applications WHERE status = 'approved') as approved_applications,
-            (SELECT COUNT(*) FROM applications WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_applications_month,
+            (SELECT COUNT(*) FROM applications WHERE deleted_at IS NULL) as total_applications,
+            (SELECT COUNT(*) FROM applications WHERE status = 'pending' AND deleted_at IS NULL) as pending_applications,
+            (SELECT COUNT(*) FROM applications WHERE status = 'approved' AND deleted_at IS NULL) as approved_applications,
+            (SELECT COUNT(*) FROM applications WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND deleted_at IS NULL) as new_applications_month,
             (SELECT COUNT(*) FROM events WHERE deleted_at IS NULL) as total_events,
             (SELECT COUNT(*) FROM events WHERE deleted_at IS NULL AND event_date >= NOW()) as upcoming_events,
             (SELECT COUNT(*) FROM event_registrations) as total_registrations,
             (SELECT COUNT(*) FROM event_registrations WHERE status = 'confirmed') as confirmed_registrations,
-            (SELECT COUNT(*) FROM contacts) as total_contacts,
-            (SELECT COUNT(*) FROM contacts WHERE is_read = 0) as unread_contacts,
-            (SELECT COUNT(*) FROM contacts WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_contacts_month,
-(SELECT COUNT(*) FROM testimonials) as total_testimonials,
-            (SELECT COUNT(*) FROM testimonials WHERE is_featured = 1) as featured_testimonials,
+            (SELECT COUNT(*) FROM contacts WHERE deleted_at IS NULL) as total_contacts,
+            (SELECT COUNT(*) FROM contacts WHERE is_read = 0 AND deleted_at IS NULL) as unread_contacts,
+            (SELECT COUNT(*) FROM contacts WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND deleted_at IS NULL) as new_contacts_month,
+            (SELECT COUNT(*) FROM blog_posts WHERE status = 'published') as total_testimonials,
+            (SELECT COUNT(*) FROM blog_posts WHERE is_featured = 1 AND status = 'published') as featured_testimonials,
             (SELECT COUNT(*) FROM newsletter_subscribers WHERE status = 'subscribed') as newsletter_subscribers,
             (SELECT COUNT(*) FROM newsletter_subscribers WHERE status = 'subscribed' AND subscribed_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)) as new_subscribers_month,
-            (SELECT COUNT(*) FROM file_uploads) as total_files,
-            (SELECT ROUND(SUM(file_size) / 1024 / 1024, 2) FROM file_uploads) as total_file_size_mb,
+            (SELECT COUNT(*) FROM file_uploads WHERE deleted_at IS NULL) as total_files,
+            (SELECT ROUND(COALESCE(SUM(file_size), 0) / 1024 / 1024, 2) FROM file_uploads WHERE deleted_at IS NULL) as total_file_size_mb,
             (SELECT COUNT(*) FROM admin_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)) as activities_today,
             (SELECT COUNT(*) FROM admin_logs WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as activities_week
     ");
@@ -61,6 +61,7 @@ try {
         SELECT a.*, p.title as program_title
         FROM applications a
         JOIN programs p ON a.program_id = p.id
+        WHERE a.deleted_at IS NULL AND p.deleted_at IS NULL
         ORDER BY a.submitted_at DESC
         LIMIT 5
     ");
@@ -70,18 +71,29 @@ try {
     $stmt = $db->query("
         SELECT *
         FROM contacts
+        WHERE deleted_at IS NULL
         ORDER BY submitted_at DESC
         LIMIT 5
     ");
     $recentContacts = $stmt->fetchAll();
+    
+    // Get recent newsletter subscriptions (last 7 days)
+    $stmt = $db->query("
+        SELECT *, subscribed_at as created_at, 'website_footer' as source
+        FROM newsletter_subscribers 
+        WHERE subscribed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) 
+        ORDER BY subscribed_at DESC 
+        LIMIT 10
+    ");
+    $recentNewsletterSubscriptions = $stmt->fetchAll();
 
     // Get upcoming events
     $stmt = $db->query("
         SELECT e.*, COUNT(er.id) as registration_count
         FROM events e
         LEFT JOIN event_registrations er ON e.id = er.event_id
-        WHERE e.event_date >= CURDATE() AND e.is_active = 1
-        GROUP BY e.id
+        WHERE e.event_date >= CURDATE() AND e.is_active = 1 AND e.deleted_at IS NULL
+        GROUP BY e.id, e.title, e.event_date, e.location, e.is_active, e.deleted_at
         ORDER BY e.event_date ASC
         LIMIT 5
     ");
@@ -93,7 +105,7 @@ try {
             DATE(submitted_at) as date,
             COUNT(*) as count
         FROM applications
-        WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        WHERE submitted_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) AND deleted_at IS NULL
         GROUP BY DATE(submitted_at)
         ORDER BY date ASC
     ");
@@ -105,6 +117,7 @@ try {
             status,
             COUNT(*) as count
         FROM applications
+        WHERE deleted_at IS NULL
         GROUP BY status
     ");
     $applicationStatusData = $stmt->fetchAll();
@@ -136,20 +149,77 @@ try {
     ");
     $eventAttendanceTrends = $stmt->fetchAll();
 
-    // Get program enrollment statistics
+    // Get comprehensive program enrollment statistics with better handling for large datasets
     $stmt = $db->query("
         SELECT 
+            p.id as program_id,
             p.title as program_name,
-            COUNT(a.id) as applications,
-            COUNT(CASE WHEN a.status = 'approved' THEN 1 END) as approved
+            p.category,
+            p.difficulty_level,
+            p.max_participants,
+            p.fee,
+            COUNT(DISTINCT a.id) as total_applications,
+            COUNT(DISTINCT CASE WHEN a.status = 'approved' THEN a.id END) as approved,
+            COUNT(DISTINCT CASE WHEN a.status = 'pending' THEN a.id END) as pending,
+            COUNT(DISTINCT CASE WHEN a.status = 'rejected' THEN a.id END) as rejected,
+            COUNT(DISTINCT CASE WHEN a.status = 'completed' THEN a.id END) as completed,
+            0 as avg_rating,
+            0 as feedback_count,
+            p.created_at as program_created,
+            p.start_date,
+            p.end_date,
+            CASE 
+                WHEN p.max_participants > 0 AND COUNT(DISTINCT CASE WHEN a.status = 'approved' THEN a.id END) >= p.max_participants THEN 'Full'
+                WHEN COUNT(DISTINCT CASE WHEN a.status = 'approved' THEN a.id END) = 0 THEN 'Empty'
+                ELSE 'Available'
+            END as enrollment_status,
+            ROUND(
+                CASE 
+                    WHEN p.max_participants > 0 THEN 
+                        (COUNT(DISTINCT CASE WHEN a.status = 'approved' THEN a.id END) * 100.0) / p.max_participants
+                    ELSE 0
+                END, 1
+            ) as capacity_percentage
         FROM programs p
-        LEFT JOIN applications a ON p.id = a.program_id
+        LEFT JOIN applications a ON p.id = a.program_id AND a.deleted_at IS NULL
         WHERE p.deleted_at IS NULL AND p.is_active = 1
-        GROUP BY p.id, p.title
-        ORDER BY applications DESC
-        LIMIT 10
+        GROUP BY p.id, p.title, p.category, p.difficulty_level, p.created_at, p.max_participants, p.fee, p.start_date, p.end_date
+        HAVING total_applications > 0 OR p.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        ORDER BY total_applications DESC, approved DESC
+        LIMIT 25
     ");
     $programEnrollmentData = $stmt->fetchAll();
+    
+    // Get program enrollment trends over time
+    $stmt = $db->query("
+        SELECT 
+            DATE_FORMAT(a.submitted_at, '%Y-%m') as month,
+            p.title as program_name,
+            COUNT(a.id) as applications
+        FROM applications a
+        JOIN programs p ON a.program_id = p.id
+        WHERE a.submitted_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        AND a.deleted_at IS NULL AND p.deleted_at IS NULL
+        GROUP BY DATE_FORMAT(a.submitted_at, '%Y-%m'), p.id, p.title
+        ORDER BY month DESC, applications DESC
+    ");
+    $programEnrollmentTrends = $stmt->fetchAll();
+    
+    // Get category-wise enrollment statistics
+    $stmt = $db->query("
+        SELECT 
+            COALESCE(p.category, 'Uncategorized') as category,
+            COUNT(DISTINCT p.id) as program_count,
+            COUNT(DISTINCT a.id) as total_applications,
+            COUNT(DISTINCT CASE WHEN a.status = 'approved' THEN a.id END) as approved_applications,
+            ROUND(AVG(CASE WHEN a.status = 'approved' THEN 1.0 ELSE 0.0 END) * 100, 1) as approval_rate
+        FROM programs p
+        LEFT JOIN applications a ON p.id = a.program_id AND a.deleted_at IS NULL
+        WHERE p.deleted_at IS NULL AND p.is_active = 1
+        GROUP BY p.category
+        ORDER BY total_applications DESC
+    ");
+    $categoryStats = $stmt->fetchAll();
 
     // Get system health metrics
     $memoryUsage = memory_get_usage(true);
@@ -162,7 +232,37 @@ try {
 
 } catch (PDOException $e) {
     error_log("Dashboard data fetch error: " . $e->getMessage());
-    $stats = [];
+    // For debugging - remove this in production
+    if (isset($_GET['debug'])) {
+        echo "<div class='alert alert-danger'>Database Error: " . htmlspecialchars($e->getMessage()) . "</div>";
+        echo "<div class='alert alert-info'>Stack trace: <pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre></div>";
+    }
+    $stats = [
+        'total_users' => 0,
+        'admin_users' => 0,
+        'new_users_month' => 0,
+        'total_programs' => 0,
+        'active_programs' => 0,
+        'total_applications' => 0,
+        'pending_applications' => 0,
+        'approved_applications' => 0,
+        'new_applications_month' => 0,
+        'total_events' => 0,
+        'upcoming_events' => 0,
+        'total_registrations' => 0,
+        'confirmed_registrations' => 0,
+        'total_contacts' => 0,
+        'unread_contacts' => 0,
+        'new_contacts_month' => 0,
+        'total_testimonials' => 0,
+        'featured_testimonials' => 0,
+        'newsletter_subscribers' => 0,
+        'new_subscribers_month' => 0,
+        'total_files' => 0,
+        'total_file_size_mb' => 0,
+        'activities_today' => 0,
+        'activities_week' => 0
+    ];
     $recentActivities = [];
     $recentApplications = [];
     $recentContacts = [];
@@ -283,7 +383,12 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
                 <div class="progress mt-2">
-                    <div class="progress-bar bg-warning" role="progressbar" style="width: <?= $stats['total_applications'] > 0 ? ($stats['pending_applications'] / $stats['total_applications']) * 100 : 0 ?>%" aria-valuenow="<?= $stats['pending_applications'] ?>" aria-valuemin="0" aria-valuemax="<?= $stats['total_applications'] ?>"></div>
+                    <?php 
+                    $total_apps = $stats['total_applications'] ?? 0;
+                    $pending_apps = $stats['pending_applications'] ?? 0;
+                    $progress_width = $total_apps > 0 ? ($pending_apps / $total_apps) * 100 : 0;
+                    ?>
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: <?= $progress_width ?>%" aria-valuenow="<?= $pending_apps ?>" aria-valuemin="0" aria-valuemax="<?= $total_apps ?>"></div>
                 </div>
             </div>
         </div>
@@ -536,8 +641,8 @@ require_once __DIR__ . '/../includes/header.php';
                         <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
-                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/programs.php">View All Programs</a>
-                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/program_export.php">Export Data</a>
+                        <a class="dropdown-item" href="<?= BASE_URL ?>programs.php">View All Programs</a>
+                        <a class="dropdown-item" href="<?= BASE_URL ?>/admin/public/data_export.php">Export Data</a>
                     </div>
                 </div>
             </div>
@@ -545,6 +650,121 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="chart-bar">
                     <canvas id="programEnrollmentChart"></canvas>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Row - Program Details Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Program Performance Details</h6>
+            </div>
+            <div class="card-body">
+                <?php if (!empty($programEnrollmentData)): ?>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Program</th>
+                                    <th>Category</th>
+                                    <th>Level</th>
+                                    <th class="text-center">Total Applications</th>
+                                    <th class="text-center">Approved</th>
+                                    <th class="text-center">Pending</th>
+                                    <th class="text-center">Completed</th>
+                                    <th class="text-center">Capacity Status</th>
+                                    <th class="text-center">Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($programEnrollmentData as $program): ?>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="mr-3">
+                                                    <div class="icon-circle bg-primary">
+                                                        <i class="fas fa-graduation-cap text-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <strong><?= htmlspecialchars($program['program_name']) ?></strong>
+                                                    <br><small class="text-muted">Created: <?= date('M j, Y', strtotime($program['program_created'])) ?></small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-secondary">
+                                                <?= htmlspecialchars($program['category'] ?: 'General') ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-<?= 
+                                                $program['difficulty_level'] === 'beginner' ? 'success' :
+                                                ($program['difficulty_level'] === 'intermediate' ? 'warning' : 'danger')
+                                            ?>">
+                                                <?= ucfirst($program['difficulty_level'] ?: 'N/A') ?>
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <strong><?= number_format($program['total_applications']) ?></strong>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="text-success font-weight-bold"><?= number_format($program['approved']) ?></span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="text-warning font-weight-bold"><?= number_format($program['pending']) ?></span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="text-info font-weight-bold"><?= number_format($program['completed']) ?></span>
+                                        </td>
+                                        <td class="text-center">
+                                            <?php if ($program['max_participants'] > 0): ?>
+                                                <div class="progress" style="width: 80px; margin: 0 auto;">
+                                                    <div class="progress-bar bg-<?= 
+                                                        $program['capacity_percentage'] >= 90 ? 'danger' :
+                                                        ($program['capacity_percentage'] >= 70 ? 'warning' : 'info')
+                                                    ?>" 
+                                                         role="progressbar" 
+                                                         style="width: <?= min(100, $program['capacity_percentage']) ?>%" 
+                                                         title="<?= $program['capacity_percentage'] ?>% full">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted d-block mt-1">
+                                                    <?= $program['approved'] ?>/<?= $program['max_participants'] ?>
+                                                </small>
+                                            <?php else: ?>
+                                                <span class="text-muted">No limit</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-center">
+                                            <?php if ($program['avg_rating'] > 0): ?>
+                                                <div class="d-flex align-items-center justify-content-center">
+                                                    <div class="text-warning mr-1">
+                                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                            <i class="fas fa-star<?= $i <= round($program['avg_rating']) ? '' : '-half-alt' ?><?= $i > $program['avg_rating'] ? ' text-muted' : '' ?>"></i>
+                                                        <?php endfor; ?>
+                                                    </div>
+                                                    <small>(<?= $program['feedback_count'] ?>)</small>
+                                                </div>
+                                            <?php else: ?>
+                                                <span class="text-muted">No rating</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="text-center py-4">
+                        <i class="fas fa-graduation-cap fa-3x text-gray-300 mb-3"></i>
+                        <h5 class="text-gray-600">No program data available</h5>
+                        <p class="text-muted">No programs found or no applications submitted yet.</p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -652,6 +872,53 @@ require_once __DIR__ . '/../includes/header.php';
                                         </td>
                                         <td>
                                             <small><?= $contact['submitted_at'] ?></small>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Newsletter Subscriptions -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Newsletter Subscriptions</h6>
+                <a href="<?= BASE_URL ?>/admin/public/newsletter.php" class="btn btn-primary btn-sm">
+                    View All <i class="fas fa-arrow-right fa-sm"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                <?php if (empty($recentNewsletterSubscriptions)): ?>
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-envelope-open fa-3x mb-2"></i>
+                        <p>No recent newsletter subscriptions</p>
+                    </div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Source</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($recentNewsletterSubscriptions as $subscription): ?>
+                                    <tr>
+                                        <td>
+                                            <strong><?= htmlspecialchars($subscription['email']) ?></strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-info"><?= htmlspecialchars($subscription['source']) ?></span>
+                                        </td>
+                                        <td>
+                                            <small><?= date('M j, Y g:i A', strtotime($subscription['created_at'])) ?></small>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -795,6 +1062,75 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
     </div>
 </div>
+
+<style>
+.icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 14px;
+}
+
+.progress {
+    height: 8px;
+}
+
+.chart-bar {
+    position: relative;
+    height: 400px;
+}
+
+.chart-area {
+    position: relative;
+    height: 300px;
+}
+
+.chart-pie {
+    position: relative;
+    height: 250px;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-responsive {
+    border-radius: 0.35rem;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.activity-feed .avatar-circle {
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .chart-bar,
+    .chart-area,
+    .chart-pie {
+        height: 250px;
+    }
+    
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    .icon-circle {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+}
+</style>
 
 <!-- Charts Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -953,26 +1289,64 @@ const eventAttendanceChart = new Chart(eventAttendanceCtx, {
     }
 });
 
-// Program enrollment statistics chart
+// Enhanced Program enrollment statistics chart with better handling for large datasets
 const programEnrollmentCtx = document.getElementById('programEnrollmentChart').getContext('2d');
+
+// Prepare data for the enhanced chart
+const programLabels = <?= json_encode(array_column($programEnrollmentData, 'program_name')) ?>;
+const programData = {
+    total_applications: <?= json_encode(array_column($programEnrollmentData, 'total_applications')) ?>,
+    approved: <?= json_encode(array_column($programEnrollmentData, 'approved')) ?>,
+    pending: <?= json_encode(array_column($programEnrollmentData, 'pending')) ?>,
+    rejected: <?= json_encode(array_column($programEnrollmentData, 'rejected')) ?>,
+    completed: <?= json_encode(array_column($programEnrollmentData, 'completed')) ?>
+};
+
+// Truncate long program names for better display
+const truncatedLabels = programLabels.map(label => {
+    return label.length > 25 ? label.substring(0, 25) + '...' : label;
+});
+
 const programEnrollmentChart = new Chart(programEnrollmentCtx, {
     type: 'bar',
     data: {
-        labels: <?= json_encode(array_column($programEnrollmentData, 'program_name')) ?>,
+        labels: truncatedLabels,
         datasets: [
             {
                 label: 'Total Applications',
-                data: <?= json_encode(array_column($programEnrollmentData, 'applications')) ?>,
-                backgroundColor: 'rgba(153, 102, 255, 0.5)',
-                borderColor: 'rgb(153, 102, 255)',
-                borderWidth: 1
+                data: programData.total_applications,
+                backgroundColor: 'rgba(78, 115, 223, 0.8)',
+                borderColor: 'rgb(78, 115, 223)',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false
             },
             {
-                label: 'Approved Applications',
-                data: <?= json_encode(array_column($programEnrollmentData, 'approved')) ?>,
-                backgroundColor: 'rgba(255, 159, 64, 0.5)',
-                borderColor: 'rgb(255, 159, 64)',
-                borderWidth: 1
+                label: 'Approved',
+                data: programData.approved,
+                backgroundColor: 'rgba(28, 200, 138, 0.8)',
+                borderColor: 'rgb(28, 200, 138)',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false
+            },
+            {
+                label: 'Pending',
+                data: programData.pending,
+                backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                borderColor: 'rgb(255, 193, 7)',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false
+            },
+            {
+                label: 'Completed',
+                data: programData.completed,
+                backgroundColor: 'rgba(54, 185, 204, 0.8)',
+                borderColor: 'rgb(54, 185, 204)',
+                borderWidth: 2,
+                borderRadius: 4,
+                borderSkipped: false
             }
         ]
     },
@@ -980,16 +1354,86 @@ const programEnrollmentChart = new Chart(programEnrollmentCtx, {
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+            intersect: false,
+            mode: 'index'
+        },
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                align: 'start',
+                labels: {
+                    usePointStyle: true,
+                    padding: 20
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    title: function(context) {
+                        const index = context[0].dataIndex;
+                        return programLabels[index]; // Show full program name in tooltip
+                    },
+                    afterLabel: function(context) {
+                        const index = context.dataIndex;
+                        const total = programData.total_applications[index];
+                        if (total > 0) {
+                            const percentage = ((context.raw / total) * 100).toFixed(1);
+                            return `${percentage}% of total applications`;
+                        }
+                        return '';
+                    }
+                }
+            }
+        },
         scales: {
             x: {
                 beginAtZero: true,
+                stacked: false,
                 ticks: {
                     stepSize: 1
+                },
+                title: {
+                    display: true,
+                    text: 'Number of Applications'
                 }
+            },
+            y: {
+                stacked: false,
+                ticks: {
+                    maxTicksLimit: 20, // Limit number of programs shown
+                    callback: function(value, index, values) {
+                        const label = this.getLabelForValue(value);
+                        return label.length > 20 ? label.substring(0, 20) + '...' : label;
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Programs'
+                }
+            }
+        },
+        layout: {
+            padding: {
+                left: 10,
+                right: 10,
+                top: 10,
+                bottom: 10
             }
         }
     }
 });
+
+// Add click handler for program chart
+programEnrollmentChart.canvas.onclick = function(evt) {
+    const points = programEnrollmentChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+    if (points.length) {
+        const firstPoint = points[0];
+        const programName = programLabels[firstPoint.index];
+        // You can add navigation to program details here
+        console.log('Clicked on program:', programName);
+    }
+};
 
 // Application status pie chart
 const statusCtx = document.getElementById('statusChart').getContext('2d');

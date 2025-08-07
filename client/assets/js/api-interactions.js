@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // API base URL - adjust based on current location
+    const API_BASE = '/chania/api/v1';
+    
     // Handle newsletter subscription
     const subscribeForm = document.getElementById('subscribeForm');
     if (subscribeForm) {
@@ -6,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const email = subscribeForm.querySelector('input[name="email"]').value;
             const name = subscribeForm.querySelector('input[name="name"]').value;
-await postData('/api/v1/newsletter/subscribe', { name, email });
+            await postData(`${API_BASE}/newsletter/subscribe`, { name, email });
         });
     }
 
@@ -17,7 +20,7 @@ await postData('/api/v1/newsletter/subscribe', { name, email });
             e.preventDefault();
             const data = new FormData(applyForm);
             const formData = Object.fromEntries(data.entries());
-await postData('/api/v1/applications', formData);
+            await postData(`${API_BASE}/applications`, formData);
         });
     }
 
@@ -28,29 +31,44 @@ await postData('/api/v1/applications', formData);
             e.preventDefault();
             const data = new FormData(contactForm);
             const formData = Object.fromEntries(data.entries());
-await postData('/api/v1/contacts', formData);
+            await postData(`${API_BASE}/contacts`, formData);
         });
     }
 
-    // Handle event registration
-    const registerForm = document.getElementById('registerForm');
+    // Handle event registration (both registerForm and eventRegistrationForm)
+    const registerForm = document.getElementById('registerForm') || document.getElementById('eventRegistrationForm');
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const data = new FormData(registerForm);
             const formData = Object.fromEntries(data.entries());
-await postData('/api/v1/events', formData);
+            const eventId = formData.event_id;
+            if (!eventId) {
+                showMessage('Event ID is missing', 'error');
+                return;
+            }
+            // Split full_name into first_name and last_name if needed
+            if (formData.full_name) {
+                const nameParts = formData.full_name.trim().split(' ', 2);
+                formData.first_name = nameParts[0];
+                formData.last_name = nameParts[1] || '';
+                delete formData.full_name;
+            }
+            await postData(`${API_BASE}/events/${eventId}/register`, formData, registerForm);
         });
     }
 
     // Utility function to POST data to API
     async function postData(url = '', data = {}, formElement = null) {
         let submitButton = null;
+        let originalButtonContent = '';
+        
         if (formElement) {
             submitButton = formElement.querySelector('button[type="submit"]');
             if (submitButton) {
+                originalButtonContent = submitButton.innerHTML;
                 submitButton.disabled = true;
-                submitButton.textContent = 'Submitting...';
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
             }
         }
 
@@ -78,7 +96,7 @@ await postData('/api/v1/events', formData);
         } finally {
             if (submitButton) {
                 submitButton.disabled = false;
-                submitButton.textContent = 'Submit';
+                submitButton.innerHTML = originalButtonContent || '<i class="fas fa-ticket-alt me-2"></i>Register Now';
             }
         }
     }

@@ -26,7 +26,7 @@ class PagesController extends BaseController {
         try {
             $pages = $this->pageManager->getAll();
 
-            $this->renderView(__DIR__ . '/../views/pages/index.php', [
+            $this->render('pages/index', [
                 'pages' => $pages,
                 'pageManager' => $this->pageManager
             ]);
@@ -34,7 +34,7 @@ class PagesController extends BaseController {
         } catch (Exception $e) {
             error_log("Pages fetch error: " . $e->getMessage());
             $this->addError('Error loading pages.');
-            $this->renderView(__DIR__ . '/../views/pages/index.php', [
+            $this->render('pages/index', [
                 'pages' => [],
                 'pageManager' => $this->pageManager
             ]);
@@ -61,7 +61,7 @@ class PagesController extends BaseController {
         }
 
         $templates = $this->pageManager->getTemplates();
-        $this->renderView(__DIR__ . '/../views/pages/add.php', [
+        $this->render('pages/add', [
             'templates' => $templates
         ]);
     }
@@ -97,7 +97,7 @@ class PagesController extends BaseController {
             }
 
             $templates = $this->pageManager->getTemplates();
-            $this->renderView(__DIR__ . '/../views/pages/edit.php', [
+            $this->render('pages/edit', [
                 'page' => $page,
                 'templates' => $templates
             ]);

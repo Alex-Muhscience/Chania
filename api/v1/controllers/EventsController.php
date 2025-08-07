@@ -121,16 +121,26 @@ class EventsController extends BaseApiController {
             $this->sendError('Event ID is required', 400);
         }
         
-        // Validate required fields
-        $this->validateRequired(['first_name', 'last_name', 'email']);
-        
         $data = $this->request['body'];
+        
+        // Handle full_name split if needed
+        if (isset($data['full_name']) && !isset($data['first_name'])) {
+            $nameParts = explode(' ', trim($data['full_name']), 2);
+            $data['first_name'] = $nameParts[0];
+            $data['last_name'] = $nameParts[1] ?? '';
+        }
+        
+        // Validate required fields
+        $this->validateRequired(['first_name', 'email']);
         
         // Validate email
         $this->validateEmail($data['email']);
         
         // Validate event exists and is available for registration
         $this->validateEventAvailable($eventId);
+        
+        // Check for existing registration
+        $this->checkDuplicateRegistration($eventId, $data['email']);
         
         // Sanitize input
         $sanitizedData = $this->sanitizeRegistrationData($data);
@@ -139,22 +149,22 @@ class EventsController extends BaseApiController {
             // Insert event registration
             $stmt = $this->db->prepare("
                 INSERT INTO event_registrations (
-                    event_id, first_name, last_name, email, phone, organization,
-                    position, dietary_requirements, accessibility_needs, status,
-                    registered_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'registered', NOW())
+                    event_id, first_name, last_name, email, phone, organization, position,
+                    dietary_requirements, accessibility_needs, status,
+                    registered_at, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'registered', NOW(), NOW())
             ");
             
             $stmt->execute([
                 $eventId,
                 $sanitizedData['first_name'],
-                $sanitizedData['last_name'],
+                $sanitizedData['last_name'] ?? '',
                 $sanitizedData['email'],
                 $sanitizedData['phone'] ?? null,
                 $sanitizedData['organization'] ?? null,
                 $sanitizedData['position'] ?? null,
-                $sanitizedData['dietary_requirements'] ?? null,
-                $sanitizedData['accessibility_needs'] ?? null
+                $sanitizedData['dietary_requirements'] ?? $sanitizedData['special_requirements'] ?? null,
+                $sanitizedData['accessibility_needs'] ?? $sanitizedData['special_requirements'] ?? null
             ]);
             
             $registrationId = $this->db->lastInsertId();
@@ -162,12 +172,14 @@ class EventsController extends BaseApiController {
             // Update event attendee count
             $this->updateEventAttendeeCount($eventId);
             
-            // Log activity
-            $this->logActivity(
+            // Log activity for admin notifications
+            require_once __DIR__ . '/../../../shared/Core/Utilities.php';
+            Utilities::logActivity(
+                null, // No user ID for public registrations
                 'EVENT_REGISTRATION',
                 'event_registrations',
                 $registrationId,
-                "New registration for event ID {$eventId} from {$sanitizedData['first_name']} {$sanitizedData['last_name']} ({$sanitizedData['email']})"
+                "New event registration from {$sanitizedData['first_name']} {$sanitizedData['last_name']} ({$sanitizedData['email']}) for event ID {$eventId}"
             );
             
             $this->sendSuccess([
@@ -456,6 +468,27 @@ class EventsController extends BaseApiController {
     }
     
     /**
+     * Helper: Check for duplicate registration
+     */
+    private function checkDuplicateRegistration($eventId, $email) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT id FROM event_registrations 
+                WHERE event_id = ? AND email = ? AND status != 'cancelled'
+            ");
+            $stmt->execute([$eventId, $email]);
+            
+            if ($stmt->fetch()) {
+                $this->sendError('You are already registered for this event', 409, 'DUPLICATE_REGISTRATION');
+            }
+            
+        } catch (Exception $e) {
+            error_log('Duplicate check error: ' . $e->getMessage());
+            $this->sendError('Unable to validate registration', 500);
+        }
+    }
+    
+    /**
      * Helper: Sanitize registration data
      */
     private function sanitizeRegistrationData($data) {
@@ -463,7 +496,7 @@ class EventsController extends BaseApiController {
         
         $fields = [
             'first_name', 'last_name', 'email', 'phone', 'organization',
-            'position', 'dietary_requirements', 'accessibility_needs'
+            'position', 'dietary_requirements', 'accessibility_needs', 'special_requirements'
         ];
         
         foreach ($fields as $field) {

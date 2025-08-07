@@ -1,13 +1,15 @@
-# Digital Empowerment Network Platform
+# Digital Empowerment Network Platform (Chania)
 
 <div align="center">
   <h3>🚀 Empowering Communities Through Digital Education</h3>
   <p>A comprehensive, production-ready platform built with PHP, MySQL, and modern web technologies for managing digital empowerment programs, users, and organizational activities.</p>
   
-  ![Version](https://img.shields.io/badge/version-2.0-blue.svg)
+  ![Version](https://img.shields.io/badge/version-3.0-blue.svg)
   ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4.svg)
   ![MySQL](https://img.shields.io/badge/MySQL-5.7%2B-4479A1.svg)
+  ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple.svg)
   ![License](https://img.shields.io/badge/license-MIT-green.svg)
+  ![Status](https://img.shields.io/badge/status-Active%20Development-green.svg)
 </div>
 
 ---
@@ -38,24 +40,28 @@ The **Digital Empowerment Network Platform** is a full-stack web application des
 
 ### **Core Management**
 - **User Management** - Complete CRUD operations with role-based permissions
-- **Program Management** - Handle training programs with categories and enrollment
-- **Event Management** - Organize and track events with registration capabilities
-- **Application Processing** - Manage program applications with status tracking
-- **Content Management** - Dynamic pages, blog posts, FAQs, and testimonials
+- **Program Management** - Handle training programs with schedules and categories
+- **Event Management** - Organize and track events with real-time registration
+- **Application Processing** - Manage program applications with enhanced status tracking
+- **Content Management** - Dynamic pages, impact blogs, FAQs, and testimonials
+- **Partner Management** - Comprehensive partner and collaboration management
+- **Team Management** - Internal team member profiles and roles
 
 ### **Communication & Marketing**
-- **Email Templates** - Rich text email templates with variable support
-- **Email Campaigns** - Bulk email campaigns with scheduling
-- **SMS Templates** - SMS messaging system integration
-- **Newsletter Management** - Subscriber management and campaigns
-- **Contact Management** - Handle contact form submissions
+- **Email Templates** - Rich text email templates with dynamic variable support
+- **Email Campaigns** - Bulk email campaigns with advanced scheduling
+- **SMS Templates** - SMS messaging system with template management
+- **Newsletter Management** - Real-time subscriber management with automated campaigns
+- **Contact Management** - Advanced contact form handling with notification system
+- **Real-time Notifications** - Live notification system with badge counters
 
 ### **Reports & Analytics**
-- **Advanced Dashboard** - Real-time statistics and charts
-- **Custom Report Builder** - Build reports with drag-and-drop interface
-- **Data Export Tools** - Export data in CSV/JSON formats
-- **Activity Timeline** - Complete audit trail of admin actions
-- **Security Monitoring** - Security logs and breach detection
+- **Advanced Dashboard** - Real-time statistics with interactive charts
+- **Custom Report Builder** - Intuitive drag-and-drop report interface
+- **Data Export Tools** - Multi-format export (CSV, JSON, PDF)
+- **Activity Timeline** - Complete audit trail with real-time logging
+- **Security Monitoring** - Enhanced security logs and threat detection
+- **Performance Analytics** - System performance metrics and optimization insights
 
 ### **Media & Files**
 - **Media Library** - Upload, organize, and manage media files

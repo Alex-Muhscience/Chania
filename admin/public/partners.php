@@ -15,7 +15,13 @@ if (!function_exists('_can_manage_entity')) {
 $can_manage = _can_manage_entity('partner');
 
 $db = (new Database())->connect();
-$stmt = $db->query("SELECT * FROM partners WHERE deleted_at IS NULL ORDER BY name ASC");
+$stmt = $db->query("
+    SELECT p.*, u.full_name as created_by_name 
+    FROM partners p 
+    LEFT JOIN users u ON p.created_by = u.id 
+    WHERE p.deleted_at IS NULL 
+    ORDER BY p.is_featured DESC, p.partnership_level ASC, p.display_order ASC, p.name ASC
+");
 $partners = $stmt->fetchAll();
 
 $message = '';
@@ -52,51 +58,114 @@ require_once __DIR__ . '/../includes/header.php';
                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>Logo</th>
-                            <th>Name</th>
-                            <th>Website</th>
-                            <th>Status</th>
-                            <th>Created At</th>
+                            <th width="80">Logo</th>
+                            <th>Partner Details</th>
+                            <th width="120">Type & Level</th>
+                            <th width="100">Status</th>
+                            <th width="100">Display Order</th>
                             <?php if ($can_manage): ?>
-                                <th>Actions</th>
+                                <th width="120">Actions</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($partners)): ?>
                             <tr>
-                                <td colspan="<?= $can_manage ? 6 : 5 ?>" class="text-center">No partners found.</td>
+                                <td colspan="<?= $can_manage ? 6 : 5 ?>" class="text-center py-4">
+                                    <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No partners found. <a href="partner_add.php">Add the first partner</a>.</p>
+                                </td>
                             </tr>
                         <?php else: ?>
                             <?php foreach ($partners as $partner): ?>
+                                <?php 
+                                    // Determine logo URL
+                                    $logo_url = null;
+                                    if ($partner['logo_path']) {
+                                        if (filter_var($partner['logo_path'], FILTER_VALIDATE_URL)) {
+                                            // It's a URL
+                                            $logo_url = $partner['logo_path'];
+                                        } else {
+                                            // It's a file path
+                                            $logo_url = '../../client/assets/images/partners/' . $partner['logo_path'];
+                                        }
+                                    }
+                                ?>
                                 <tr>
-                                    <td>
-                                        <?php if ($partner['logo_path']): ?>
-                                            <img src="../../<?= htmlspecialchars($partner['logo_path']) ?>" alt="<?= htmlspecialchars($partner['name']) ?>" class="img-thumbnail" style="max-width: 50px;">
+                                    <td class="text-center align-middle">
+                                        <?php if ($logo_url): ?>
+                                            <img src="<?= htmlspecialchars($logo_url) ?>" 
+                                                 alt="<?= htmlspecialchars($partner['name']) ?>" 
+                                                 class="img-thumbnail" 
+                                                 style="max-width: 60px; max-height: 40px; object-fit: contain;"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                            <div style="display:none;" class="text-muted small">No Image</div>
                                         <?php else: ?>
-                                            No Logo
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 40px; font-size: 11px;">
+                                                <span class="text-muted">No Logo</span>
+                                            </div>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?= htmlspecialchars($partner['name']) ?></td>
                                     <td>
-                                        <?php if ($partner['website_url']): ?>
-                                            <a href="<?= htmlspecialchars($partner['website_url']) ?>" target="_blank"><?= htmlspecialchars($partner['website_url']) ?></a>
-                                        <?php else: ?>
-                                            No Website
-                                        <?php endif; ?>
+                                        <div class="partner-info">
+                                            <h6 class="mb-1">
+                                                <?= htmlspecialchars($partner['name']) ?>
+                                                <?php if ($partner['is_featured']): ?>
+                                                    <span class="badge badge-warning badge-sm ml-1">Featured</span>
+                                                <?php endif; ?>
+                                            </h6>
+                                            <?php if ($partner['description']): ?>
+                                                <p class="text-muted small mb-1"><?= htmlspecialchars(substr($partner['description'], 0, 80)) ?><?= strlen($partner['description']) > 80 ? '...' : '' ?></p>
+                                            <?php endif; ?>
+                                            <div class="small text-muted">
+                                                <?php if ($partner['website_url']): ?>
+                                                    <i class="fas fa-globe"></i> <a href="<?= htmlspecialchars($partner['website_url']) ?>" target="_blank" class="text-decoration-none"><?= parse_url($partner['website_url'], PHP_URL_HOST) ?></a><br>
+                                                <?php endif; ?>
+                                                <?php if ($partner['contact_email']): ?>
+                                                    <i class="fas fa-envelope"></i> <?= htmlspecialchars($partner['contact_email']) ?><br>
+                                                <?php endif; ?>
+                                                <?php if ($partner['contact_person']): ?>
+                                                    <i class="fas fa-user"></i> <?= htmlspecialchars($partner['contact_person']) ?>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>
+                                    <td class="text-center align-middle">
+                                        <div class="mb-1">
+                                            <span class="badge badge-<?= 
+                                                $partner['partnership_type'] == 'funding' ? 'success' : 
+                                                ($partner['partnership_type'] == 'technology' ? 'primary' : 
+                                                ($partner['partnership_type'] == 'training' ? 'info' : 'secondary')) 
+                                            ?> badge-sm">
+                                                <?= ucwords($partner['partnership_type']) ?>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <small class="text-muted"><?= ucwords($partner['partnership_level']) ?></small>
+                                        </div>
+                                    </td>
+                                    <td class="text-center align-middle">
                                         <?= $partner['is_active'] ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>' ?>
+                                        <div class="small text-muted mt-1"><?= date('M j, Y', strtotime($partner['created_at'])) ?></div>
                                     </td>
-                                    <td><?= date('M j, Y', strtotime($partner['created_at'])) ?></td>
+                                    <td class="text-center align-middle">
+                                        <span class="badge badge-light"><?= $partner['display_order'] ?></span>
+                                    </td>
                                     <?php if ($can_manage): ?>
-                                        <td>
-                                            <a href="partner_edit.php?id=<?= $partner['id'] ?>" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="partner_delete.php?id=<?= $partner['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this partner?')">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
+                                        <td class="text-center align-middle">
+                                            <div class="btn-group" role="group">
+                                                <a href="partner_edit.php?id=<?= $partner['id'] ?>" 
+                                                   class="btn btn-outline-primary btn-sm" 
+                                                   title="Edit Partner">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="partner_delete.php?id=<?= $partner['id'] ?>" 
+                                                   class="btn btn-outline-danger btn-sm" 
+                                                   title="Delete Partner"
+                                                   onclick="return confirm('Are you sure you want to delete \"<?= htmlspecialchars($partner['name']) ?>\"? This action cannot be undone.')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
                                         </td>
                                     <?php endif; ?>
                                 </tr>

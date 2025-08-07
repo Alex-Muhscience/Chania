@@ -7,9 +7,17 @@ AddDefaultCharset UTF-8
 # Prevent directory listing
 Options -Indexes
 
+# Custom 404 error page
+ErrorDocument 404 /chania/404.php
+
 # Simple approach: rewrite everything to client/public/
 # Root access goes to client/public/index.php
 RewriteRule ^$ client/public/index.php [L]
+
+# Handle specific files/directories in root that should not be redirected
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^(404\.php|admin/.*|api/.*|public/.*|shared/.*)$ - [L]
 
 # All other requests go to client/public/ directory
 RewriteCond %{REQUEST_FILENAME} !-f

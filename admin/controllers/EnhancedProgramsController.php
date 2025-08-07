@@ -106,7 +106,7 @@ class EnhancedProgramsController extends BaseController {
         $this->setPageTitle('Add New Enhanced Program');
         $this->setBreadcrumbs([
             ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
-            ['title' => 'Enhanced Programs Management', 'url' => BASE_URL . '/admin/enhanced_programs.php'],
+            ['title' => 'Enhanced Programs Management', 'url' => BASE_URL . '/admin/programs.php'],
             ['title' => 'Add New Program']
         ]);
 
@@ -127,13 +127,13 @@ class EnhancedProgramsController extends BaseController {
 
         $programId = intval($_GET['id'] ?? 0);
         if (!$programId) {
-            $this->redirect(BASE_URL . '/admin/enhanced_programs.php', 'Invalid program ID.');
+            $this->redirect(BASE_URL . '/admin/programs.php', 'Invalid program ID.');
         }
 
         $this->setPageTitle('Edit Enhanced Program');
         $this->setBreadcrumbs([
             ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
-            ['title' => 'Enhanced Programs Management', 'url' => BASE_URL . '/admin/enhanced_programs.php'],
+            ['title' => 'Enhanced Programs Management', 'url' => BASE_URL . '/admin/programs.php'],
             ['title' => 'Edit Program']
         ]);
 
@@ -146,13 +146,13 @@ class EnhancedProgramsController extends BaseController {
             $programData = $this->getProgramWithDetails($programId);
             
             if (!$programData['program']) {
-                $this->redirect(BASE_URL . '/admin/enhanced_programs.php', 'Program not found.');
+                $this->redirect(BASE_URL . '/admin/programs.php', 'Program not found.');
             }
 
             $this->renderView(__DIR__ . '/../views/enhanced_programs/edit.php', $programData);
 
         } catch (Exception $e) {
-            $this->redirect(BASE_URL . '/admin/enhanced_programs.php', 'Error loading program: ' . $e->getMessage());
+            $this->redirect(BASE_URL . '/admin/programs.php', 'Error loading program: ' . $e->getMessage());
         }
     }
 
@@ -166,6 +166,11 @@ class EnhancedProgramsController extends BaseController {
         $stmt = $this->db->prepare("SELECT * FROM program_info WHERE program_id = ?");
         $stmt->execute([$programId]);
         $programInfo = $stmt->fetch();
+
+        // Merge program_info fields into the main program array for form display
+        if ($program && $programInfo) {
+            $program = array_merge($program, $programInfo);
+        }
 
         // Get program schedules
         $stmt = $this->db->prepare("SELECT * FROM program_schedules WHERE program_id = ? AND deleted_at IS NULL ORDER BY start_date ASC");
@@ -214,6 +219,10 @@ class EnhancedProgramsController extends BaseController {
                         $this->setSuccess("Program status updated successfully.");
                     }
                     break;
+                    
+                case 'delete_gallery_image':
+                    $this->deleteGalleryImageAjax();
+                    break;
             }
 
             $this->redirect($_SERVER['PHP_SELF']);
@@ -237,15 +246,71 @@ class EnhancedProgramsController extends BaseController {
                 
                 // Create basic program
                 $programData = $this->sanitizeInput($_POST);
+                
+                // Handle main image upload
+                $imagePath = null;
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    $uploadResult = $this->handleImageUpload($_FILES['image'], 'programs');
+                    if ($uploadResult['success']) {
+                        $imagePath = $uploadResult['path'];
+                    } else {
+                        $this->db->rollBack();
+                        $this->addError($uploadResult['error']);
+                        return;
+                    }
+                }
+                
+                // Handle gallery images upload
+                $galleryImages = [];
+                if (isset($_FILES['gallery_images'])) {
+                    for ($i = 0; $i < count($_FILES['gallery_images']['name']); $i++) {
+                        if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
+                            $file = [
+                                'name' => $_FILES['gallery_images']['name'][$i],
+                                'type' => $_FILES['gallery_images']['type'][$i],
+                                'tmp_name' => $_FILES['gallery_images']['tmp_name'][$i],
+                                'error' => $_FILES['gallery_images']['error'][$i],
+                                'size' => $_FILES['gallery_images']['size'][$i]
+                            ];
+                            $uploadResult = $this->handleImageUpload($file, 'programs/gallery');
+                            if ($uploadResult['success']) {
+                                $galleryImages[] = $uploadResult['path'];
+                            }
+                        }
+                    }
+                }
+                
                 $stmt = $this->db->prepare("
-                    INSERT INTO programs (title, description, duration, fee, is_active, created_at) 
-                    VALUES (?, ?, ?, ?, 1, NOW())
+                    INSERT INTO programs (title, slug, description, short_description, category, duration, 
+                                        difficulty_level, fee, max_participants, start_date, end_date,
+                                        image_path, gallery_images, video_url, brochure_path,
+                                        instructor_name, location, is_featured, is_active, is_online,
+                                        tags, meta_title, meta_description, created_at) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, NOW())
                 ");
                 $result = $stmt->execute([
                     $programData['title'],
+                    $this->generateSlug($programData['title']),
                     $programData['description'],
+                    $programData['short_description'] ?? '',
+                    $programData['category'] ?? 'General',
                     $programData['duration'],
-                    $programData['fee'] ?? 0
+                    $programData['difficulty_level'] ?? 'beginner',
+                    $programData['fee'] ?? 0,
+                    $programData['max_participants'] ?? null,
+                    $programData['start_date'] ?? null,
+                    $programData['end_date'] ?? null,
+                    $imagePath,
+                    !empty($galleryImages) ? json_encode($galleryImages) : null,
+                    $programData['video_url'] ?? null,
+                    null, // brochure_path - can be added later
+                    $programData['instructor_name'] ?? null,
+                    $programData['location'] ?? null,
+                    isset($programData['is_featured']) ? 1 : 0,
+                    isset($programData['is_online']) ? 1 : 0,
+                    $programData['tags'] ?? null,
+                    $programData['meta_title'] ?? null,
+                    $programData['meta_description'] ?? null
                 ]);
                 
                 $programId = $this->db->lastInsertId();
@@ -272,7 +337,7 @@ class EnhancedProgramsController extends BaseController {
                 $this->db->commit();
                 
                 if ($result) {
-                    $this->redirect(BASE_URL . '/admin/enhanced_programs.php', 'Program created successfully.');
+                    $this->redirect(BASE_URL . '/admin/programs.php', 'Program created successfully.');
                 } else {
                     $this->addError('Failed to create program.');
                 }
@@ -295,17 +360,110 @@ class EnhancedProgramsController extends BaseController {
                 
                 $programData = $this->sanitizeInput($_POST);
                 
-                // Update basic program
+                // Get current program data
+                $stmt = $this->db->prepare("SELECT * FROM programs WHERE id = ?");
+                $stmt->execute([$programId]);
+                $currentProgram = $stmt->fetch();
+                
+                if (!$currentProgram) {
+                    throw new Exception('Program not found.');
+                }
+                
+                // Handle main image upload or removal
+                $imagePath = $currentProgram['image_path'];
+                
+                // Check if image should be removed
+                if (isset($programData['remove_image']) && $programData['remove_image'] == '1') {
+                    // Delete current image file if exists
+                    if ($imagePath) {
+                        $currentImagePath = __DIR__ . '/../../uploads/' . $imagePath;
+                        if (file_exists($currentImagePath)) {
+                            unlink($currentImagePath);
+                        }
+                    }
+                    $imagePath = null;
+                }
+                
+                // Handle new image upload
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    // Delete old image if exists
+                    if ($imagePath) {
+                        $oldImagePath = __DIR__ . '/../../uploads/' . $imagePath;
+                        if (file_exists($oldImagePath)) {
+                            unlink($oldImagePath);
+                        }
+                    }
+                    
+                    $uploadResult = $this->handleImageUpload($_FILES['image'], 'programs');
+                    if ($uploadResult['success']) {
+                        $imagePath = $uploadResult['path'];
+                    } else {
+                        $this->db->rollBack();
+                        $this->addError($uploadResult['error']);
+                        return;
+                    }
+                }
+                
+                // Handle gallery images
+                $currentGallery = json_decode($currentProgram['gallery_images'] ?? '[]', true);
+                $galleryImages = $currentGallery;
+                
+                // Add new gallery images
+                if (isset($_FILES['gallery_images'])) {
+                    $newGalleryImages = [];
+                    for ($i = 0; $i < count($_FILES['gallery_images']['name']); $i++) {
+                        if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
+                            $file = [
+                                'name' => $_FILES['gallery_images']['name'][$i],
+                                'type' => $_FILES['gallery_images']['type'][$i],
+                                'tmp_name' => $_FILES['gallery_images']['tmp_name'][$i],
+                                'error' => $_FILES['gallery_images']['error'][$i],
+                                'size' => $_FILES['gallery_images']['size'][$i]
+                            ];
+                            $uploadResult = $this->handleImageUpload($file, 'programs/gallery');
+                            if ($uploadResult['success']) {
+                                $newGalleryImages[] = $uploadResult['path'];
+                            }
+                        }
+                    }
+                    
+                    if (!empty($newGalleryImages)) {
+                        $galleryImages = array_merge($galleryImages, $newGalleryImages);
+                    }
+                }
+                
+                // Update main program table with all fields
                 $stmt = $this->db->prepare("
                     UPDATE programs 
-                    SET title = ?, description = ?, duration = ?, fee = ?, updated_at = NOW() 
+                    SET title = ?, slug = ?, description = ?, category = ?, duration = ?, 
+                        difficulty_level = ?, fee = ?, max_participants = ?, start_date = ?, end_date = ?,
+                        image_path = ?, gallery_images = ?, video_url = ?,
+                        instructor_name = ?, location = ?, is_featured = ?, is_online = ?,
+                        tags = ?, meta_title = ?, meta_description = ?, updated_at = NOW()
                     WHERE id = ?
                 ");
+                
                 $result = $stmt->execute([
                     $programData['title'],
+                    $this->generateSlug($programData['title']),
                     $programData['description'],
+                    $programData['category'] ?? 'General',
                     $programData['duration'],
+                    $programData['difficulty_level'] ?? 'beginner',
                     $programData['fee'] ?? 0,
+                    $programData['max_participants'] ?: null,
+                    $programData['start_date'] ?: null,
+                    $programData['end_date'] ?: null,
+                    $imagePath,
+                    !empty($galleryImages) ? json_encode(array_values($galleryImages)) : null,
+                    $programData['video_url'] ?: null,
+                    $programData['instructor_name'] ?: null,
+                    $programData['location'] ?: null,
+                    isset($programData['is_featured']) ? 1 : 0,
+                    isset($programData['is_online']) ? 1 : 0,
+                    $programData['tags'] ?: null,
+                    $programData['meta_title'] ?: null,
+                    $programData['meta_description'] ?: null,
                     $programId
                 ]);
                 
@@ -352,7 +510,7 @@ class EnhancedProgramsController extends BaseController {
                 $this->db->commit();
                 
                 if ($result) {
-                    $this->redirect(BASE_URL . '/admin/enhanced_programs.php', 'Program updated successfully.');
+                    $this->redirect(BASE_URL . '/admin/programs.php', 'Program updated successfully.');
                 } else {
                     $this->addError('Failed to update program.');
                 }
@@ -368,7 +526,7 @@ class EnhancedProgramsController extends BaseController {
     public function schedules() {
         $programId = intval($_GET['program_id'] ?? 0);
         if (!$programId) {
-            $this->redirect(BASE_URL . '/admin/enhanced_programs.php', 'Invalid program ID.');
+            $this->redirect(BASE_URL . '/admin/programs.php', 'Invalid program ID.');
         }
 
         // Check permissions
@@ -391,7 +549,7 @@ class EnhancedProgramsController extends BaseController {
             $program = $stmt->fetch();
 
             if (!$program) {
-                $this->redirect(BASE_URL . '/admin/enhanced_programs.php', 'Program not found.');
+                $this->redirect(BASE_URL . '/admin/programs.php', 'Program not found.');
             }
 
             // Get schedules
@@ -406,7 +564,7 @@ class EnhancedProgramsController extends BaseController {
             ]);
 
         } catch (Exception $e) {
-            $this->redirect(BASE_URL . '/admin/enhanced_programs.php', 'Error loading schedules: ' . $e->getMessage());
+            $this->redirect(BASE_URL . '/admin/programs.php', 'Error loading schedules: ' . $e->getMessage());
         }
     }
 
@@ -445,9 +603,12 @@ class EnhancedProgramsController extends BaseController {
             }
         }
 
-        // Validate that at least one fee is provided
-        if (empty($scheduleData['online_fee']) && empty($scheduleData['physical_fee'])) {
-            $errors[] = "At least one fee (online or physical) must be specified.";
+        // Validate that both fees are provided (requirement: all courses available in both modes)
+        if (empty($scheduleData['online_fee']) || $scheduleData['online_fee'] <= 0) {
+            $errors[] = "Online fee is required and must be greater than 0.";
+        }
+        if (empty($scheduleData['physical_fee']) || $scheduleData['physical_fee'] <= 0) {
+            $errors[] = "Physical fee is required and must be greater than 0.";
         }
 
         if (empty($errors)) {
@@ -493,6 +654,192 @@ class EnhancedProgramsController extends BaseController {
                 $this->addError($error);
             }
         }
+    }
+    
+    private function handleImageUpload($file, $subfolder = '') {
+        $uploadDir = __DIR__ . '/../../uploads/' . ($subfolder ? $subfolder . '/' : '');
+        
+        // Create directory if it doesn't exist
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Validate file type
+        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($file['type'], $allowedTypes)) {
+            return ['success' => false, 'error' => 'Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.'];
+        }
+
+        // Validate file size (10MB max for programs)
+        if ($file['size'] > 10 * 1024 * 1024) {
+            return ['success' => false, 'error' => 'File is too large. Maximum size is 10MB.'];
+        }
+
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = uniqid() . '_' . time() . '.' . $extension;
+        $filepath = $uploadDir . $filename;
+
+        if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            return ['success' => true, 'path' => ($subfolder ? $subfolder . '/' : '') . $filename];
+        } else {
+            return ['success' => false, 'error' => 'Failed to upload file.'];
+        }
+    }
+    
+    private function generateSlug($title) {
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title)));
+        $slug = trim($slug, '-');
+        
+        // Check if slug exists and make it unique
+        $originalSlug = $slug;
+        $counter = 1;
+        
+        while (true) {
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM programs WHERE slug = ?");
+            $stmt->execute([$slug]);
+            $count = $stmt->fetchColumn();
+            
+            if ($count == 0) {
+                break;
+            }
+            
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+        
+        return $slug;
+    }
+    
+    public function deleteGalleryImage() {
+        // Check permissions
+        if (!$this->hasPermission('programs') && !$this->hasPermission('*')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Access denied']);
+            exit;
+        }
+        
+        $programId = intval($_POST['program_id'] ?? 0);
+        $imageIndex = intval($_POST['image_index'] ?? -1);
+        
+        if (!$programId || $imageIndex < 0) {
+            echo json_encode(['success' => false, 'error' => 'Invalid parameters']);
+            exit;
+        }
+        
+        try {
+            // Get current gallery images
+            $stmt = $this->db->prepare("SELECT gallery_images FROM programs WHERE id = ?");
+            $stmt->execute([$programId]);
+            $program = $stmt->fetch();
+            
+            if (!$program) {
+                echo json_encode(['success' => false, 'error' => 'Program not found']);
+                exit;
+            }
+            
+            $galleryImages = json_decode($program['gallery_images'] ?? '[]', true);
+            
+            if (isset($galleryImages[$imageIndex])) {
+                $imagePath = __DIR__ . '/../../uploads/' . $galleryImages[$imageIndex];
+                
+                // Remove from array
+                $removedImage = $galleryImages[$imageIndex];
+                unset($galleryImages[$imageIndex]);
+                $galleryImages = array_values($galleryImages); // Re-index array
+                
+                // Update database
+                $stmt = $this->db->prepare("UPDATE programs SET gallery_images = ?, updated_at = NOW() WHERE id = ?");
+                $stmt->execute([!empty($galleryImages) ? json_encode($galleryImages) : null, $programId]);
+                
+                // Delete physical file
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+                
+                echo json_encode(['success' => true, 'message' => 'Image deleted successfully']);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Image not found']);
+            }
+            
+        } catch (Exception $e) {
+            error_log("Gallery image deletion error: " . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'Failed to delete image']);
+        }
+        
+        exit;
+    }
+    
+    public function addGalleryImages() {
+        // Check permissions
+        if (!$this->hasPermission('programs') && !$this->hasPermission('*')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Access denied']);
+            exit;
+        }
+        
+        $programId = intval($_POST['program_id'] ?? 0);
+        
+        if (!$programId) {
+            echo json_encode(['success' => false, 'error' => 'Invalid program ID']);
+            exit;
+        }
+        
+        try {
+            // Get current gallery images
+            $stmt = $this->db->prepare("SELECT gallery_images FROM programs WHERE id = ?");
+            $stmt->execute([$programId]);
+            $program = $stmt->fetch();
+            
+            if (!$program) {
+                echo json_encode(['success' => false, 'error' => 'Program not found']);
+                exit;
+            }
+            
+            $currentGallery = json_decode($program['gallery_images'] ?? '[]', true);
+            $newImages = [];
+            
+            // Handle new image uploads
+            if (isset($_FILES['gallery_images'])) {
+                for ($i = 0; $i < count($_FILES['gallery_images']['name']); $i++) {
+                    if ($_FILES['gallery_images']['error'][$i] === UPLOAD_ERR_OK) {
+                        $file = [
+                            'name' => $_FILES['gallery_images']['name'][$i],
+                            'type' => $_FILES['gallery_images']['type'][$i],
+                            'tmp_name' => $_FILES['gallery_images']['tmp_name'][$i],
+                            'error' => $_FILES['gallery_images']['error'][$i],
+                            'size' => $_FILES['gallery_images']['size'][$i]
+                        ];
+                        $uploadResult = $this->handleImageUpload($file, 'programs/gallery');
+                        if ($uploadResult['success']) {
+                            $newImages[] = $uploadResult['path'];
+                        }
+                    }
+                }
+            }
+            
+            if (!empty($newImages)) {
+                $updatedGallery = array_merge($currentGallery, $newImages);
+                
+                // Update database
+                $stmt = $this->db->prepare("UPDATE programs SET gallery_images = ?, updated_at = NOW() WHERE id = ?");
+                $stmt->execute([json_encode($updatedGallery), $programId]);
+                
+                echo json_encode([
+                    'success' => true, 
+                    'message' => count($newImages) . ' image(s) added successfully',
+                    'new_images' => $newImages
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'No valid images uploaded']);
+            }
+            
+        } catch (Exception $e) {
+            error_log("Gallery image addition error: " . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'Failed to add images']);
+        }
+        
+        exit;
     }
 }
 ?>

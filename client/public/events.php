@@ -29,6 +29,13 @@ try {
     // Column doesn't exist, skip this condition
 }
 
+// Only show future events (events that haven't expired) - main feature
+// Allow showing past events only if explicitly requested
+$show_past = $_GET['show_past'] ?? false;
+if (!$show_past) {
+    $where_conditions[] = "e.event_date >= NOW()";
+}
+
 if (!empty($category_filter)) {
     $where_conditions[] = "e.category = ?";
     $params[] = $category_filter;
@@ -85,7 +92,7 @@ try {
     $featured_query = "
         SELECT *, DATEDIFF(event_date, NOW()) as days_until
         FROM events 
-        WHERE event_date >= NOW() AND deleted_at IS NULL 
+        WHERE event_date >= NOW() AND deleted_at IS NULL AND is_active = 1
         ORDER BY event_date ASC 
         LIMIT 3
     ";
@@ -386,9 +393,17 @@ include '../includes/header.php';
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-filter me-1"></i>Filter
-                            </button>
+                            <div class="d-flex flex-column gap-2">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-filter me-1"></i>Filter
+                                </button>
+                                <div class="form-check small">
+                                    <input class="form-check-input" type="checkbox" id="show_past" name="show_past" value="1" <?php echo $show_past ? 'checked' : ''; ?>>
+                                    <label class="form-check-label text-muted" for="show_past">
+                                        Include past events
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -465,7 +480,7 @@ include '../includes/header.php';
                             <ul class="pagination justify-content-center">
                                 <?php if ($page > 1): ?>
                                     <li class="page-item">
-                                        <a class="page-link" href="?page=<?php echo $page - 1; ?>&<?php echo http_build_query(['search' => $search_query, 'category' => $category_filter, 'type' => $type_filter]); ?>">
+                                        <a class="page-link" href="?page=<?php echo $page - 1; ?>&<?php echo http_build_query(['search' => $search_query, 'category' => $category_filter, 'type' => $type_filter, 'show_past' => $show_past]); ?>">
                                             <i class="fas fa-chevron-left"></i>
                                         </a>
                                     </li>
@@ -473,7 +488,7 @@ include '../includes/header.php';
                                 
                                 <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
                                     <li class="page-item <?php echo $i === $page ? 'active' : ''; ?>">
-                                        <a class="page-link" href="?page=<?php echo $i; ?>&<?php echo http_build_query(['search' => $search_query, 'category' => $category_filter, 'type' => $type_filter]); ?>">
+                                        <a class="page-link" href="?page=<?php echo $i; ?>&<?php echo http_build_query(['search' => $search_query, 'category' => $category_filter, 'type' => $type_filter, 'show_past' => $show_past]); ?>">
                                             <?php echo $i; ?>
                                         </a>
                                     </li>
@@ -481,7 +496,7 @@ include '../includes/header.php';
                                 
                                 <?php if ($page < $total_pages): ?>
                                     <li class="page-item">
-                                        <a class="page-link" href="?page=<?php echo $page + 1; ?>&<?php echo http_build_query(['search' => $search_query, 'category' => $category_filter, 'type' => $type_filter]); ?>">
+                                        <a class="page-link" href="?page=<?php echo $page + 1; ?>&<?php echo http_build_query(['search' => $search_query, 'category' => $category_filter, 'type' => $type_filter, 'show_past' => $show_past]); ?>">
                                             <i class="fas fa-chevron-right"></i>
                                         </a>
                                     </li>

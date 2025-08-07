@@ -176,7 +176,7 @@ require_once __DIR__ . '/../includes/header.php';
                                                 case 'program':
                                                     $iconClass = 'fa-graduation-cap';
                                                     $badgeClass = 'badge-secondary';
-                                                    $linkUrl = BASE_URL . '/admin/public/programs.php?action=view&id=' . $result['id'];
+                                                    $linkUrl = BASE_URL . '/admin/public/programs.php?action=edit&id=' . $result['id'];
                                                     break;
                                             }
                                             ?>

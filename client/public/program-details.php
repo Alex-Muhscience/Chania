@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/config.php';
+require_once '../../shared/Core/CurrencyConverter.php';
 
 // Fetch program details with enhanced fields
 $program_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -127,529 +128,686 @@ $curriculum = getCourseCurriculum($program_id);
 include '../includes/header.php';
 ?>
 
-<!-- Program Hero Section -->
-<section class="hero-section py-5" style="background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%); position: relative; overflow: hidden;">
-    <div class="position-absolute top-0 start-0 w-100 h-100 hero-pattern"></div>
-    <div class="container position-relative">
-        <div class="row mb-5">
-            <div class="col-lg-10 mx-auto" data-aos="fade-up">
-                <div class="program-detail-header text-center text-white">
-                    <h1 class="display-4 fw-bold mb-3 text-white"><?php echo htmlspecialchars($program['title']); ?></h1>
-                    <p class="lead mb-4 text-white-50"><?php echo htmlspecialchars($program['description']); ?></p>
-                    <div class="program-meta d-flex justify-content-center flex-wrap gap-3 mb-4">
-                        <span class="badge bg-light text-dark px-3 py-2 fs-6 rounded-pill">
-                            <i class="fas fa-tag me-2"></i>Category: <?php echo htmlspecialchars($program['category']); ?>
+<!-- Modern Hero Section -->
+<section class="modern-hero py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center min-vh-50">
+            <div class="col-lg-8" data-aos="fade-right">
+                <div class="hero-content">
+                    <div class="program-category mb-3">
+                        <span class="category-badge">
+                            <i class="fas fa-graduation-cap me-2"></i><?php echo ucwords(htmlspecialchars($program['category'])); ?>
                         </span>
-                        <span class="badge bg-light text-dark px-3 py-2 fs-6 rounded-pill">
-                            <i class="fas fa-clock me-2"></i>Duration: <?php echo htmlspecialchars($program['duration']); ?>
-                        </span>
-                        <?php if ($program['fee']): ?>
-                            <span class="badge bg-warning text-dark px-3 py-2 fs-6 rounded-pill">
-                                <i class="fas fa-dollar-sign me-2"></i>Fee: $<?php echo number_format($program['fee'], 2); ?>
-                            </span>
-                        <?php else: ?>
-                            <span class="badge bg-success px-3 py-2 fs-6 rounded-pill">
-                                <i class="fas fa-gift me-2"></i>Free
-                            </span>
-                        <?php endif; ?>
+                    </div>
+                    <h1 class="display-4 fw-bold text-white mb-4" style="line-height: 1.2;">
+                        <?php echo htmlspecialchars($program['title']); ?>
+                    </h1>
+                    <p class="lead text-white-50 mb-4" style="font-size: 1.25rem; max-width: 600px;">
+                        <?php echo htmlspecialchars($program['description']); ?>
+                    </p>
+                    <div class="program-highlights d-flex flex-wrap gap-3 mb-4">
+                        <div class="highlight-item">
+                            <i class="fas fa-clock text-warning"></i>
+                            <span class="ms-2"><?php echo htmlspecialchars($program['duration']); ?></span>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-certificate text-success"></i>
+                            <span class="ms-2">Certificate Included</span>
+                        </div>
+                        <div class="highlight-item">
+                            <i class="fas fa-users text-info"></i>
+                            <span class="ms-2">Expert Instructors</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4" data-aos="fade-left" data-aos-delay="200">
+                <div class="hero-card">
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-4 text-center">
+                            <div class="price-display mb-3">
+                                <?php if ($program['fee'] && $program['fee'] > 0): 
+                                    $kshAmount = CurrencyConverter::usdToKsh($program['fee']);
+                                    $formattedKsh = CurrencyConverter::formatKsh($kshAmount);
+                                    $formattedUsd = CurrencyConverter::formatUsd($program['fee']);
+                                ?>
+                                    <div class="price-amount text-primary fw-bold" style="font-size: 2rem;">
+                                        <?php echo $formattedKsh; ?>
+                                    </div>
+                                    <div class="price-currency text-muted"><?php echo $formattedUsd; ?> equivalent</div>
+                                <?php else: ?>
+                                    <div class="price-amount text-success fw-bold" style="font-size: 2rem;">FREE</div>
+                                    <div class="price-currency text-muted">No Cost</div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <a href="#schedules" class="btn btn-primary btn-lg smooth-scroll">
+                                    <i class="fas fa-calendar-alt me-2"></i>View Schedules
+                                </a>
+                                <a href="#details" class="btn btn-outline-primary smooth-scroll">
+                                    <i class="fas fa-info-circle me-2"></i>Learn More
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <div class="hero-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
 </section>
 
-<!-- Program Brochure Section -->
-<section class="py-5 bg-light">
+<!-- Program Content Section -->
+<section class="py-5 bg-light" id="details">
     <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <!-- Brochure Header -->
-                <div class="brochure-header text-center mb-5">
-                    <h2 class="display-5 fw-bold text-primary mb-3">Course Brochure</h2>
-                    <p class="lead text-muted">Download comprehensive course information</p>
-                    <button class="btn btn-primary btn-lg" onclick="downloadBrochure()">
-                        <i class="fas fa-download me-2"></i>Download PDF Brochure
-                    </button>
+        <div class="program-content-wrapper">
+            <!-- Program Description -->
+            <div class="content-card mb-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-info-circle me-2"></i>Course Description</h3>
                 </div>
+                <div class="card-body">
+                    <p class="lead"><?php echo nl2br(htmlspecialchars($program['description'])); ?></p>
+                </div>
+            </div>
 
-                <!-- Brochure Content -->
-                <div class="brochure-wrapper" id="brochure-content">
-                    <div class="brochure-container">
-                        <!-- Brochure Cover -->
-                        <div class="brochure-page brochure-cover">
-                            <div class="cover-header">
-                                <div class="logo-section">
-                                    <?php $brochure_logo_url = getLogoUrl(); ?>
-                                    <img src="<?php echo $brochure_logo_url; ?>" alt="Chania College" class="brochure-logo">
-                                    <h1 class="college-name">Chania Technical Training Institute</h1>
+            <!-- Course Schedule Section -->
+            <?php if (!empty($schedules)): ?>
+            <div class="content-card mb-4" id="schedules">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-alt me-2"></i>Available Schedules</h3>
+                </div>
+                <div class="card-body">
+                    <div class="skills-africa-table">
+                        <table class="course-schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>Schedule</th>
+                                    <th>Dates</th>
+                                    <th>Time</th>
+                                    <th>Duration</th>
+                                    <th>Location</th>
+                                    <th>Currency</th>
+                                    <th>Apply</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($schedules as $schedule): ?>
+                                    <tr class="schedule-table-row">
+                                        <td class="schedule-column">
+                                            <div class="schedule-title">
+                                                <?php echo htmlspecialchars($schedule['title'] ?? 'Program Schedule'); ?>
+                                            </div>
+                                            <div class="delivery-mode">
+                                                <?php 
+                                                $mode = $schedule['delivery_mode'] ?? 'physical';
+                                                $modeClass = $mode === 'online' ? 'online-badge' : 'physical-badge';
+                                                $modeIcon = $mode === 'online' ? 'fas fa-laptop' : 'fas fa-map-marker-alt';
+                                                echo "<span class='mode-badge $modeClass'><i class='$modeIcon'></i> " . ucfirst($mode) . "</span>";
+                                                ?>
+                                            </div>
+                                        </td>
+                                        <td class="dates-column">
+                                            <div class="date-info">
+                                                <div class="start-date"><?php echo date('d M Y', strtotime($schedule['start_date'])); ?></div>
+                                                <div class="date-separator">to</div>
+                                                <div class="end-date"><?php echo date('d M Y', strtotime($schedule['end_date'])); ?></div>
+                                            </div>
+                                        </td>
+                                        <td class="time-column">
+                                            <div class="time-info">
+                                                <?php 
+                                                $start_time = $schedule['start_time'] ?? '09:00';
+                                                $end_time = $schedule['end_time'] ?? '17:00';
+                                                echo date('g:i A', strtotime($start_time)) . ' -<br>' . date('g:i A', strtotime($end_time));
+                                                ?>
+                                            </div>
+                                        </td>
+                                        <td class="duration-column">
+                                            <div class="duration-info">
+                                                <?php 
+                                                $start = new DateTime($schedule['start_date']);
+                                                $end = new DateTime($schedule['end_date']);
+                                                $interval = $start->diff($end);
+                                                $days = $interval->days + 1; // Include start day
+                                                echo $days . ' Day' . ($days > 1 ? 's' : '');
+                                                ?>
+                                            </div>
+                                        </td>
+                                        <td class="location-column">
+                                            <?php echo htmlspecialchars($schedule['location']); ?>
+                                        </td>
+                                        <td class="currency-column" id="currency-<?php echo $schedule['id']; ?>">
+                                            <div class="currency-selector-wrapper">
+                                                <select class="currency-selector" onchange="updateSchedulePricing(<?php echo $schedule['id']; ?>, this.value)">
+                                                    <option value="USD">USD ($)</option>
+                                                    <option value="KSH">KSH (KSh)</option>
+                                                </select>
+                                                <div class="pricing-display" id="pricing-display-<?php echo $schedule['id']; ?>">
+                                                    <?php if (!empty($schedule['online_fee']) && $schedule['online_fee'] > 0): 
+                                                        // Convert USD fees to KSH
+                                                        $onlineKsh = CurrencyConverter::usdToKsh($schedule['online_fee']);
+                                                        $onlineFormattedKsh = CurrencyConverter::formatKsh($onlineKsh);
+                                                        $onlineFormattedUsd = CurrencyConverter::formatUsd($schedule['online_fee']);
+                                                    ?>
+                                                        <div class="price-item online-price">
+                                                            <span class="mode-label">Online:</span>
+                                                            <span class="price-value">
+                                                                <span class="usd-price"><?php echo $onlineFormattedUsd; ?></span>
+                                                                <span class="ksh-price" style="display: none;"><?php echo $onlineFormattedKsh; ?></span>
+                                                            </span>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($schedule['physical_fee']) && $schedule['physical_fee'] > 0): 
+                                                        // Convert USD fees to KSH
+                                                        $physicalKsh = CurrencyConverter::usdToKsh($schedule['physical_fee']);
+                                                        $physicalFormattedKsh = CurrencyConverter::formatKsh($physicalKsh);
+                                                        $physicalFormattedUsd = CurrencyConverter::formatUsd($schedule['physical_fee']);
+                                                    ?>
+                                                        <div class="price-item physical-price">
+                                                            <span class="mode-label">Physical:</span>
+                                                            <span class="price-value">
+                                                                <span class="usd-price"><?php echo $physicalFormattedUsd; ?></span>
+                                                                <span class="ksh-price" style="display: none;"><?php echo $physicalFormattedKsh; ?></span>
+                                                            </span>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <?php if (empty($schedule['online_fee']) && empty($schedule['physical_fee'])): ?>
+                                                        <div class="price-item free-price">
+                                                            <span class="mode-label">FREE</span>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="apply-column">
+                                            <div class="apply-hover-container" onmouseleave="hideApplyOptions(<?php echo $schedule['id']; ?>)">
+                                                <button class="apply-trigger-btn" 
+                                                        onmouseenter="showApplyOptions(<?php echo $schedule['id']; ?>)"
+                                                        onclick="showApplyOptions(<?php echo $schedule['id']; ?>)">
+                                                    <i class="fas fa-hand-pointer me-1"></i>Apply
+                                                </button>
+                                                <div class="apply-options-dropdown" id="apply-options-<?php echo $schedule['id']; ?>" style="display: none;">
+                                                    <?php if (!empty($schedule['online_fee']) || (!empty($schedule['online_fee']) && $schedule['online_fee'] == 0)): ?>
+                                                        <button class="apply-option online-option" 
+                                                                onclick="applyForScheduleMode(<?php echo $schedule['id']; ?>, '<?php echo addslashes($schedule['title'] ?? 'Schedule'); ?>', 'online')">
+                                                            <i class="fas fa-laptop me-2"></i>Apply Online
+                                                        </button>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($schedule['physical_fee']) || (!empty($schedule['physical_fee']) && $schedule['physical_fee'] == 0)): ?>
+                                                        <button class="apply-option physical-option" 
+                                                                onclick="applyForScheduleMode(<?php echo $schedule['id']; ?>, '<?php echo addslashes($schedule['title'] ?? 'Schedule'); ?>', 'physical')">
+                                                            <i class="fas fa-map-marker-alt me-2"></i>Apply Physical
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <?php else: ?>
+            <div class="content-card mb-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-calendar-times me-2"></i>Course Schedule</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5>No Active Schedules</h5>
+                        <p class="text-muted">Please contact us for upcoming schedules</p>
+                        <a href="mailto:info@chaniacollege.com" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-1"></i> Contact Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+                    <!-- Learning Objectives -->
+                    <?php if (!empty($program['objectives'])): ?>
+                    <div class="content-card mb-4">
+                        <div class="card-header">
+                            <h3><i class="fas fa-bullseye me-2"></i>Learning Objectives</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="objectives-list">
+                                <?php 
+                                $objectives = explode("\n", $program['objectives']);
+                                foreach($objectives as $objective):
+                                    if(trim($objective)):
+                                ?>
+                                <div class="objective-item mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    <span><?php echo htmlspecialchars(trim($objective)); ?></span>
                                 </div>
-                            </div>
-                            
-                            <div class="cover-content">
-                                <div class="program-title-section">
-                                    <h2 class="program-title"><?php echo htmlspecialchars($program['title']); ?></h2>
-                                    <div class="program-category"><?php echo ucfirst($program['category'] ?? 'General'); ?> Program</div>
-                                </div>
-                                
-                                <div class="program-highlights">
-                                    <div class="highlight-item">
-                                        <i class="fas fa-clock"></i>
-                                        <span>Duration: <?php echo htmlspecialchars($program['duration'] ?? 'Flexible'); ?></span>
-                                    </div>
-                                    <div class="highlight-item">
-                                        <i class="fas fa-certificate"></i>
-                                        <span>Certification Available</span>
-                                    </div>
-                                    <div class="highlight-item">
-                                        <i class="fas fa-users"></i>
-                                        <span>Expert Instructors</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="cover-footer">
-                                <div class="contact-info">
-                                    <p>📧 info@chaniacollege.com | 📞 +254-700-000-000</p>
-                                    <p>🌐 www.chaniacollege.com</p>
-                                </div>
+                                <?php 
+                                    endif;
+                                endforeach; 
+                                ?>
                             </div>
                         </div>
+                    </div>
+                    <?php endif; ?>
 
-                        <!-- Brochure Inner Pages -->
-                        <div class="brochure-page brochure-content-page">
-                            <div class="page-header">
-                                <h3 class="page-title">Program Overview</h3>
-                            </div>
-                            
-                            <div class="content-grid">
-                                <div class="content-section">
-                                    <h4><i class="fas fa-info-circle"></i> Course Description</h4>
-                                    <p><?php echo nl2br(htmlspecialchars($program['description'])); ?></p>
+                    <!-- Two Column Layout for Additional Info -->
+                    <div class="row">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <?php if (!empty($program['target_audience'])): ?>
+                            <div class="content-card mb-4">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-users me-2"></i>Target Audience</h4>
                                 </div>
-                                
-                                <?php if (!empty($program['objectives'])): ?>
-                                <div class="content-section">
-                                    <h4><i class="fas fa-bullseye"></i> Learning Objectives</h4>
-                                    <div class="objectives-list">
-                                        <?php 
-                                        $objectives = explode("\n", $program['objectives']);
-                                        foreach($objectives as $objective):
-                                            if(trim($objective)):
-                                        ?>
-                                        <div class="objective-item">
-                                            <i class="fas fa-check-circle text-success"></i>
-                                            <span><?php echo htmlspecialchars(trim($objective)); ?></span>
-                                        </div>
-                                        <?php 
-                                            endif;
-                                        endforeach; 
-                                        ?>
-                                    </div>
-                                </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($program['target_audience'])): ?>
-                                <div class="content-section">
-                                    <h4><i class="fas fa-users"></i> Target Audience</h4>
+                                <div class="card-body">
                                     <p><?php echo nl2br(htmlspecialchars($program['target_audience'])); ?></p>
                                 </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($program['prerequisites'])): ?>
-                                <div class="content-section">
-                                    <h4><i class="fas fa-list-check"></i> Prerequisites</h4>
-                                    <p><?php echo nl2br(htmlspecialchars($program['prerequisites'])); ?></p>
-                                </div>
-                                <?php endif; ?>
                             </div>
-                        </div>
+                            <?php endif; ?>
 
-                        <!-- Schedule Information Page -->
-                        <div class="brochure-page brochure-schedule-page">
-                            <div class="page-header">
-                                <h3 class="page-title">Available Schedules & Pricing</h3>
+                            <?php if (!empty($program['benefits'])): ?>
+                            <div class="content-card mb-4">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-star me-2"></i>Course Benefits</h4>
+                                </div>
+                                <div class="card-body">
+                                    <p><?php echo nl2br(htmlspecialchars($program['benefits'])); ?></p>
+                                </div>
                             </div>
-                            
-                            <?php if (!empty($schedules)): ?>
-                                <div class="schedule-table-container">
-                                    <table class="schedule-table">
-                                        <thead>
-                                            <tr>
-                                                <th class="schedule-col">Schedule</th>
-                                                <th class="dates-col">Start - End Date</th>
-                                                <th class="time-col">Time</th>
-                                                <th class="location-col">Location</th>
-                                                <th class="mode-col">Mode</th>
-                                                <th class="pricing-col">Pricing</th>
-                                                <th class="action-col">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($schedules as $index => $schedule): ?>
-                                            <tr class="schedule-row">
-                                                <td class="schedule-name">
-                                                    <div class="schedule-title-cell">
-                                                        <strong><?php echo htmlspecialchars($schedule['title']); ?></strong>
-                                                        <?php if (!empty($schedule['timezone'])): ?>
-                                                            <div class="timezone-info">
-                                                                <i class="fas fa-globe"></i> <?php echo htmlspecialchars($schedule['timezone']); ?>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                </td>
-                                                <td class="dates-cell">
-                                                    <div class="date-range">
-                                                        <div class="start-date">
-                                                            <i class="fas fa-calendar-alt"></i>
-                                                            <?php echo date('M j, Y', strtotime($schedule['start_date'])); ?>
-                                                        </div>
-                                                        <div class="date-separator">to</div>
-                                                        <div class="end-date">
-                                                            <i class="fas fa-calendar-check"></i>
-                                                            <?php echo date('M j, Y', strtotime($schedule['end_date'])); ?>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="time-cell">
-                                                    <div class="time-range">
-                                                        <i class="fas fa-clock"></i>
-                                                        <span><?php echo date('g:i A', strtotime($schedule['start_date'])); ?></span>
-                                                        <div class="time-separator">-</div>
-                                                        <span><?php echo date('g:i A', strtotime($schedule['end_date'])); ?></span>
-                                                    </div>
-                                                </td>
-                                                <td class="location-cell">
-                                                    <div class="location-info">
-                                                        <i class="fas fa-map-marker-alt"></i>
-                                                        <span><?php echo htmlspecialchars($schedule['location']); ?></span>
-                                                    </div>
-                                                </td>
-                                                <td class="mode-cell">
-                                                    <span class="mode-badge mode-<?php echo $schedule['delivery_mode']; ?>">
-                                                        <?php 
-                                                        $modeIcon = $schedule['delivery_mode'] === 'online' ? 'laptop' : 'building';
-                                                        ?>
-                                                        <i class="fas fa-<?php echo $modeIcon; ?>"></i>
-                                                        <?php echo ucfirst($schedule['delivery_mode']); ?>
-                                                    </span>
-                                                </td>
-                                                <td class="pricing-cell">
-                                                    <div class="pricing-info">
-                                                        <?php if (!empty($schedule['online_fee']) && $schedule['online_fee'] > 0): ?>
-                                                            <div class="price-item online-price">
-                                                                <span class="price-label">Online:</span>
-                                                                <span class="price-value"><?php echo $schedule['currency']; ?> <?php echo number_format($schedule['online_fee'], 2); ?></span>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                        
-                                                        <?php if (!empty($schedule['physical_fee']) && $schedule['physical_fee'] > 0): ?>
-                                                            <div class="price-item physical-price">
-                                                                <span class="price-label">Physical:</span>
-                                                                <span class="price-value"><?php echo $schedule['currency']; ?> <?php echo number_format($schedule['physical_fee'], 2); ?></span>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                        
-                                                        <?php if (empty($schedule['online_fee']) && empty($schedule['physical_fee'])): ?>
-                                                            <div class="price-item free-price">
-                                                                <i class="fas fa-gift"></i>
-                                                                <span class="price-value">Free</span>
-                                                            </div>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                </td>
-                                                <td class="action-cell">
-                                                    <button class="btn-apply-table" onclick="applyForSchedule(<?php echo $schedule['id']; ?>, '<?php echo addslashes($schedule['title']); ?>')">
-                                                        <i class="fas fa-paper-plane"></i>
-                                                        Apply
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
+                            <?php endif; ?>
+
+                            <?php if (!empty($program['materials_included'])): ?>
+                            <div class="content-card mb-4">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-box me-2"></i>Materials Included</h4>
                                 </div>
-                                
-                                <!-- Table Legend -->
-                                <div class="table-legend">
-                                    <h6>Legend:</h6>
-                                    <div class="legend-items">
-                                        <div class="legend-item">
-                                            <span class="mode-badge mode-online"><i class="fas fa-laptop"></i> Online</span>
-                                            <span class="legend-desc">Virtual classroom sessions</span>
-                                        </div>
-                                        <div class="legend-item">
-                                            <span class="mode-badge mode-physical"><i class="fas fa-building"></i> Physical</span>
-                                            <span class="legend-desc">In-person classes at campus</span>
-                                        </div>
-                                    </div>
+                                <div class="card-body">
+                                    <p><?php echo nl2br(htmlspecialchars($program['materials_included'])); ?></p>
                                 </div>
-                            <?php else: ?>
-                                <div class="no-schedules-table">
-                                    <div class="no-schedules-content">
-                                        <i class="fas fa-calendar-times"></i>
-                                        <h5>No Schedules Available</h5>
-                                        <p>Please contact us for upcoming schedule information.</p>
-                                        <div class="contact-prompt">
-                                            <i class="fas fa-envelope"></i> info@chaniacollege.com
-                                            <br>
-                                            <i class="fas fa-phone"></i> +254-700-000-000
-                                        </div>
-                                    </div>
-                                </div>
+                            </div>
                             <?php endif; ?>
                         </div>
 
-                        <!-- Additional Information Page -->
-                        <div class="brochure-page brochure-info-page">
-                            <div class="page-header">
-                                <h3 class="page-title">Additional Information</h3>
-                            </div>
-                            
-                            <div class="info-grid">
-                                <?php if (!empty($program['benefits'])): ?>
-                                <div class="info-section">
-                                    <h4><i class="fas fa-star"></i> Course Benefits</h4>
-                                    <p><?php echo nl2br(htmlspecialchars($program['benefits'])); ?></p>
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <?php if (!empty($program['prerequisites'])): ?>
+                            <div class="content-card mb-4">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-list-check me-2"></i>Prerequisites</h4>
                                 </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($program['career_outcomes'])): ?>
-                                <div class="info-section">
-                                    <h4><i class="fas fa-briefcase"></i> Career Outcomes</h4>
+                                <div class="card-body">
+                                    <p><?php echo nl2br(htmlspecialchars($program['prerequisites'])); ?></p>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($program['career_outcomes'])): ?>
+                            <div class="content-card mb-4">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-briefcase me-2"></i>Career Outcomes</h4>
+                                </div>
+                                <div class="card-body">
                                     <p><?php echo nl2br(htmlspecialchars($program['career_outcomes'])); ?></p>
                                 </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($program['materials_included'])): ?>
-                                <div class="info-section">
-                                    <h4><i class="fas fa-box"></i> Materials Included</h4>
-                                    <p><?php echo nl2br(htmlspecialchars($program['materials_included'])); ?></p>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($program['certification_details'])): ?>
+                            <div class="content-card mb-4">
+                                <div class="card-header">
+                                    <h4><i class="fas fa-certificate me-2"></i>Certification Details</h4>
                                 </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($program['certification_details'])): ?>
-                                <div class="info-section">
-                                    <h4><i class="fas fa-certificate"></i> Certification Details</h4>
+                                <div class="card-body">
                                     <p><?php echo nl2br(htmlspecialchars($program['certification_details'])); ?></p>
                                 </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($program['general_notes'])): ?>
-                                <div class="info-section">
-                                    <h4><i class="fas fa-info-circle"></i> Important Notes</h4>
-                                    <p><?php echo nl2br(htmlspecialchars($program['general_notes'])); ?></p>
-                                </div>
-                                <?php endif; ?>
                             </div>
-                            
-                            <!-- Contact Information -->
-                            <div class="contact-section">
-                                <h4><i class="fas fa-phone"></i> Contact Information</h4>
-                                <div class="contact-details">
-                                    <div class="contact-item">
-                                        <i class="fas fa-envelope"></i>
-                                        <span>Email: info@chaniacollege.com</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <!-- Important Notes -->
+                    <?php if (!empty($program['general_notes'])): ?>
+                    <div class="content-card mb-4">
+                        <div class="card-header">
+                            <h4><i class="fas fa-info-circle me-2"></i>Important Notes</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <?php echo nl2br(htmlspecialchars($program['general_notes'])); ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <!-- Contact Information -->
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h4><i class="fas fa-phone me-2"></i>Contact Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="contact-item mb-2">
+                                        <i class="fas fa-envelope text-primary me-2"></i>
+                                        <span>info@chaniacollege.com</span>
                                     </div>
-                                    <div class="contact-item">
-                                        <i class="fas fa-phone"></i>
-                                        <span>Phone: +254-700-000-000</span>
+                                    <div class="contact-item mb-2">
+                                        <i class="fas fa-phone text-primary me-2"></i>
+                                        <span>+254-700-000-000</span>
                                     </div>
-                                    <div class="contact-item">
-                                        <i class="fas fa-globe"></i>
-                                        <span>Website: www.chaniacollege.com</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="contact-item mb-2">
+                                        <i class="fas fa-globe text-primary me-2"></i>
+                                        <span>www.chaniacollege.com</span>
                                     </div>
-                                    <div class="contact-item">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>Address: Chania Technical Training Institute, Kenya</span>
+                                    <div class="contact-item mb-2">
+                                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                        <span>Chania Technical Training Institute, Kenya</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 </section>
 
 <style>
-/* Hero Pattern */
-.hero-pattern {
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.8" fill="white" opacity="0.08"/><circle cx="10" cy="90" r="0.8" fill="white" opacity="0.08"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-/* Brochure Styles */
-.brochure-wrapper {
-    background: #f8f9fa;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.brochure-container {
-    max-width: 100%;
-    margin: 0;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-}
-
-.brochure-page {
-    padding: 3rem;
-    min-height: 600px;
-    page-break-after: always;
-}
-
-/* Cover Page Styles */
-.brochure-cover {
-    background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
+/* Modern Hero Styles */
+.modern-hero {
     position: relative;
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
 }
 
-.brochure-cover::before {
-    content: '';
+.hero-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.03"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
-    pointer-events: none;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 1;
 }
 
-.cover-header {
-    position: relative;
-    z-index: 2;
+.min-vh-50 {
+    min-height: 50vh;
 }
 
-.logo-section {
-    margin-bottom: 2rem;
-}
-
-.brochure-logo {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
-    margin-bottom: 1rem;
-    background: white;
-    padding: 10px;
-    border-radius: 50%;
-}
-
-.college-name {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0;
-    opacity: 0.9;
-}
-
-.cover-content {
-    position: relative;
-    z-index: 2;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.program-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-}
-
-.program-category {
-    font-size: 1.2rem;
-    background: rgba(255,255,255,0.2);
-    padding: 0.5rem 1.5rem;
+.category-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 25px;
-    display: inline-block;
-    margin-bottom: 2rem;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.category-badge:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 .program-highlights {
     display: flex;
-    justify-content: center;
-    gap: 2rem;
     flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1.5rem;
 }
 
 .highlight-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-}
-
-.highlight-item i {
-    font-size: 1.2rem;
-    opacity: 0.8;
-}
-
-.cover-footer {
-    position: relative;
-    z-index: 2;
-    opacity: 0.8;
-}
-
-.contact-info p {
-    margin: 0.5rem 0;
-    font-size: 0.9rem;
-}
-
-/* Content Pages Styles */
-.brochure-content-page,
-.brochure-schedule-page,
-.brochure-info-page {
-    background: white;
-}
-
-.page-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 3px solid #DA2525;
-}
-
-.page-title {
-    color: #DA2525;
-    font-size: 2rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.content-grid,
-.info-grid {
-    display: grid;
-    gap: 2rem;
-}
-
-.content-section,
-.info-section {
-    background: #f8f9fa;
-    padding: 1.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    border-left: 4px solid #DA2525;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
 }
 
-.content-section h4,
-.info-section h4 {
-    color: #DA2525;
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
+.highlight-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.hero-card {
+    position: relative;
+    z-index: 3;
+}
+
+.hero-card .card {
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.price-display {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.price-amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.price-currency {
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.hero-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 6s ease-in-out infinite;
+}
+
+.shape-1 {
+    width: 80px;
+    height: 80px;
+    top: 10%;
+    right: 10%;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 60px;
+    height: 60px;
+    bottom: 20%;
+    left: 10%;
+    animation-delay: 2s;
+}
+
+.shape-3 {
+    width: 40px;
+    height: 40px;
+    top: 60%;
+    right: 30%;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.smooth-scroll {
+    scroll-behavior: smooth;
+    text-decoration: none;
+}
+
+.smooth-scroll:hover {
+    text-decoration: none;
+}
+
+/* Responsive Hero */
+@media (max-width: 768px) {
+    .modern-hero {
+        min-height: 60vh;
+        text-align: center;
+    }
+    
+    .program-highlights {
+        justify-content: center;
+    }
+    
+    .highlight-item {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .category-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .price-amount {
+        font-size: 2rem;
+    }
+}
+
+/* Clean Content Card Styles */
+.program-content-wrapper {
+    max-width: 100%;
+}
+
+.content-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.content-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.content-card .card-header {
+    background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.content-card .card-header h3,
+.content-card .card-header h4 {
+    color: white;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.content-card .card-header i {
+    opacity: 0.9;
+}
+
+.content-card .card-body {
+    padding: 1.5rem;
+    background: white;
+}
+
+.content-card .card-body p {
+    color: #495057;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.content-card .card-body .lead {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #343a40;
+}
+
+/* Objectives List */
+.objectives-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.objective-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #28a745;
+    transition: all 0.2s ease;
+}
+
+.objective-item:hover {
+    background: #e8f5e8;
+    transform: translateX(5px);
+}
+
+.objective-item i {
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+.objective-item span {
+    color: #495057;
+    line-height: 1.5;
+}
+
+/* Contact Items */
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.contact-item i {
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
 }
 
 .objectives-list {
@@ -715,14 +873,12 @@ include '../includes/header.php';
     border-bottom: none;
 }
 
-/* Column Specific Styles - Optimized for full width */
-.schedule-col { width: 20%; }
-.dates-col { width: 18%; }
-.time-col { width: 12%; }
-.location-col { width: 16%; }
-.mode-col { width: 10%; }
-.pricing-col { width: 14%; }
-.action-col { width: 10%; }
+/* Column Specific Styles - Larger widths for better readability */
+.schedule-col { width: 25%; min-width: 180px; }
+.dates-col { width: 22%; min-width: 170px; }
+.location-col { width: 18%; min-width: 150px; }
+.pricing-col { width: 22%; min-width: 180px; }
+.apply-col { width: 13%; min-width: 120px; }
 
 /* Schedule Name Cell */
 .schedule-title-cell strong {
@@ -789,6 +945,36 @@ include '../includes/header.php';
     font-weight: 500;
 }
 
+/* Duration Cell */
+.duration-cell {
+    text-align: center;
+}
+
+.duration-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.duration-info i {
+    color: #667eea;
+    font-size: 0.9rem;
+}
+
+.duration-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.duration-text {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 /* Location Cell */
 .location-info {
     display: flex;
@@ -800,6 +986,46 @@ include '../includes/header.php';
     color: #667eea;
     width: 12px;
     flex-shrink: 0;
+}
+
+/* Currency Cell */
+.currency-cell {
+    padding: 0.8rem 0.5rem;
+}
+
+.currency-selector {
+    position: relative;
+}
+
+.currency-select {
+    width: 100%;
+    padding: 0.5rem 0.3rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.currency-select:hover {
+    border-color: #667eea;
+}
+
+.currency-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.currency-icon {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 0.7rem;
+    pointer-events: none;
 }
 
 /* Mode Badge */
@@ -880,8 +1106,39 @@ include '../includes/header.php';
     color: #2e7d32;
 }
 
-/* Action Button */
-.btn-apply-table {
+/* Apply Hover Container */
+.apply-hover-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Course Schedule Sidebar Layout Fix */
+.course-schedule-sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.schedule-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* Ensure table content is fully visible */
+.schedule-table {
+    min-width: 800px;
+}
+
+/* Wrapper for horizontal scrolling */
+.table-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.apply-hover-trigger {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
@@ -896,16 +1153,92 @@ include '../includes/header.php';
     gap: 0.4rem;
     text-decoration: none;
     white-space: nowrap;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
 }
 
-.btn-apply-table:hover {
+.apply-hover-trigger:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    color: white;
 }
 
-.btn-apply-table i {
+.apply-hover-trigger i {
     font-size: 0.75rem;
+}
+
+.apply-buttons-group {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 10;
+    background: white;
+    border-radius: 8px;
+    padding: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #e9ecef;
+}
+
+.apply-hover-container:hover .apply-buttons-group {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.apply-hover-container:hover .apply-hover-trigger {
+    opacity: 0.3;
+}
+
+.btn-apply-online,
+.btn-apply-physical {
+    background: transparent;
+    border: 1px solid #ddd;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.btn-apply-online {
+    color: #1976d2;
+    border-color: #1976d2;
+}
+
+.btn-apply-online:hover {
+    background: #1976d2;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-apply-physical {
+    color: #2e7d32;
+    border-color: #2e7d32;
+}
+
+.btn-apply-physical:hover {
+    background: #2e7d32;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-apply-online i,
+.btn-apply-physical i {
+    font-size: 0.7rem;
 }
 
 /* Table Legend */
@@ -979,75 +1312,87 @@ include '../includes/header.php';
     margin-right: 0.3rem;
 }
 
+/* Apply cell center alignment */
+.apply-cell {
+    text-align: center;
+}
+
+.apply-cell .apply-buttons {
+    justify-content: center;
+}
+
+/* Program Info Wrapper */
+.program-info-wrapper {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
 /* Responsive Table */
 @media (max-width: 1400px) {
-    .schedule-table {
-        font-size: 0.85rem;
+    .schedules-table {
+        font-size: 0.8rem;
     }
     
-    .schedule-table th,
-    .schedule-table td {
-        padding: 0.9rem 0.6rem;
+    .schedules-table th,
+    .schedules-table td {
+        padding: 0.8rem 0.6rem;
     }
 }
 
 @media (max-width: 1200px) {
-    .schedule-table {
-        font-size: 0.8rem;
+    .schedule-table-wrapper {
+        position: relative;
+        top: 0;
+        max-height: none;
+        margin-top: 2rem;
     }
     
-    .schedule-table th,
-    .schedule-table td {
-        padding: 0.8rem 0.5rem;
-    }
-    
-    .btn-apply-table {
-        padding: 0.5rem 0.8rem;
+    .schedules-table {
         font-size: 0.75rem;
+        min-width: 700px;
+    }
+    
+    .schedules-table th,
+    .schedules-table td {
+        padding: 0.7rem 0.5rem;
     }
 }
 
 @media (max-width: 992px) {
-    .schedule-table-container {
+    .schedules-table-container {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
     
-    .schedule-table {
-        min-width: 900px; /* Increased for better readability */
-    }
-    
-    .legend-items {
-        flex-direction: column;
-        gap: 1rem;
+    .schedules-table {
+        min-width: 650px;
     }
 }
 
 @media (max-width: 768px) {
-    .schedule-table {
-        min-width: 800px; /* Increased for mobile */
-        font-size: 0.75rem;
+    .schedules-table {
+        min-width: 600px;
+        font-size: 0.7rem;
     }
     
-    .schedule-table th,
-    .schedule-table td {
+    .schedules-table th,
+    .schedules-table td {
         padding: 0.6rem 0.4rem;
     }
     
-    .table-legend {
-        padding: 1rem;
-    }
-    
-    .legend-items {
-        gap: 0.8rem;
-    }
-    
-    .legend-item {
-        gap: 0.5rem;
-    }
-    
     .brochure-page {
-        padding: 1.5rem 1rem; /* Reduced horizontal padding on mobile */
+        padding: 1.5rem 1rem;
+    }
+    
+    .btn-apply-compact {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .btn-apply-compact i {
+        font-size: 0.7rem;
     }
 }
 
@@ -1121,7 +1466,756 @@ include '../includes/header.php';
     }
 }
 
+/* Schedule Table Wrapper */
+.schedule-table-wrapper {
+    position: sticky;
+    top: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+}
+
+.schedule-table-header {
+    background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
+    color: white;
+    padding: 1.2rem;
+    border-radius: 12px 12px 0 0;
+    text-align: center;
+}
+
+.schedule-table-header h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.schedule-table-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.85rem;
+}
+
+/* Currency Toggle */
+.currency-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.currency-toggle-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #666;
+    margin-right: 0.5rem;
+}
+
+.currency-toggle-buttons {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.currency-btn {
+    background: white;
+    border: none;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.currency-btn.active {
+    background: #DA2525;
+    color: white;
+}
+
+.currency-btn:not(.active):hover {
+    background: #f1f3f4;
+}
+
+/* Course Schedule Sidebar */
+.course-schedule-sidebar {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
+    color: white;
+    padding: 1.2rem;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h4 {
+    color: white;
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.download-pdf-btn {
+    background: #27ae60;
+    border: none;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.download-pdf-btn:hover {
+    background: #2ecc71;
+    transform: translateY(-1px);
+}
+
+.schedule-table-wrapper {
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 0.85rem;
+}
+
+.schedule-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.schedule-table th {
+    padding: 1rem 0.8rem;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+    border-bottom: none;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.schedule-table td {
+    padding: 1.2rem 0.8rem;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: top;
+    color: #333;
+    font-size: 0.85rem;
+}
+
+.schedule-row:hover {
+    background: #f8f9fa;
+    transition: background-color 0.2s ease;
+}
+
+.schedule-row:last-child td {
+    border-bottom: none;
+}
+
+.dates-cell {
+    font-weight: 500;
+    line-height: 1.3;
+    color: #333;
+}
+
+.fees-cell {
+    font-weight: 600;
+    color: #f39c12;
+}
+
+.location-cell {
+    color: #333;
+}
+
+/* Apply Dropdown */
+.apply-dropdown {
+    position: relative;
+}
+
+.btn-register {
+    background: #f39c12;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.btn-register:hover {
+    background: #e67e22;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.apply-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #34495e;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    margin-top: 0.25rem;
+}
+
+.apply-options.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.apply-option {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    background: transparent;
+    border: none;
+    color: white;
+    text-align: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-radius: 0;
+}
+
+.apply-option:first-child {
+    border-radius: 4px 4px 0 0;
+}
+
+.apply-option:last-child {
+    border-radius: 0 0 4px 4px;
+}
+
+.apply-option:only-child {
+    border-radius: 4px;
+}
+
+.apply-option:hover {
+    background: rgba(52, 152, 219, 0.2);
+}
+
+.physical-class {
+    border-bottom: 1px solid #4a5f7a;
+}
+
+.physical-class:hover {
+    background: #27ae60;
+}
+
+.online-class:hover {
+    background: #e74c3c;
+}
+
+.no-schedules {
+    padding: 2rem;
+    text-align: center;
+    color: #bdc3c7;
+}
+
+.no-schedules h6 {
+    color: #ecf0f1;
+    margin-bottom: 1rem;
+}
+
+.no-schedules i {
+    color: #7f8c8d;
+    margin-bottom: 1rem;
+}
+
+/* Column Width Distribution - Optimized for Apply Button */
+.course-schedule-table th:nth-child(1), /* Schedule */
+.course-schedule-table td:nth-child(1) {
+    width: 20%;
+    min-width: 120px;
+}
+
+.course-schedule-table th:nth-child(2), /* Dates */
+.course-schedule-table td:nth-child(2) {
+    width: 15%;
+    min-width: 100px;
+}
+
+.course-schedule-table th:nth-child(3), /* Time */
+.course-schedule-table td:nth-child(3) {
+    width: 12%;
+    min-width: 90px;
+}
+
+.course-schedule-table th:nth-child(4), /* Duration */
+.course-schedule-table td:nth-child(4) {
+    width: 10%;
+    min-width: 80px;
+}
+
+.course-schedule-table th:nth-child(5), /* Location */
+.course-schedule-table td:nth-child(5) {
+    width: 18%;
+    min-width: 110px;
+}
+
+.course-schedule-table th:nth-child(6), /* Currency */
+.course-schedule-table td:nth-child(6) {
+    width: 15%;
+    min-width: 120px;
+}
+
+.course-schedule-table th:nth-child(7), /* Apply */
+.course-schedule-table td:nth-child(7) {
+    width: 10%;
+    min-width: 100px;
+    text-align: center;
+}
+
+/* Cell Specific Styles */
+.schedule-name-cell .schedule-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.85rem;
+}
+
+.schedule-name-cell .schedule-duration {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.dates-cell .date-info {
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+.location-cell {
+    font-size: 0.8rem;
+}
+
+.pricing-cell .price-item {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+.pricing-cell .price-item:last-child {
+    margin-bottom: 0;
+}
+
+.pricing-cell .mode-label {
+    font-weight: 500;
+    margin-right: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.pricing-cell .price-value {
+    font-weight: 600;
+}
+
+.pricing-cell .online .mode-label {
+    color: #1976d2;
+}
+
+.pricing-cell .physical .mode-label {
+    color: #2e7d32;
+}
+
+.apply-cell .apply-buttons {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.btn-apply-compact {
+    border: 1px solid;
+    border-radius: 5px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-apply-compact i {
+    font-size: 0.8rem;
+}
+
+.btn-online {
+    color: #1976d2;
+    background: white;
+    border-color: #1976d2;
+}
+
+.btn-online:hover {
+    background: #1976d2;
+    color: white;
+}
+
+.btn-physical {
+    color: #2e7d32;
+    background: white;
+    border-color: #2e7d32;
+}
+
+.btn-physical:hover {
+    background: #2e7d32;
+    color: white;
+}
+
+.quick-actions {
+    padding: 0.75rem 1rem;
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.no-schedules-table {
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+/* Skills for Africa Table Layout */
+.skills-africa-table {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #0b2239; /* Dark blue background */
+    color: white;
+}
+
+/* Currency Selector Column */
+.currency-column {
+    text-align: center;
+    width: 120px;
+    min-width: 120px;
+}
+
+.currency-selector-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.currency-selector {
+    background: #1e3a5f;
+    border: 1px solid #34495e;
+    color: white;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    min-width: 90px;
+    transition: all 0.3s ease;
+}
+
+.currency-selector:hover {
+    background: #2c4d6d;
+    border-color: #5a6c7d;
+}
+
+.currency-selector:focus {
+    outline: none;
+    border-color: #f39c12;
+    box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.3);
+}
+
+.pricing-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.price-item {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    min-width: 90px;
+    text-align: center;
+}
+
+.online-price {
+    border-left: 3px solid #3498db;
+}
+
+.physical-price {
+    border-left: 3px solid #27ae60;
+}
+
+.free-price {
+    background: rgba(39, 174, 96, 0.2);
+    border-color: #27ae60;
+    color: #2ecc71;
+    font-weight: 600;
+}
+
+.mode-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #ffffff;
+    margin-bottom: 0.2rem;
+    opacity: 0.9;
+}
+
+.price-value {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #ffffff !important;
+}
+
+/* Bright color for amount text */
+.usd-price, .ksh-price {
+    color: #ffeb3b !important; /* Bright yellow for high visibility */
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Apply Hover Container */
+.apply-hover-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    height: 60px; /* Fixed height for consistency */
+}
+
+.apply-trigger-btn {
+    background: #f39c12;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.7rem;
+    width: 100%;
+    max-width: 80px; /* Limit width */
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    height: 24px; /* Fixed height */
+}
+
+.apply-trigger-btn:hover {
+    background: #e67e22;
+    transform: translateX(-50%) translateY(-1px);
+}
+
+.apply-options-dropdown {
+    position: absolute;
+    top: 32px; /* Position below the apply button */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2c3e50;
+    border-radius: 3px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(-5px);
+    transition: all 0.2s ease;
+    min-width: 100px;
+    max-width: 120px;
+}
+
+.apply-options-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.apply-option {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.65rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    justify-content: flex-start;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.apply-option:hover {
+    background: rgba(52, 152, 219, 0.2);
+}
+
+.online-option:hover {
+    background: #3498db;
+}
+
+.physical-option:hover {
+    background: #27ae60;
+}
+
+.apply-option:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.apply-option i {
+    font-size: 0.55rem;
+    width: 10px;
+    flex-shrink: 0;
+}
+
+.course-schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem; /* Increased base font size for better readability */
+}
+
+.course-schedule-table th,
+.course-schedule-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #2c3e50;
+    font-size: 0.9rem; /* Increased consistent font size */
+}
+
+.course-schedule-table th {
+    background-color: #0b2239;
+    font-weight: 600;
+    font-size: 0.85rem; /* Increased header font size */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.schedule-table-row:last-child td {
+    border-bottom: none;
+}
+
+.dates-column,
+.time-column,
+.duration-column,
+.location-column,
+.currency-column,
+.apply-column {
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+/* Schedule column content */
+.schedule-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    line-height: 1.3;
+}
+
+.delivery-mode .mode-badge {
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+/* Date info styling */
+.date-info {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: white;
+}
+
+.date-separator {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Time info styling */
+.time-info {
+    font-size: 0.9rem;
+    line-height: 1.3;
+    color: white;
+    text-align: center;
+}
+
+/* Duration info styling */
+.duration-info {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+}
+
+/* Location styling */
+.location-column {
+    font-size: 0.9rem;
+    color: white;
+    line-height: 1.3;
+}
+
+.register-btn {
+    background-color: #f39c12; /* Yellow-orange button */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.register-btn:hover {
+    background-color: #e67e22; /* Darker orange on hover */
+}
+
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .course-schedule-sidebar {
+        position: relative;
+        top: 0;
+        max-height: none;
+        margin-top: 2rem;
+    }
+    
+    .schedule-cards-container {
+        max-height: none;
+    }
+}
+
 @media (max-width: 768px) {
     .brochure-page {
         padding: 1.5rem;
@@ -1139,12 +2233,41 @@ include '../includes/header.php';
         font-size: 0.9rem;
     }
     
-    .schedules-grid {
+    .contact-details {
         grid-template-columns: 1fr;
     }
     
-    .contact-details {
-        grid-template-columns: 1fr;
+    .apply-buttons-row {
+        flex-direction: column;
+    }
+    
+    .btn-apply {
+        flex: none;
+        width: 100%;
+    }
+    
+    .program-info-wrapper {
+        padding: 1rem;
+    }
+    
+    .schedule-card-header,
+    .schedule-card-body,
+    .schedule-card-footer {
+        padding: 0.8rem;
+    }
+    
+    .schedule-info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .info-item {
+        width: 100%;
+    }
+    
+    .schedule-cards-container {
+        gap: 0.75rem;
     }
 }
 </style>
@@ -1204,6 +2327,155 @@ function submitApplication() {
         submitBtn.disabled = false;
     });
 }
+
+// Function to update pricing based on selected currency
+function updatePricing(scheduleId, currency) {
+    const pricingCell = document.getElementById('pricing-' + scheduleId);
+    const priceItems = pricingCell.querySelectorAll('.price-item');
+    
+    priceItems.forEach(item => {
+        const kshValues = item.querySelectorAll('.currency-ksh');
+        const usdValues = item.querySelectorAll('.currency-usd');
+        
+        if (currency === 'KSH') {
+            kshValues.forEach(val => val.style.display = 'inline');
+            usdValues.forEach(val => val.style.display = 'none');
+        } else {
+            kshValues.forEach(val => val.style.display = 'none');
+            usdValues.forEach(val => val.style.display = 'inline');
+        }
+    });
+}
+
+// Function to handle mode-specific applications
+function applyForScheduleMode(scheduleId, scheduleTitle, mode) {
+    // Pre-select the mode in the modal
+    showApplicationModal(scheduleId, scheduleTitle);
+    
+    // Set the delivery mode after a short delay to ensure modal is loaded
+    setTimeout(() => {
+        const deliveryModeSelect = document.getElementById('delivery_mode');
+        if (deliveryModeSelect) {
+            deliveryModeSelect.value = mode;
+        }
+    }, 100);
+}
+
+// Function to switch global currency display
+function switchGlobalCurrency(currency) {
+    // Update currency toggle buttons
+    document.querySelectorAll('.currency-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.currency === currency) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Update pricing in all schedule cards (works for both table and card layouts)
+    document.querySelectorAll('.schedule-card, .schedule-row').forEach(item => {
+        const kshValues = item.querySelectorAll('.currency-ksh');
+        const usdValues = item.querySelectorAll('.currency-usd');
+
+        if (currency === 'KSH') {
+            kshValues.forEach(val => val.style.display = 'inline');
+            usdValues.forEach(val => val.style.display = 'none');
+        } else {
+            kshValues.forEach(val => val.style.display = 'none');
+            usdValues.forEach(val => val.style.display = 'inline');
+        }
+    });
+}
+
+// Function to toggle apply dropdown options
+function toggleApplyOptions(scheduleId) {
+    // Hide all other open dropdowns
+    document.querySelectorAll('.apply-options.show').forEach(dropdown => {
+        if (dropdown.id !== `apply-options-${scheduleId}`) {
+            dropdown.classList.remove('show');
+        }
+    });
+    
+    // Toggle the clicked dropdown
+    const dropdown = document.getElementById(`apply-options-${scheduleId}`);
+    if (dropdown) {
+        dropdown.classList.toggle('show');
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.apply-dropdown')) {
+        document.querySelectorAll('.apply-options.show').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
+    }
+});
+
+// Function to update schedule pricing based on currency selection
+function updateSchedulePricing(scheduleId, currency) {
+    const pricingDisplay = document.getElementById(`pricing-display-${scheduleId}`);
+    if (!pricingDisplay) return;
+    
+    const usdPrices = pricingDisplay.querySelectorAll('.usd-price');
+    const kshPrices = pricingDisplay.querySelectorAll('.ksh-price');
+    
+    if (currency === 'USD') {
+        usdPrices.forEach(price => price.style.display = 'inline');
+        kshPrices.forEach(price => price.style.display = 'none');
+    } else {
+        usdPrices.forEach(price => price.style.display = 'none');
+        kshPrices.forEach(price => price.style.display = 'inline');
+    }
+}
+
+// Function to show apply options on hover/click
+function showApplyOptions(scheduleId) {
+    // Hide all other dropdowns first
+    document.querySelectorAll('.apply-options-dropdown').forEach(dropdown => {
+        if (dropdown.id !== `apply-options-${scheduleId}`) {
+            dropdown.classList.remove('show');
+            dropdown.style.display = 'none';
+        }
+    });
+    
+    // Show the current dropdown
+    const dropdown = document.getElementById(`apply-options-${scheduleId}`);
+    if (dropdown) {
+        dropdown.style.display = 'block';
+        // Use setTimeout to allow display change to take effect first
+        setTimeout(() => {
+            dropdown.classList.add('show');
+        }, 10);
+    }
+}
+
+// Function to hide apply options
+function hideApplyOptions(scheduleId) {
+    const dropdown = document.getElementById(`apply-options-${scheduleId}`);
+    if (dropdown) {
+        dropdown.classList.remove('show');
+        // Hide after animation completes
+        setTimeout(() => {
+            if (!dropdown.classList.contains('show')) {
+                dropdown.style.display = 'none';
+            }
+        }, 300);
+    }
+}
+
+// Close all dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.apply-hover-container')) {
+        document.querySelectorAll('.apply-options-dropdown.show').forEach(dropdown => {
+            dropdown.classList.remove('show');
+            setTimeout(() => {
+                if (!dropdown.classList.contains('show')) {
+                    dropdown.style.display = 'none';
+                }
+            }, 300);
+        });
+    }
+});
 
 function downloadBrochure() {
     // Create a new window for printing

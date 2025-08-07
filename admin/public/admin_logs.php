@@ -426,7 +426,7 @@ require_once __DIR__ . '/../includes/header.php';
                                             <small class="text-muted"><?= htmlspecialchars(substr($log['user_agent'] ?? '', 0, 50)) ?><?= strlen($log['user_agent'] ?? '') > 50 ? '...' : '' ?></small>
                                         </td>
                                         <td>
-                                            <small class="text-muted"><?= htmlspecialchars($log['ip_address']) ?></small>
+                                            <small class="text-muted"><?= htmlspecialchars($log['ip_address'] ?? '') ?></small>
                                         </td>
                                         <td>
                                             <?php if (!empty($log['old_values']) || !empty($log['new_values'])): ?>
@@ -483,10 +483,10 @@ require_once __DIR__ . '/../includes/header.php';
                                 <p><strong>User:</strong> <?= htmlspecialchars($log['user_name']) ?></p>
                                 <p><strong>Action:</strong> <?= htmlspecialchars($log['action']) ?></p>
                                 <p><strong>Entity:</strong> <?= htmlspecialchars($log['entity_type'] ?? 'N/A') ?></p>
-                                <p><strong>Entity ID:</strong> <?= htmlspecialchars($log['entity_id'] ?? 'N/A') ?></p>
-                                <p><strong>Severity:</strong> <?= htmlspecialchars($log['severity'] ?? 'N/A') ?></p>
+                                <p><strong>Entity ID:</strong> <?= htmlspecialchars(($log['entity_id'] ?? 'N/A') ?: 'N/A') ?></p>
+                                <p><strong>Severity:</strong> <?= htmlspecialchars(($log['severity'] ?? 'N/A') ?: 'N/A') ?></p>
                                 <p><strong>Date:</strong> <?= date('M j, Y g:i A', strtotime($log['created_at'])) ?></p>
-                                <p><strong>IP Address:</strong> <?= htmlspecialchars($log['ip_address']) ?></p>
+                                <p><strong>IP Address:</strong> <?= htmlspecialchars($log['ip_address'] ?? '') ?></p>
                             </div>
                             <div class="col-md-6">
                                 <h6>Technical Details</h6>

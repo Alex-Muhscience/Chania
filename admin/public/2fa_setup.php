@@ -3,7 +3,11 @@ require_once __DIR__ . '/../../shared/Core/Database.php';
 require_once __DIR__ . '/../../shared/Core/User.php';
 require_once __DIR__ . '/../../shared/Core/TOTP.php';
 require_once __DIR__ . '/../../shared/Core/SecurityLogger.php';
-require_once __DIR__ . '/../includes/header.php';
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -16,16 +20,16 @@ $userModel = new User($db);
 $logger = new SecurityLogger($db);
 $userId = $_SESSION['user_id'];
 
-// Handle form submissions
+// Handle form submissions BEFORE including header
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['enable_2fa'])) {
-        // Generate new secret
+        // Generate new secret but don't enable yet
         $secret = TOTP::generateSecret();
-        $userModel->enableTwoFactor($userId, $secret);
+        $userModel->setTwoFactorSecret($userId, $secret);
         $logger->logEvent(
             $userId,
             $_SESSION['username'],
-            '2fa_enabled',
+            '2fa_secret_generated',
             'medium',
             '2FA secret generated (pending verification)'
         );
@@ -45,6 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Verify and enable 2FA
         $code = $_POST['code'];
         if ($userModel->verifyTwoFactorSetup($userId, $code)) {
+            // Enable 2FA after successful verification
+            $userModel->confirmTwoFactorSetup($userId);
             $logger->logEvent(
                 $userId,
                 $_SESSION['username'],
@@ -68,9 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
+// Get user data before including header
 $user = $userModel->getById($userId);
 $is2faEnabled = $user['two_factor_enabled'];
 $secret = $user['two_factor_secret'];
+
+// Now include header after all redirects are handled
+require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <div class="container-fluid px-4">
@@ -79,6 +89,22 @@ $secret = $user['two_factor_secret'];
         <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
         <li class="breadcrumb-item active">2FA Setup</li>
     </ol>
+
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> <?= htmlspecialchars($_SESSION['success']) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($_SESSION['error']) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
     <div class="row">
         <div class="col-lg-8">

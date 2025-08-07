@@ -49,6 +49,7 @@ if (session_status() === PHP_SESSION_NONE) {
         .sidebar .nav-item .nav-link {
             color: #ecf0f1;
             transition: all 0.3s ease;
+            position: relative; /* Enable absolute positioning for badges */
         }
 
         .sidebar .nav-item .nav-link:hover {
@@ -131,17 +132,38 @@ if (session_status() === PHP_SESSION_NONE) {
 
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
             background-color: #e74c3c;
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 11px;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
+            font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: 2px solid #fff;
+            z-index: 10;
+            animation: pulse-badge 2s infinite;
+        }
+        
+        @keyframes pulse-badge {
+            0% {
+                transform: translateY(-50%) scale(1);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+            50% {
+                transform: translateY(-50%) scale(1.1);
+                box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
+            }
+            100% {
+                transform: translateY(-50%) scale(1);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
         }
 
         .activity-feed .small {
@@ -313,6 +335,57 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #888 !important;
         }
 
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            display: none;
+            width: 2.75rem;
+            height: 2.75rem;
+            text-align: center;
+            color: white;
+            background: rgba(90, 92, 105, 0.5);
+            line-height: 46px;
+            z-index: 1000;
+        }
+
+        .scroll-to-top:focus,
+        .scroll-to-top:hover {
+            color: white;
+        }
+
+        .scroll-to-top:hover {
+            background: #5a5c69;
+        }
+
+        .scroll-to-top.rounded {
+            border-radius: 100%;
+        }
+
+        /* Badge styles */
+        .badge-counter {
+            color: #fff;
+            background-color: #e74c3c;
+            border-radius: 1rem;
+            padding: .25rem .5rem;
+            font-size: .75rem;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+        }
+
+        /* Icon circle for notifications */
+        .icon-circle {
+            height: 2.5rem;
+            width: 2.5rem;
+            border-radius: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* Mobile Responsive Tables */
         @media (max-width: 768px) {
             .table-responsive {
@@ -463,8 +536,10 @@ if (session_status() === PHP_SESSION_NONE) {
                                     $db = (new Database())->connect();
                                     $stmt = $db->query("
                                         SELECT 
-                                            (SELECT COUNT(*) FROM applications WHERE status = 'pending') +
-                                            (SELECT COUNT(*) FROM contacts WHERE is_read = 0) as total_notifications
+                                            (SELECT COUNT(*) FROM applications WHERE status = 'pending' AND deleted_at IS NULL) +
+                                            (SELECT COUNT(*) FROM contacts WHERE is_read = 0) +
+                                            (SELECT COUNT(*) FROM event_registrations WHERE status = 'registered') +
+                                            (SELECT COUNT(*) FROM newsletter_subscribers WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR) AND status = 'subscribed') as total_notifications
                                     ");
                                     $totalNotifications = $stmt->fetchColumn();
                                     if ($totalNotifications > 0): ?>
@@ -487,9 +562,9 @@ if (session_status() === PHP_SESSION_NONE) {
                                     $stmt = $db->query("
                                         SELECT 'application' as type, id, CONCAT(first_name, ' ', last_name) as title, submitted_at as created_at
                                         FROM applications 
-                                        WHERE status = 'pending'
+                                        WHERE status = 'pending' AND deleted_at IS NULL
                                         ORDER BY submitted_at DESC
-                                        LIMIT 3
+                                        LIMIT 2
                                     ");
                                     $notifications = $stmt->fetchAll();
 
@@ -498,25 +573,52 @@ if (session_status() === PHP_SESSION_NONE) {
                                         FROM contacts 
                                         WHERE is_read = 0
                                         ORDER BY submitted_at DESC
-                                        LIMIT 3
+                                        LIMIT 2
                                     ");
                                     $contactNotifications = $stmt->fetchAll();
 
-                                    $notifications = array_merge($notifications, $contactNotifications);
+                                    // Get recent event registrations
+                                    $stmt = $db->query("
+                                        SELECT 'event' as type, er.id, CONCAT(er.first_name, ' ', er.last_name, ' - ', e.title) as title, er.registered_at as created_at
+                                        FROM event_registrations er
+                                        LEFT JOIN events e ON er.event_id = e.id
+                                        WHERE er.status = 'registered'
+                                        ORDER BY er.registered_at DESC
+                                        LIMIT 2
+                                    ");
+                                    $eventNotifications = $stmt->fetchAll();
+
+                                    // Get recent newsletter subscriptions (last 24 hours)
+                                    $stmt = $db->query("
+                                        SELECT 'newsletter' as type, id, email as title, created_at
+                                        FROM newsletter_subscribers 
+                                        WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR) AND status = 'subscribed'
+                                        ORDER BY created_at DESC
+                                        LIMIT 2
+                                    ");
+                                    $newsletterNotifications = $stmt->fetchAll();
+
+                                    $notifications = array_merge($notifications, $contactNotifications, $eventNotifications, $newsletterNotifications);
+                                    
+                                    // Sort by created_at desc and limit to 5 most recent
+                                    usort($notifications, function($a, $b) {
+                                        return strtotime($b['created_at']) - strtotime($a['created_at']);
+                                    });
+                                    $notifications = array_slice($notifications, 0, 5);
 
                                     if (empty($notifications)): ?>
                                         <div class="dropdown-item text-center small text-gray-500">No new notifications</div>
                                     <?php else:
                                         foreach ($notifications as $notification): ?>
-                                            <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/admin/public/<?= $notification['type'] === 'application' ? 'applications' : 'contacts' ?>.php">
+                                            <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/admin/public/<?= $notification['type'] === 'application' ? 'applications' : ($notification['type'] === 'contact' ? 'contacts' : ($notification['type'] === 'event' ? 'event_registrations' : 'newsletter')) ?>.php">
                                                 <div class="mr-3">
-                                                    <div class="icon-circle bg-<?= $notification['type'] === 'application' ? 'primary' : 'success' ?>">
-                                                        <i class="fas fa-<?= $notification['type'] === 'application' ? 'file-alt' : 'envelope' ?> text-white"></i>
+                                                    <div class="icon-circle bg-<?= $notification['type'] === 'application' ? 'primary' : ($notification['type'] === 'contact' ? 'success' : ($notification['type'] === 'event' ? 'warning' : 'secondary')) ?>">
+                                                        <i class="fas fa-<?= $notification['type'] === 'application' ? 'file-alt' : ($notification['type'] === 'contact' ? 'envelope' : ($notification['type'] === 'event' ? 'calendar-check' : 'envelope-open')) ?> text-white"></i>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <div class="small text-gray-500"><?= date('M j, Y', strtotime($notification['created_at'])) ?></div>
-                                                    <span class="font-weight-bold"><?= Utilities::truncate($notification['title'], 30) ?></span>
+                                                    <div class="small text-gray-500"><?= date('M j, Y g:i A', strtotime($notification['created_at'])) ?></div>
+                                                    <span class="font-weight-bold"><?= $notification['type'] === 'newsletter' ? 'New subscriber: ' : ($notification['type'] === 'event' ? 'Event registration: ' : '') ?><?= Utilities::truncate($notification['title'], 30) ?></span>
                                                 </div>
                                             </a>
                                         <?php endforeach;
@@ -599,9 +701,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php if (isset($_SESSION['success'])): ?>
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <?= htmlspecialchars($_SESSION['success']) ?>
-                            <button type="button" class="close" data-dismiss="alert">
-                                <span>&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         <?php unset($_SESSION['success']); ?>
                     <?php endif; ?>
@@ -609,9 +709,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php if (isset($_SESSION['error'])): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <?= htmlspecialchars($_SESSION['error']) ?>
-                            <button type="button" class="close" data-dismiss="alert">
-                                <span>&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         <?php unset($_SESSION['error']); ?>
                     <?php endif; ?>
@@ -619,9 +717,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php if (isset($_SESSION['warning'])): ?>
                         <div class="alert alert-warning alert-dismissible fade show" role="alert">
                             <?= htmlspecialchars($_SESSION['warning']) ?>
-                            <button type="button" class="close" data-dismiss="alert">
-                                <span>&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         <?php unset($_SESSION['warning']); ?>
                     <?php endif; ?>
@@ -629,9 +725,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <?php if (isset($_SESSION['info'])): ?>
                         <div class="alert alert-info alert-dismissible fade show" role="alert">
                             <?= htmlspecialchars($_SESSION['info']) ?>
-                            <button type="button" class="close" data-dismiss="alert">
-                                <span>&times;</span>
-                            </button>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         <?php unset($_SESSION['info']); ?>
                     <?php endif; ?>

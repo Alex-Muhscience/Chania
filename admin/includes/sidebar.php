@@ -36,12 +36,12 @@
     </li>
 
     <!-- Nav Item - Programs Dropdown -->
-    <li class="nav-item <?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_edit.php', 'program_add.php', 'program_categories.php', 'manage_schedules.php', 'schedule_add.php', 'schedule_edit.php']) ? 'active' : '' ?>">
-        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePrograms" aria-expanded="<?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_edit.php', 'program_add.php', 'program_categories.php', 'manage_schedules.php', 'schedule_add.php', 'schedule_edit.php']) ? 'true' : 'false' ?>">
+    <li class="nav-item <?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_add.php', 'program_edit.php', 'program_categories.php', 'schedules.php', 'schedule_add.php', 'schedule_edit.php', 'program_export.php']) ? 'active' : '' ?>">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePrograms" aria-expanded="<?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_add.php', 'program_edit.php', 'program_categories.php', 'schedules.php', 'schedule_add.php', 'schedule_edit.php', 'program_export.php']) ? 'true' : 'false' ?>">
             <i class="fas fa-fw fa-graduation-cap"></i>
             <span>Programs</span>
         </a>
-        <div id="collapsePrograms" class="collapse <?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_edit.php', 'program_add.php', 'program_categories.php', 'manage_schedules.php', 'schedule_add.php', 'schedule_edit.php']) ? 'show' : '' ?>" data-bs-parent="#accordionSidebar">
+        <div id="collapsePrograms" class="collapse <?= in_array(basename($_SERVER['PHP_SELF']), ['programs.php', 'program_add.php', 'program_edit.php', 'program_categories.php', 'schedules.php', 'schedule_add.php', 'schedule_edit.php', 'program_export.php']) ? 'show' : '' ?>" data-bs-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Program Management:</h6>
                 <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'programs.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/programs.php">
@@ -50,16 +50,21 @@
                 <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'program_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/program_add.php">
                     <i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Program
                 </a>
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">Schedule Management:</h6>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'schedules.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/schedules.php">
+                    <i class="fas fa-calendar fa-sm fa-fw mr-2 text-gray-400"></i>All Schedules
+                </a>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'schedule_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/schedule_add.php">
+                    <i class="fas fa-calendar-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Schedule
+                </a>
+                <div class="collapse-divider"></div>
+                <h6 class="collapse-header">Other:</h6>
                 <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'program_categories.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/program_categories.php">
                     <i class="fas fa-tags fa-sm fa-fw mr-2 text-gray-400"></i>Categories
                 </a>
-                <div class="collapse-divider"></div>
-                <h6 class="collapse-header">Scheduling:</h6>
-                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'manage_schedules.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/manage_schedules.php">
-                    <i class="fas fa-calendar-alt fa-sm fa-fw mr-2 text-gray-400"></i>Manage Schedules
-                </a>
-                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'schedule_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/schedule_add.php">
-                    <i class="fas fa-calendar-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add Schedule
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'program_export.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/program_export.php">
+                    <i class="fas fa-download fa-sm fa-fw mr-2 text-gray-400"></i>Export Programs
                 </a>
             </div>
         </div>
@@ -106,6 +111,18 @@
         <a class="nav-link" href="<?= BASE_URL ?>/admin/public/event_registrations.php">
             <i class="fas fa-fw fa-user-plus"></i>
             <span>Event Registrations</span>
+            <?php
+            try {
+                $db = (new Database())->connect();
+                $stmt = $db->query("SELECT COUNT(*) FROM event_registrations WHERE status = 'registered'");
+                $newRegistrations = $stmt->fetchColumn();
+                if ($newRegistrations > 0): ?>
+                    <span class="notification-badge"><?= $newRegistrations ?></span>
+                <?php endif;
+            } catch (Exception $e) {
+                // Silently handle error
+            }
+            ?>
         </a>
     </li>
 
@@ -216,6 +233,25 @@
         </a>
     </li>
 
+    <!-- Nav Item - Achievements -->
+    <li class="nav-item <?= in_array(basename($_SERVER['PHP_SELF']), ['achievements.php', 'achievement_add.php', 'achievement_edit.php']) ? 'active' : '' ?>">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAchievements" aria-expanded="<?= in_array(basename($_SERVER['PHP_SELF']), ['achievements.php', 'achievement_add.php', 'achievement_edit.php']) ? 'true' : 'false' ?>">
+            <i class="fas fa-fw fa-trophy"></i>
+            <span>Achievements</span>
+        </a>
+        <div id="collapseAchievements" class="collapse <?= in_array(basename($_SERVER['PHP_SELF']), ['achievements.php', 'achievement_add.php', 'achievement_edit.php']) ? 'show' : '' ?>" data-bs-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Achievement Management:</h6>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'achievements.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/achievements.php">
+                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>All Achievements
+                </a>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'achievement_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/achievements.php?action=add">
+                    <i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Achievement
+                </a>
+            </div>
+        </div>
+    </li>
+
     <!-- Nav Item - Pages -->
     <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'pages.php' || basename($_SERVER['PHP_SELF']) === 'page_edit.php' ? 'active' : '' ?>">
         <a class="nav-link" href="<?= BASE_URL ?>/admin/public/pages.php">
@@ -248,12 +284,32 @@
         </a>
     </li>
 
+
     <!-- Nav Item - Files -->
     <li class="nav-item <?= basename($_SERVER['PHP_SELF']) === 'files.php' ? 'active' : '' ?>">
         <a class="nav-link" href="<?= BASE_URL ?>/admin/public/files.php">
             <i class="fas fa-fw fa-folder"></i>
             <span>File Manager</span>
         </a>
+    </li>
+
+    <!-- Nav Item - Impact Blogs -->
+    <li class="nav-item <?= in_array(basename($_SERVER['PHP_SELF']), ['impact_blogs.php', 'impact_blog_add.php', 'impact_blog_edit.php']) ? 'active' : '' ?>">
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseImpactBlogs" aria-expanded="<?= in_array(basename($_SERVER['PHP_SELF']), ['impact_blogs.php', 'impact_blog_add.php', 'impact_blog_edit.php']) ? 'true' : 'false' ?>">
+            <i class="fas fa-fw fa-trophy"></i>
+            <span>Impact Stories</span>
+        </a>
+        <div id="collapseImpactBlogs" class="collapse <?= in_array(basename($_SERVER['PHP_SELF']), ['impact_blogs.php', 'impact_blog_add.php', 'impact_blog_edit.php']) ? 'show' : '' ?>" data-bs-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Impact Stories:</h6>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'impact_blogs.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/impact_blogs.php">
+                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>All Stories
+                </a>
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'impact_blog_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/impact_blog_add.php">
+                    <i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Story
+                </a>
+            </div>
+        </div>
     </li>
 
     <!-- Divider -->

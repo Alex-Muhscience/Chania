@@ -139,10 +139,13 @@ class ApplicationsController extends BaseApiController {
             SELECT 
                 a.id, a.application_number, a.first_name, a.last_name, a.email, a.phone,
                 a.status, a.priority, a.submitted_at, a.reviewed_at, a.payment_status,
+                a.preferred_delivery_mode, a.schedule_id,
                 p.title as program_title, p.category as program_category,
+                s.title as schedule_title, s.start_date as schedule_start_date, s.end_date as schedule_end_date,
                 CONCAT(a.first_name, ' ', a.last_name) as full_name
             FROM applications a
             LEFT JOIN programs p ON a.program_id = p.id
+            LEFT JOIN program_schedules s ON a.schedule_id = s.id
             {$whereClause}
             ORDER BY a.submitted_at DESC
         ";
@@ -220,7 +223,8 @@ class ApplicationsController extends BaseApiController {
         $allowedFields = [
             'status', 'status_reason', 'priority', 'notes', 'reviewed_by',
             'interview_scheduled', 'interview_date', 'interview_notes',
-            'payment_status', 'payment_amount', 'payment_reference'
+            'payment_status', 'payment_amount', 'payment_reference',
+            'schedule_id', 'preferred_delivery_mode'
         ];
         
         // Filter only allowed fields

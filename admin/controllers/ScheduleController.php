@@ -49,7 +49,7 @@ class ScheduleController extends BaseController {
 
             $stats = $this->scheduleModel->getStatistics();
 
-            $this->renderView(__DIR__ . '/../views/schedules/index.php', [
+            $this->render('schedules/index', [
                 'schedules' => $schedules,
                 'programs' => $programs,
                 'stats' => $stats,
@@ -64,7 +64,7 @@ class ScheduleController extends BaseController {
         } catch (Exception $e) {
             error_log("Schedules fetch error: " . $e->getMessage());
             $this->addError('Error loading schedules.');
-            $this->renderView(__DIR__ . '/../views/schedules/index.php', [
+            $this->render('schedules/index', [
                 'schedules' => [],
                 'programs' => [],
                 'stats' => ['total' => 0, 'active' => 0, 'upcoming' => 0, 'open_registration' => 0],

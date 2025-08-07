@@ -122,7 +122,7 @@ try {
                 $registration['email'],
                 $registration['registered_at'],
                 [
-                    'url' => '/admin/events.php?id=' . $registration['id'],
+                    'url' => '/admin/public/event_registrations.php',
                     'status' => $registration['status'],
                     'event' => $registration['event_title']
                 ]

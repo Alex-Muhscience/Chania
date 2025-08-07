@@ -11,13 +11,13 @@ Utilities::requireLogin();
 $eventId = intval($_GET['id'] ?? 0);
 if (!$eventId) {
     $_SESSION['error'] = "Invalid event ID.";
-    Utilities::redirect('/admin/events.php');
+    Utilities::redirect('/admin/public/events.php');
 }
 
 $pageTitle = "Edit Event";
 $breadcrumbs = [
-    ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/'],
-    ['title' => 'Events', 'url' => BASE_URL . '/admin/events.php'],
+    ['title' => 'Dashboard', 'url' => BASE_URL . '/admin/public/'],
+    ['title' => 'Events', 'url' => BASE_URL . '/admin/public/events.php'],
     ['title' => 'Edit Event']
 ];
 
@@ -33,7 +33,7 @@ try {
 
     if (!$event) {
         $_SESSION['error'] = "Event not found.";
-        Utilities::redirect('/admin/events.php');
+        Utilities::redirect('/admin/public/events.php');
     }
 
     $formData = [
@@ -51,7 +51,7 @@ try {
 } catch (PDOException $e) {
     error_log("Event fetch error: " . $e->getMessage());
     $_SESSION['error'] = "Error loading event.";
-    Utilities::redirect('/admin/events.php');
+    Utilities::redirect('/admin/public/events.php');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             $_SESSION['success'] = "Event updated successfully.";
-            Utilities::redirect('/admin/events.php');
+            Utilities::redirect('/admin/public/events.php');
 
         } catch (PDOException $e) {
             error_log("Event update error: " . $e->getMessage());
@@ -217,7 +217,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="<?= BASE_URL ?>/admin/events.php" class="btn btn-secondary">
+                        <a href="<?= BASE_URL ?>/admin/public/events.php" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back to Events
                         </a>
                         <button type="submit" class="btn btn-primary">

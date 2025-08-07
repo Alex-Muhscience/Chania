@@ -2,7 +2,7 @@
 // Admin Panel Configuration
 define('ADMIN_TITLE', 'Chania Skills for Africa - Admin');
 define('ADMIN_VERSION', '2.0.0');
-define('BASE_URL', 'http://localhost/chania');
+define('BASE_URL', 'http://localhost/chania/');
 define('ADMIN_URL', BASE_URL . '/admin');
 define('UPLOAD_PATH', __DIR__ . '/../../uploads');
 define('UPLOAD_URL', BASE_URL . '/uploads');

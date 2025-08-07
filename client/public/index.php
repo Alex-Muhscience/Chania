@@ -35,20 +35,54 @@ $stats_query = "
 ";
 $stats = $db->query($stats_query)->fetch(PDO::FETCH_ASSOC);
 
-// Fetch testimonials (using status instead of is_active if column doesn't exist)
+// Fetch testimonials with enhanced data processing
 try {
-    $testimonials_query = "SELECT * FROM testimonials WHERE is_active = 1 AND is_featured = 1 AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 6";
+    $testimonials_query = "SELECT id, name, content, position, company, program_title, image, video_url, 
+                                  rating, is_featured, created_at 
+                           FROM testimonials 
+                           WHERE is_active = 1 AND is_featured = 1 AND deleted_at IS NULL 
+                           ORDER BY created_at DESC 
+                           LIMIT 6";
     $testimonials = $db->query($testimonials_query)->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    // Fallback query if is_active column doesn't exist
-    try {
-        $testimonials_query = "SELECT * FROM testimonials WHERE status = 'active' AND is_featured = 1 AND deleted_at IS NULL ORDER BY created_at DESC LIMIT 6";
-        $testimonials = $db->query($testimonials_query)->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e2) {
-        // Final fallback - get all testimonials
-        $testimonials_query = "SELECT * FROM testimonials WHERE deleted_at IS NULL ORDER BY created_at DESC LIMIT 6";
+    
+    // If no results with is_active, try with status
+    if (empty($testimonials)) {
+        $testimonials_query = "SELECT id, name, content, position, company, program_title, image, video_url, 
+                                      rating, is_featured, created_at 
+                               FROM testimonials 
+                               WHERE status = 'active' AND is_featured = 1 AND deleted_at IS NULL 
+                               ORDER BY created_at DESC 
+                               LIMIT 6";
         $testimonials = $db->query($testimonials_query)->fetchAll(PDO::FETCH_ASSOC);
     }
+    
+    // Process testimonials for better display
+    foreach ($testimonials as &$testimonial) {
+        // Ensure image URL is complete
+        if (!empty($testimonial['image'])) {
+            $testimonial['image_url'] = (strpos($testimonial['image'], 'http') === 0) 
+                ? $testimonial['image'] 
+                : BASE_URL . "/uploads/testimonials/" . $testimonial['image'];
+        } else {
+            $testimonial['image_url'] = null;
+        }
+        
+        // Ensure rating is numeric
+        $testimonial['rating'] = (int)($testimonial['rating'] ?? 5);
+        
+        // Format date
+        $testimonial['formatted_date'] = date('M Y', strtotime($testimonial['created_at']));
+        
+        // Generate initials for fallback
+        $testimonial['initials'] = strtoupper(substr($testimonial['name'], 0, 1));
+        if (strpos($testimonial['name'], ' ') !== false) {
+            $names = explode(' ', $testimonial['name']);
+            $testimonial['initials'] = strtoupper(substr($names[0], 0, 1) . substr(end($names), 0, 1));
+        }
+    }
+    
+} catch (PDOException $e) {
+    $testimonials = []; // Empty array for fallback
 }
 
 include '../includes/header.php';
@@ -610,17 +644,19 @@ include '../includes/header.php';
                                 <p class="card-text text-muted mb-4 fst-italic">"<?php echo htmlspecialchars($testimonial['content']); ?>"</p>
                                 <div class="d-flex align-items-center">
                                     <div class="me-3">
-                                        <?php if (!empty($testimonial['avatar'])): ?>
-                                            <img src="<?php echo ASSETS_URL; ?>images/testimonials/<?php echo $testimonial['avatar']; ?>" alt="<?php echo htmlspecialchars($testimonial['name']); ?>" class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                                        <?php if (!empty($testimonial['image_url'])): ?>
+                                            <img src="<?php echo $testimonial['image_url']; ?>" alt="<?php echo htmlspecialchars($testimonial['name']); ?>" class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                                        <?php elseif (!empty($testimonial['image'])): ?>
+                                            <img src="<?php echo BASE_URL; ?>/uploads/testimonials/<?php echo $testimonial['image']; ?>" alt="<?php echo htmlspecialchars($testimonial['name']); ?>" class="rounded-circle" width="50" height="50" style="object-fit: cover;">
                                         <?php else: ?>
                                             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; font-weight: bold;">
-                                                <?php echo strtoupper(substr($testimonial['name'], 0, 1)); ?>
+                                                <?php echo $testimonial['initials'] ?? strtoupper(substr($testimonial['name'], 0, 1)); ?>
                                             </div>
                                         <?php endif; ?>
                                     </div>
                                     <div>
                                         <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($testimonial['name']); ?></h6>
-                                        <small class="text-muted"><?php echo htmlspecialchars($testimonial['position'] ?? $testimonial['program_title'] ?? 'Graduate'); ?></small>
+                                        <small class="text-muted"><?php echo htmlspecialchars($testimonial['position'] ?? $testimonial['company'] ?? $testimonial['program_title'] ?? 'Graduate'); ?></small>
                                     </div>
                                 </div>
                             </div>

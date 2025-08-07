@@ -29,8 +29,30 @@ abstract class BaseController {
     }
     
     private function checkAuthentication() {
-        // Use Utilities::requireLogin() instead of custom logic
-        Utilities::requireLogin();
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if (!Utilities::isLoggedIn()) {
+            // Check if this is an AJAX request
+            $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                     strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+            
+            if ($isAjax) {
+                // Return JSON error for AJAX requests instead of redirecting
+                header('Content-Type: application/json');
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Authentication required. Please log in.',
+                    'redirect' => BASE_URL . '/admin/public/login.php'
+                ]);
+                exit;
+            }
+            
+            // For non-AJAX requests, redirect to login as before
+            Utilities::requireLogin();
+        }
     }
     
     protected function handleFlashMessages() {
@@ -118,18 +140,12 @@ abstract class BaseController {
         $errors = $this->errors;
         $success = $this->success;
         
-        // Include header
-        require_once __DIR__ . '/../includes/header.php';
-        
-        // Include the view file
+        // Include the view file (views include their own header/footer)
         if (file_exists($viewFile)) {
             require_once $viewFile;
         } else {
             throw new Exception("View file not found: $viewFile");
         }
-        
-        // Include footer
-        require_once __DIR__ . '/../includes/footer.php';
     }
     
     /**

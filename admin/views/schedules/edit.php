@@ -1,3 +1,5 @@
+<?php include __DIR__ . '/../../includes/header.php'; ?>
+
 <div class="container-fluid px-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Edit Schedule</h1>
@@ -79,18 +81,19 @@
                 <div class="row">
                     <!-- Delivery Mode -->
                     <div class="col-md-6 mb-3">
-                        <label for="delivery_mode" class="form-label">Delivery Mode</label>
+                        <label for="delivery_mode" class="form-label">Primary Delivery Mode</label>
                         <select class="form-select" id="delivery_mode" name="delivery_mode">
+                            <option value="hybrid" <?php echo (isset($_POST['delivery_mode']) ? ($_POST['delivery_mode'] == 'hybrid') : ($schedule['delivery_mode'] == 'hybrid')) ? 'selected' : ''; ?>>
+                                Both Online & Physical Available
+                            </option>
                             <option value="online" <?php echo (isset($_POST['delivery_mode']) ? ($_POST['delivery_mode'] == 'online') : ($schedule['delivery_mode'] == 'online')) ? 'selected' : ''; ?>>
-                                Online
+                                Online Only
                             </option>
                             <option value="physical" <?php echo (isset($_POST['delivery_mode']) ? ($_POST['delivery_mode'] == 'physical') : ($schedule['delivery_mode'] == 'physical')) ? 'selected' : ''; ?>>
-                                Physical
-                            </option>
-                            <option value="hybrid" <?php echo (isset($_POST['delivery_mode']) ? ($_POST['delivery_mode'] == 'hybrid') : ($schedule['delivery_mode'] == 'hybrid')) ? 'selected' : ''; ?>>
-                                Hybrid
+                                Physical Only
                             </option>
                         </select>
+                        <small class="form-text text-muted">We recommend offering both modes to maximize accessibility.</small>
                     </div>
 
                     <!-- Location -->
@@ -105,18 +108,20 @@
                 <div class="row">
                     <!-- Online Fee -->
                     <div class="col-md-4 mb-3">
-                        <label for="online_fee" class="form-label">Online Fee (KES)</label>
+                        <label for="online_fee" class="form-label">Online Fee (USD) <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" class="form-control" id="online_fee" name="online_fee" 
-                               value="<?php echo htmlspecialchars($_POST['online_fee'] ?? $schedule['online_fee'] ?? '0.00'); ?>" 
-                               placeholder="0.00">
+                               value="<?php echo htmlspecialchars($_POST['online_fee'] ?? $schedule['online_fee'] ?? ''); ?>" 
+                               placeholder="e.g., 50.00" required>
+                        <small class="form-text text-muted">Fee in USD for online participants</small>
                     </div>
 
                     <!-- Physical Fee -->
                     <div class="col-md-4 mb-3">
-                        <label for="physical_fee" class="form-label">Physical Fee (KES)</label>
+                        <label for="physical_fee" class="form-label">Physical Fee (USD) <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" class="form-control" id="physical_fee" name="physical_fee" 
-                               value="<?php echo htmlspecialchars($_POST['physical_fee'] ?? $schedule['physical_fee'] ?? '0.00'); ?>" 
-                               placeholder="0.00">
+                               value="<?php echo htmlspecialchars($_POST['physical_fee'] ?? $schedule['physical_fee'] ?? ''); ?>" 
+                               placeholder="e.g., 65.00" required>
+                        <small class="form-text text-muted">Fee in USD for in-person participants</small>
                     </div>
 
                     <!-- Max Participants -->
@@ -291,3 +296,5 @@ document.getElementById('start_date').addEventListener('change', function() {
     }
 });
 </script>
+
+<?php include __DIR__ . '/../../includes/footer.php'; ?>
