@@ -1,49 +1,101 @@
+<?php
+/**
+ * Enhanced Programs Edit View - Clean Implementation
+ * Safely handles all form data and displays with proper error handling
+ */
+
+// Safe value retrieval function
+function getSafeValue($key, $program = [], $default = '') {
+    // Check POST data first (for form resubmissions after errors)
+    if (isset($_POST[$key])) {
+        $value = $_POST[$key];
+        return is_string($value) ? trim($value) : $value;
+    }
+    
+    // Check program data
+    if (is_array($program) && isset($program[$key])) {
+        $value = $program[$key];
+        return is_string($value) ? trim($value) : $value;
+    }
+    
+    return $default;
+}
+
+// Ensure program array is properly set
+$program = $program ?? [];
+
+// Include header
+require_once __DIR__ . '/../../includes/header.php';
+?>
+
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Edit Enhanced Program</h1>
+    <div class="d-none d-sm-inline-block">
+        <a href="<?= BASE_URL ?>/admin/public/programs.php" class="btn btn-sm btn-secondary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Programs
+        </a>
+    </div>
+</div>
+
+<!-- Flash Messages -->
+<?php if (!empty($success)): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($success) ?>
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($errors)): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <ul class="mb-0">
+            <?php foreach ($errors as $error): ?>
+                <li><?= htmlspecialchars($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    </div>
+<?php endif; ?>
+
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Edit Enhanced Program: <?= htmlspecialchars($program['title']) ?></h5>
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h5 class="m-0 font-weight-bold text-primary">
+                    Edit Program: <?= htmlspecialchars($program['title'] ?? 'New Program') ?>
+                </h5>
             </div>
             <div class="card-body">
-                <?php if (!empty($this->errors)): ?>
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            <?php foreach ($this->errors as $error): ?>
-                                <li><?= htmlspecialchars($error) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($this->success)): ?>
-                    <div class="alert alert-success">
-                        <?= htmlspecialchars($this->success) ?>
-                    </div>
-                <?php endif; ?>
 
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" id="programForm">
                     <!-- Basic Program Information -->
                     <div class="row">
                         <div class="col-md-8">
                             <div class="mb-3">
                                 <label for="title" class="form-label">Program Title *</label>
                                 <input type="text" class="form-control" id="title" name="title"
-                                       value="<?= htmlspecialchars($_POST['title'] ?? $program['title']) ?>" required>
+                                       value="<?= htmlspecialchars(getSafeValue('title', $program)) ?>" 
+                                       required maxlength="255">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="duration" class="form-label">Duration *</label>
                                 <input type="text" class="form-control" id="duration" name="duration"
-                                       value="<?= htmlspecialchars($_POST['duration'] ?? $program['duration']) ?>"
-                                       placeholder="e.g., 3 days, 2 weeks" required>
+                                       value="<?= htmlspecialchars(getSafeValue('duration', $program)) ?>"
+                                       placeholder="e.g., 3 days, 2 weeks" required maxlength="100">
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label for="description" class="form-label">Short Description *</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" required><?= htmlspecialchars($_POST['description'] ?? $program['description']) ?></textarea>
+                        <textarea class="form-control" id="description" name="description" rows="3" required maxlength="500"><?= htmlspecialchars(getSafeValue('description', $program)) ?></textarea>
                     </div>
 
                     <div class="row">
@@ -53,7 +105,7 @@
                                 <select class="form-control" id="category" name="category">
                                     <?php 
                                     $categories = ['General', 'Technology', 'Business', 'Leadership', 'Skills'];
-                                    $selected_category = $_POST['category'] ?? $program['category'];
+                                    $selected_category = getSafeValue('category', $program, 'General');
                                     foreach ($categories as $category): ?>
                                         <option value="<?= $category ?>" <?= $selected_category === $category ? 'selected' : '' ?>><?= $category ?></option>
                                     <?php endforeach; ?>
@@ -66,7 +118,7 @@
                                 <select class="form-control" id="difficulty_level" name="difficulty_level">
                                     <?php 
                                     $levels = ['beginner' => 'Beginner', 'intermediate' => 'Intermediate', 'advanced' => 'Advanced'];
-                                    $selected_level = $_POST['difficulty_level'] ?? $program['difficulty_level'];
+                                    $selected_level = getSafeValue('difficulty_level', $program, 'beginner');
                                     foreach ($levels as $value => $label): ?>
                                         <option value="<?= $value ?>" <?= $selected_level === $value ? 'selected' : '' ?>><?= $label ?></option>
                                     <?php endforeach; ?>
@@ -77,7 +129,7 @@
                             <div class="mb-3">
                                 <label for="fee" class="form-label">Base Fee ($)</label>
                                 <input type="number" class="form-control" id="fee" name="fee"
-                                       value="<?= $_POST['fee'] ?? $program['fee'] ?>" min="0" step="0.01">
+                                       value="<?= htmlspecialchars(getSafeValue('fee', $program, '0')) ?>" min="0" step="0.01">
                                 <div class="form-text">This is the base fee. Individual schedules can have different fees.</div>
                             </div>
                         </div>
@@ -88,21 +140,21 @@
                             <div class="mb-3">
                                 <label for="max_participants" class="form-label">Max Participants</label>
                                 <input type="number" class="form-control" id="max_participants" name="max_participants"
-                                       value="<?= $_POST['max_participants'] ?? $program['max_participants'] ?>" min="1">
+                                       value="<?= htmlspecialchars(getSafeValue('max_participants', $program)) ?>" min="1">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="start_date" class="form-label">Start Date</label>
                                 <input type="date" class="form-control" id="start_date" name="start_date"
-                                       value="<?= $_POST['start_date'] ?? $program['start_date'] ?>">
+                                       value="<?= htmlspecialchars(getSafeValue('start_date', $program)) ?>">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="end_date" class="form-label">End Date</label>
                                 <input type="date" class="form-control" id="end_date" name="end_date"
-                                       value="<?= $_POST['end_date'] ?? $program['end_date'] ?>">
+                                       value="<?= htmlspecialchars(getSafeValue('end_date', $program)) ?>">
                             </div>
                         </div>
                     </div>
@@ -114,13 +166,13 @@
                     <div class="mb-3">
                         <label for="introduction" class="form-label">Program Introduction</label>
                         <textarea class="form-control" id="introduction" name="introduction" rows="4"
-                                  placeholder="Detailed introduction to the program, what it covers, and its benefits"><?= htmlspecialchars($_POST['introduction'] ?? $program['introduction']) ?></textarea>
+                                  placeholder="Detailed introduction to the program, what it covers, and its benefits"><?= htmlspecialchars(getSafeValue('introduction', $program)) ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="objectives" class="form-label">Learning Objectives</label>
                         <textarea class="form-control" id="objectives" name="objectives" rows="4"
-                                  placeholder="List the key learning objectives participants will achieve"><?= htmlspecialchars($_POST['objectives'] ?? $program['objectives']) ?></textarea>
+                                  placeholder="List the key learning objectives participants will achieve"><?= htmlspecialchars(getSafeValue('objectives', $program)) ?></textarea>
                     </div>
 
                     <div class="row">
@@ -128,14 +180,14 @@
                             <div class="mb-3">
                                 <label for="target_audience" class="form-label">Target Audience</label>
                                 <textarea class="form-control" id="target_audience" name="target_audience" rows="3"
-                                          placeholder="Who is this program designed for?"><?= htmlspecialchars($_POST['target_audience'] ?? $program['target_audience']) ?></textarea>
+                                          placeholder="Who is this program designed for?"><?= htmlspecialchars(getSafeValue('target_audience', $program)) ?></textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="prerequisites" class="form-label">Prerequisites</label>
                                 <textarea class="form-control" id="prerequisites" name="prerequisites" rows="3"
-                                          placeholder="Any prerequisites or requirements for participants"><?= htmlspecialchars($_POST['prerequisites'] ?? $program['prerequisites']) ?></textarea>
+                                          placeholder="Any prerequisites or requirements for participants"><?= htmlspecialchars(getSafeValue('prerequisites', $program)) ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -143,19 +195,19 @@
                     <div class="mb-3">
                         <label for="course_content" class="form-label">Course Content (Modules)</label>
                         <textarea class="form-control" id="course_content" name="course_content" rows="5"
-                                  placeholder="Outline the course modules and content structure"><?= htmlspecialchars($_POST['course_content'] ?? $program['course_content']) ?></textarea>
+                                  placeholder="Outline the course modules and content structure"><?= htmlspecialchars(getSafeValue('course_content', $program)) ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="general_notes" class="form-label">General Notes</label>
                         <textarea class="form-control" id="general_notes" name="general_notes" rows="3"
-                                  placeholder="Additional notes, requirements, or important information"><?= htmlspecialchars($_POST['general_notes'] ?? $program['general_notes']) ?></textarea>
+                                  placeholder="Additional notes, requirements, or important information"><?= htmlspecialchars(getSafeValue('general_notes', $program)) ?></textarea>
                     </div>
 
                     <div class="mb-3">
                         <label for="certification_details" class="form-label">Certification Details</label>
                         <textarea class="form-control" id="certification_details" name="certification_details" rows="3"
-                                  placeholder="Information about certificates, credentials, or completion recognition"><?= htmlspecialchars($_POST['certification_details'] ?? $program['certification_details']) ?></textarea>
+                                  placeholder="Information about certificates, credentials, or completion recognition"><?= htmlspecialchars(getSafeValue('certification_details', $program)) ?></textarea>
                     </div>
 
                     <!-- Media and Additional Information -->
@@ -188,7 +240,7 @@
                             <div class="mb-3">
                                 <label for="video_url" class="form-label">Video URL</label>
                                 <input type="url" class="form-control" id="video_url" name="video_url"
-                                       value="<?= htmlspecialchars($_POST['video_url'] ?? $program['video_url']) ?>"
+                                       value="<?= htmlspecialchars(getSafeValue('video_url', $program)) ?>"
                                        placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
                                 <div class="form-text">Optional. Link to program intro/overview video</div>
                             </div>
@@ -241,7 +293,7 @@
                             <div class="mb-3">
                                 <label for="instructor_name" class="form-label">Instructor Name</label>
                                 <input type="text" class="form-control" id="instructor_name" name="instructor_name"
-                                       value="<?= htmlspecialchars($_POST['instructor_name'] ?? $program['instructor_name']) ?>"
+                                       value="<?= htmlspecialchars(getSafeValue('instructor_name', $program)) ?>"
                                        placeholder="Name of the primary instructor">
                             </div>
                         </div>
@@ -249,7 +301,7 @@
                             <div class="mb-3">
                                 <label for="location" class="form-label">Default Location</label>
                                 <input type="text" class="form-control" id="location" name="location"
-                                       value="<?= htmlspecialchars($_POST['location'] ?? $program['location']) ?>"
+                                       value="<?= htmlspecialchars(getSafeValue('location', $program)) ?>"
                                        placeholder="Default location for in-person sessions">
                             </div>
                         </div>
@@ -260,7 +312,7 @@
                             <div class="mb-3">
                                 <label for="tags" class="form-label">Tags</label>
                                 <input type="text" class="form-control" id="tags" name="tags"
-                                       value="<?= htmlspecialchars($_POST['tags'] ?? $program['tags']) ?>"
+                                       value="<?= htmlspecialchars(getSafeValue('tags', $program)) ?>"
                                        placeholder="programming, web development, php, mysql">
                                 <div class="form-text">Comma-separated tags for better searchability</div>
                             </div>
@@ -268,16 +320,18 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <div class="form-check mt-4">
+                                    <?php $isFeatured = getSafeValue('is_featured', $program, 0); ?>
                                     <input type="checkbox" class="form-check-input" id="is_featured" name="is_featured" value="1"
-                                           <?= (isset($_POST['is_featured']) ? $_POST['is_featured'] : $program['is_featured']) ? 'checked' : '' ?>>
+                                           <?= $isFeatured ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="is_featured">
                                         <strong>Featured Program</strong>
                                     </label>
                                     <div class="form-text">Featured programs appear prominently on the website</div>
                                 </div>
                                 <div class="form-check">
+                                    <?php $isOnline = getSafeValue('is_online', $program, 0); ?>
                                     <input type="checkbox" class="form-check-input" id="is_online" name="is_online" value="1"
-                                           <?= (isset($_POST['is_online']) ? $_POST['is_online'] : $program['is_online']) ? 'checked' : '' ?>>
+                                           <?= $isOnline ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="is_online">
                                         <strong>Online Program</strong>
                                     </label>
@@ -294,7 +348,7 @@
                     <div class="mb-3">
                         <label for="meta_title" class="form-label">Meta Title</label>
                         <input type="text" class="form-control" id="meta_title" name="meta_title"
-                               value="<?= htmlspecialchars($_POST['meta_title'] ?? $program['meta_title']) ?>"
+                               value="<?= htmlspecialchars(getSafeValue('meta_title', $program)) ?>"
                                placeholder="SEO title for search engines (optional)">
                         <div class="form-text">If left blank, program title will be used</div>
                     </div>
@@ -302,7 +356,7 @@
                     <div class="mb-3">
                         <label for="meta_description" class="form-label">Meta Description</label>
                         <textarea class="form-control" id="meta_description" name="meta_description" rows="2"
-                                  placeholder="Brief description for search engines (optional)"><?= htmlspecialchars($_POST['meta_description'] ?? $program['meta_description']) ?></textarea>
+                                  placeholder="Brief description for search engines (optional)"><?= htmlspecialchars(getSafeValue('meta_description', $program)) ?></textarea>
                         <div class="form-text">If left blank, short description will be used</div>
                     </div>
 
@@ -310,7 +364,7 @@
                     <input type="hidden" id="removed_gallery_images" name="removed_gallery_images" value="">
 
                     <div class="d-flex justify-content-between">
-                        <a href="<?= BASE_URL ?>/admin/enhanced_programs.php" class="btn btn-secondary">
+                        <a href="<?= BASE_URL ?>/admin/public/programs.php" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back to Programs
                         </a>
                         <button type="submit" class="btn btn-primary">
@@ -424,7 +478,7 @@ function removeGalleryImage(imageName, button) {
         button.closest('.col-md-3').remove();
         
         // Send AJAX request to delete the image immediately
-        fetch('<?= BASE_URL ?>/admin/enhanced_programs.php', {
+        fetch('<?= BASE_URL ?>/admin/public/programs.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -446,3 +500,7 @@ function removeGalleryImage(imageName, button) {
 }
 </script>
 
+<?php
+// Include footer
+require_once __DIR__ . '/../../includes/footer.php';
+?>

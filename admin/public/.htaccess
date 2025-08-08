@@ -1,5 +1,28 @@
 RewriteEngine On
 
+# Additional security measures
+Options -Indexes -ExecCGI
+
+# Block suspicious user agents and empty user agents
+RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+RewriteCond %{HTTP_USER_AGENT} (bot|crawl|spider|scan|wget|curl|nikto|sqlmap|nmap|hack) [NC]
+RewriteCond %{REQUEST_URI} !^/admin/public/login\.php$ [NC]
+RewriteRule ^.*$ - [F,L]
+
+# Block requests with suspicious query strings
+RewriteCond %{QUERY_STRING} (union|select|insert|update|delete|drop|create|alter|exec|script|base64_decode|eval|assert) [NC]
+RewriteRule ^.*$ - [F,L]
+
+# Block requests with null bytes or special characters
+RewriteCond %{QUERY_STRING} \x00 [NC,OR]
+RewriteCond %{QUERY_STRING} \.\./\.\./ [NC,OR]
+RewriteCond %{QUERY_STRING} \.(php|phtml|inc)\. [NC]
+RewriteRule ^.*$ - [F,L]
+
+# Session security - prevent session fixation
+RewriteCond %{QUERY_STRING} PHPSESSID= [NC]
+RewriteRule ^.*$ - [F,L]
+
 # Redirect requests to admin root to admin/public
 RewriteCond %{REQUEST_URI} ^/admin/?$
 RewriteRule ^(.*)$ /admin/public/ [L,R=301]

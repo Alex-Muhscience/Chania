@@ -2,7 +2,7 @@
 require_once '../includes/config.php';
 
 $page_title = 'About Us';
-$page_description = 'Learn about Chania Skills for Africa\'s mission to empower communities through transformative skills development and training programs across Africa.';
+$page_description = 'Learn about Euroafrique Corporate Skills\' mission to empower professionals and organizations through transformative skills development and training programs.';
 $page_keywords = 'about, mission, vision, team, skills training, Africa, education, empowerment';
 
 // Fetch team members (with fallback data if database is empty)
@@ -96,9 +96,9 @@ include '../includes/header.php';
                         <li class="breadcrumb-item active" aria-current="page">About Us</li>
                     </ol>
                 </nav>
-                <h1 class="text-black mb-4" data-aos="fade-up">About Chania Skills for Africa</h1>
+                <h1 class="text-black mb-4" data-aos="fade-up">About EuroAfrique Corporate Skills</h1>
                 <p class="text-black-50 fs-5 mb-0" data-aos="fade-up" data-aos-delay="200">
-                    Empowering communities across Africa through transformative skills development, innovative training programs, and sustainable capacity building initiatives.
+                    Bridging the gap between talent and opportunity across Europe and Africa through transformative skills development and strategic consultancy.
                 </p>
             </div>
         </div>
@@ -112,14 +112,14 @@ include '../includes/header.php';
             <div class="col-lg-6" data-aos="fade-right">
                 <div class="pe-lg-4">
                     <div class="badge bg-primary bg-opacity-10 text-black mb-3 px-3 py-2">
-                        <i class="fas fa-heart me-2"></i>Our Story
+                        <i class="fas fa-heart me-2"></i>About Us
                     </div>
-                    <h2 class="display-6 fw-bold mb-4">Transforming Lives Through Skills Development</h2>
+                    <h2 class="display-6 fw-bold mb-4">Bridging Talent and Opportunity</h2>
                     <p class="fs-5 text-muted mb-4">
-                        Founded with a simple yet powerful belief: every individual deserves access to quality skills training that can transform their future and uplift entire communities across Africa.
+                        At EuroAfrique Corporate Skills, we believe that the right skills can transform institutions, communities, and economies. In today's interconnected world, bridging the gap between talent and opportunity is not just a goal—it's a necessity.
                     </p>
                     <p class="mb-4">
-                        Since our inception, we've been bridging the critical skills gap in technology, business, agriculture, and healthcare sectors, creating pathways to prosperity for thousands of African youth and professionals.
+                        We are a premier corporate training and consultancy firm dedicated to empowering government institutions, NGOs, development agencies, and private sector organizations across Europe and Africa. Our strength lies in combining global best practices with deep regional insights, enabling us to deliver solutions that are practical, relevant, and impactful across different sectors.
                     </p>
                     <div class="row g-3 mb-4">
                         <div class="col-6">
@@ -204,10 +204,7 @@ include '../includes/header.php';
                         </div>
                     </div>
                     <p class="fs-5 text-muted mb-4">
-                        To empower communities across Africa by providing accessible, high-quality skills training that transforms lives, creates opportunities, and drives sustainable economic development.
-                    </p>
-                    <p class="mb-4">
-                        We believe that every individual deserves the opportunity to unlock their potential through education and skills development. Our comprehensive programs are designed to bridge the skills gap in critical sectors.
+                        To cultivate excellence and drive sustainable growth by providing innovative, high-impact training solutions and strategic consultancy services. We focus on building skills, enhancing leadership capacity, and promoting operational effectiveness so that our clients are equipped not only for today's challenges but also to lead confidently into the future.
                     </p>
                     <div class="row g-3">
                         <div class="col-12">
@@ -258,10 +255,7 @@ include '../includes/header.php';
                         </div>
                     </div>
                     <p class="fs-5 text-muted mb-4">
-                        To be Africa's leading skills development organization, creating a continent where every individual has access to quality education and training opportunities that enable them to thrive in the global economy.
-                    </p>
-                    <p class="mb-4">
-                        We envision a future where skills gaps are eliminated, communities are self-sufficient, and African talent contributes significantly to global innovation and economic growth.
+                        To be the leading bridge between European and African skills development, inspiring excellence and driving transformation in organizations and communities worldwide.
                     </p>
                     <div class="row g-3">
                         <div class="col-6">

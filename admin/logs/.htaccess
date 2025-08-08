@@ -1,0 +1,16 @@
+# Prevent web access to log files
+Order Deny,Allow
+Deny from all
+
+# Additional security
+<Files "*">
+    Require all denied
+</Files>
+
+# Prevent directory listing
+Options -Indexes
+
+# Block all file extensions
+<FilesMatch ".*">
+    Require all denied
+</FilesMatch>

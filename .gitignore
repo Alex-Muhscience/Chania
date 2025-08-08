@@ -1,8 +1,22 @@
 # Environment files
 .env
-.env.local
-.env.production
-.env.staging
+.env.*
+!.env.example
+
+# Deployment and setup files
+deploy-setup.php
+export-database.php
+test-db-connection.php
+info.php
+server-info.php
+.setup_complete
+
+# Database exports and sensitive data
+database_exports/
+*.sql
+!database/schema.sql
+!database/*.sql
+!deployment/hostafrica/*.sql
 
 # Composer
 vendor/
@@ -83,6 +97,18 @@ test.php
 test_*.php
 check_*.php
 reset_*.php
+test-*
+
+# Development and admin shortcuts
+*.lnk
+*- Shortcut.lnk
+
+# IDE metadata (sensitive)
+.idea/dataSources.local.xml
+.idea/dataSources/
+
+# Fixed configuration files (keep originals only)
+*.fixed
 
 # Performance and configuration backups
 *.performance

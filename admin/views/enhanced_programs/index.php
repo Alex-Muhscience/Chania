@@ -50,7 +50,7 @@ require_once __DIR__ . '/../../includes/header.php';
                 <i class="fas fa-search"></i> Search
             </button>
             <?php if (!empty($search)): ?>
-                <a href="enhanced_programs.php" class="btn btn-secondary">
+                <a href="programs.php" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Clear
                 </a>
             <?php endif; ?>
@@ -138,21 +138,20 @@ require_once __DIR__ . '/../../includes/header.php';
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <form method="POST" style="display: inline-block;">
-                                        <input type="hidden" name="action" value="toggle_status">
-                                        <input type="hidden" name="program_id" value="<?= $program['id'] ?>">
-                                        <button type="submit" class="btn btn-sm <?= $program['is_active'] ? 'btn-success' : 'btn-secondary' ?>">
-                                            <?= $program['is_active'] ? 'Active' : 'Inactive' ?>
-                                        </button>
-                                    </form>
+                                    <button type="button" 
+                                            class="btn btn-sm status-toggle-btn <?= $program['is_active'] ? 'btn-success' : 'btn-secondary' ?>" 
+                                            data-program-id="<?= $program['id'] ?>"
+                                            data-current-status="<?= $program['is_active'] ?>">
+                                        <?= $program['is_active'] ? 'Active' : 'Inactive' ?>
+                                    </button>
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="enhanced_programs.php?action=edit&id=<?= $program['id'] ?>" 
+                                        <a href="programs.php?action=edit&id=<?= $program['id'] ?>" 
                                            class="btn btn-primary btn-sm" title="Edit Program">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="enhanced_programs.php?action=schedules&program_id=<?= $program['id'] ?>" 
+                                        <a href="programs.php?action=schedules&program_id=<?= $program['id'] ?>" 
                                            class="btn btn-info btn-sm" title="Manage Schedules">
                                             <i class="fas fa-calendar-alt"></i>
                                         </a>
@@ -262,6 +261,94 @@ require_once __DIR__ . '/../../includes/header.php';
         </div>
     </div>
 </div>
+
+<!-- Status Toggle Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div id="statusMessage"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle status toggle buttons
+    const statusButtons = document.querySelectorAll('.status-toggle-btn');
+    
+    statusButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const programId = this.dataset.programId;
+            const currentStatus = this.dataset.currentStatus;
+            
+            // Disable button during request
+            this.disabled = true;
+            const originalText = this.textContent;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+            
+            // Send AJAX request
+            fetch('<?= BASE_URL ?>/admin/public/programs.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `action=toggle_status&program_id=${programId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update button appearance
+                    this.className = `btn btn-sm status-toggle-btn ${data.buttonClass}`;
+                    this.textContent = data.statusText;
+                    this.dataset.currentStatus = data.newStatus;
+                    
+                    // Show success message
+                    showStatusMessage(data.message, 'success');
+                } else {
+                    // Show error message
+                    showStatusMessage(data.error || 'Failed to update status', 'error');
+                    
+                    // Restore button
+                    this.textContent = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showStatusMessage('An error occurred while updating the status', 'error');
+                
+                // Restore button
+                this.textContent = originalText;
+            })
+            .finally(() => {
+                this.disabled = false;
+            });
+        });
+    });
+    
+    function showStatusMessage(message, type) {
+        const modalElement = document.getElementById('statusModal');
+        const messageElement = document.getElementById('statusMessage');
+        
+        const icon = type === 'success' ? 'fa-check-circle text-success' : 'fa-exclamation-triangle text-danger';
+        
+        messageElement.innerHTML = `
+            <i class="fas ${icon} fa-2x mb-2"></i>
+            <p class="mb-0">${message}</p>
+        `;
+        
+        // Show modal
+        $(modalElement).modal('show');
+        
+        // Auto-hide after 2 seconds
+        setTimeout(() => {
+            $(modalElement).modal('hide');
+        }, 2000);
+    }
+});
+</script>
 
 <?php
 // Include footer

@@ -30,10 +30,10 @@ if (!defined('MAX_UPLOAD_SIZE')) {
 }
 
 // Site settings
-define('SITE_NAME', 'Chania Skills for Africa');
-define('SITE_DESCRIPTION', 'Empowering communities through skills development and training programs');
-define('CONTACT_EMAIL', 'info@skillsforafrica.org');
-define('CONTACT_PHONE', '+254 700 000 000');
+define('SITE_NAME', 'Euroafrique Corporate Skills');
+define('SITE_DESCRIPTION', 'Empowering professionals and organizations through comprehensive skills development and training programs');
+define('CONTACT_EMAIL', 'info@euroafriquecorporateskills.com');
+define('CONTACT_PHONE', '+254 724 213 764');
 
 // Initialize database connection if not already connected
 if (!isset($db)) {

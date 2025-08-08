@@ -1,0 +1,96 @@
+# Admin Area Security Configuration
+# Simplified version for XAMPP compatibility
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Prevent directory listing
+Options -Indexes
+
+# Basic Security Headers (if mod_headers is enabled)
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# User-Agent filtering - block common bots and scanners
+RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+RewriteCond %{HTTP_USER_AGENT} (bot|crawl|spider|scan|wget|curl|nikto|sqlmap|nmap) [NC]
+RewriteRule ^.*$ - [F,L]
+
+# Referrer-based protection (uncomment to require referrer from your domain)
+# RewriteCond %{HTTP_REFERER} !^https?://(.*\.)?euroafriquecorporateskills\.com [NC]
+# RewriteCond %{REQUEST_URI} !^/admin/public/login\.php$ [NC]
+# RewriteCond %{REQUEST_URI} !secure-admin-access\.php$ [NC]
+# RewriteRule ^.*$ - [F,L]
+
+# Hide admin directory structure
+# Block direct access to sensitive directories
+RewriteRule ^(classes|controllers|includes|sql|views|actions|ajax|api)/ - [F,L]
+
+# Prevent access to backup files and logs
+<FilesMatch "\.(bak|backup|log|old|orig|save|swp|tmp)$">
+    <IfVersion ">= 2.4">
+        Require all denied
+    </IfVersion>
+    <IfVersion "< 2.4">
+        Order allow,deny
+        Deny from all
+    </IfVersion>
+</FilesMatch>
+
+# Prevent access to configuration and sensitive files
+<FilesMatch "(config|settings|\.env|\.htaccess|composer\.(json|lock)|package\.json)$">
+    <IfVersion ">= 2.4">
+        Require all denied
+    </IfVersion>
+    <IfVersion "< 2.4">
+        Order allow,deny
+        Deny from all
+    </IfVersion>
+</FilesMatch>
+
+# Block access to common attack vectors
+RewriteCond %{QUERY_STRING} (union|select|insert|update|delete|drop|create|alter|exec|script) [NC]
+RewriteRule ^.*$ - [F,L]
+
+# Block access to files with suspicious patterns
+RewriteCond %{REQUEST_URI} \.(php|phtml|php3|php4|php5|inc)$ [NC]
+RewriteCond %{REQUEST_URI} !(public/|secure-admin-access\.php) [NC]
+RewriteRule ^.*$ - [F,L]
+
+# Redirect all admin root requests to public directory (except our secure script)
+RewriteCond %{REQUEST_URI} !secure-admin-access\.php$
+RewriteRule ^$ public/ [L,R=301]
+
+# Handle specific files in admin root (except our secure script)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/admin/public/
+RewriteCond %{REQUEST_URI} !secure-admin-access\.php$
+RewriteRule ^(.*)$ public/$1 [L,R=301]
+
+# Additional security measures
+<Files ~ "^\.">
+    <IfVersion ">= 2.4">
+        Require all denied
+    </IfVersion>
+    <IfVersion "< 2.4">
+        Order allow,deny
+        Deny from all
+    </IfVersion>
+</Files>
+
+# Cache control for static assets
+<IfModule mod_expires.c>
+    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+        ExpiresActive On
+        ExpiresDefault "access plus 1 month"
+    </FilesMatch>
+</IfModule>
+
+# Additional protection against common exploits
+RewriteCond %{REQUEST_METHOD} ^(TRACE|DELETE|TRACK) [NC]
+RewriteRule ^.*$ - [F,L]

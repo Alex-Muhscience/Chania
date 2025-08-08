@@ -1,0 +1,33 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /shared/
+Disallow: /uploads/
+Disallow: /logs/
+Disallow: /cache/
+Disallow: /backups/
+Disallow: /database_exports/
+Disallow: *.log
+Disallow: *.sql
+Disallow: *.env*
+
+# Allow access to public areas
+Allow: /
+Allow: /client/public/
+Allow: /public/
+
+# Sitemap location (update when you create one)
+Sitemap: https://www.euroafriquecorporateskills.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 10
+
+# Block known bad bots
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /

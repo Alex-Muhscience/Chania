@@ -120,6 +120,7 @@
   --z-modal: 1050;
   --z-popover: 1060;
   --z-tooltip: 1070;
+  --z-whatsapp-float: 1080;
   
   /* Breakpoints */
   --breakpoint-sm: 576px;
@@ -11600,4 +11601,431 @@ p {
   background-position: center;
   background-repeat: no-repeat;
   min-height: 15rem;
+}
+
+/* ===== WHATSAPP FLOATING BUTTON ===== */
+.whatsapp-float {
+  position: fixed;
+  width: 64px;
+  height: 64px;
+  bottom: 30px;
+  right: 30px;
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  font-size: 28px;
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4), 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: var(--z-whatsapp-float);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  animation: whatsapp-pulse 2s infinite;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.whatsapp-float:hover {
+  background: linear-gradient(135deg, #128c7e 0%, #0da458 100%);
+  transform: scale(1.15) rotate(5deg);
+  color: white;
+  text-decoration: none;
+  box-shadow: 0 12px 35px rgba(18, 140, 126, 0.5), 0 6px 15px rgba(0, 0, 0, 0.15);
+  animation: none;
+}
+
+.whatsapp-float:active {
+  transform: scale(1.05) rotate(2deg);
+  transition: all 0.1s ease;
+}
+
+.whatsapp-float:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.25), 0 8px 25px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-float i {
+  margin: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Tooltip for WhatsApp button */
+.whatsapp-float::before {
+  content: 'Chat with us on WhatsApp';
+  position: absolute;
+  right: 70px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.whatsapp-float::after {
+  content: '';
+  position: absolute;
+  right: 62px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left-color: rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-float:hover::before,
+.whatsapp-float:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* WhatsApp Button Animation */
+@keyframes whatsapp-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4), 0 4px 10px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(37, 211, 102, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(37, 211, 102, 0.5), 0 6px 15px rgba(0, 0, 0, 0.15), 0 0 0 10px rgba(37, 211, 102, 0.1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4), 0 4px 10px rgba(0, 0, 0, 0.1), 0 0 0 0 rgba(37, 211, 102, 0.4);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* WhatsApp Button Styles for other elements */
+.whatsapp-btn {
+  background-color: #25d366 !important;
+  border-color: #25d366 !important;
+  color: white !important;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-btn:hover,
+.whatsapp-btn:focus {
+  background-color: #128c7e !important;
+  border-color: #128c7e !important;
+  color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-link {
+  color: #25d366 !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-link:hover {
+  color: #128c7e !important;
+  transform: translateX(3px);
+}
+
+.whatsapp-footer {
+  transition: all 0.3s ease;
+}
+
+.whatsapp-footer:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+  .whatsapp-float {
+    width: 50px;
+    height: 50px;
+    bottom: 20px;
+    right: 20px;
+    font-size: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .whatsapp-float {
+    width: 45px;
+    height: 45px;
+    bottom: 15px;
+    right: 15px;
+    font-size: 18px;
+  }
+}
+
+/* ===== NEWSLETTER FORM STYLING ===== */
+.newsletter-form {
+  max-width: 100%;
+  margin-bottom: 15px;
+  min-width: 400px;
+}
+
+.newsletter-input-group {
+  display: flex;
+  align-items: stretch;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: white;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+  width: 100%;
+  min-width: 400px;
+}
+
+.newsletter-input-group:focus-within {
+  border-color: #DA2525;
+  box-shadow: 0 4px 25px rgba(218, 37, 37, 0.2);
+  transform: translateY(-2px);
+}
+
+.newsletter-input {
+  flex: 1;
+  border: none;
+  padding: 16px 20px;
+  font-size: 1rem;
+  background: transparent;
+  color: #333;
+  border-radius: 0;
+  outline: none;
+}
+
+.newsletter-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.newsletter-input::placeholder {
+  color: #6c757d;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+.newsletter-btn {
+  border: none;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border-radius: 0;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.newsletter-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.newsletter-btn:hover::before {
+  left: 100%;
+}
+
+.newsletter-btn:hover {
+  background: linear-gradient(135deg, #B31E1E 0%, #9a1a1a 100%);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px rgba(218, 37, 37, 0.4);
+}
+
+.newsletter-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(218, 37, 37, 0.3);
+  background: linear-gradient(135deg, #B31E1E 0%, #9a1a1a 100%);
+  color: white;
+}
+
+.newsletter-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(218, 37, 37, 0.4);
+}
+
+.newsletter-btn i {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.newsletter-btn span {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Newsletter form responsive design */
+@media screen and (max-width: 576px) {
+  .newsletter-btn span {
+    display: none !important;
+  }
+  
+  .newsletter-btn {
+    min-width: 60px;
+    padding: 16px 18px;
+  }
+  
+  .newsletter-input {
+    font-size: 0.95rem;
+    padding: 16px 18px;
+  }
+  
+  .newsletter-input-group {
+    border-radius: 8px;
+  }
+}
+
+/* Footer specific styling */
+.footer .newsletter-input-group {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.footer .newsletter-input-group:hover {
+  border-color: rgba(218, 37, 37, 0.5);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.footer .newsletter-input-group:focus-within {
+  border-color: #DA2525;
+  box-shadow: 0 4px 25px rgba(218, 37, 37, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.footer .newsletter-input {
+  background: transparent;
+  color: white;
+  font-weight: 500;
+}
+
+.footer .newsletter-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.footer .newsletter-input:focus {
+  color: white;
+}
+
+.footer .newsletter-btn {
+  background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
+  box-shadow: 0 4px 15px rgba(218, 37, 37, 0.3);
+}
+
+.footer .newsletter-btn:hover {
+  background: linear-gradient(135deg, #B31E1E 0%, #9a1a1a 100%);
+  box-shadow: 0 6px 20px rgba(218, 37, 37, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Additional hover effect for the entire input group */
+.newsletter-input-group:hover {
+  border-color: rgba(218, 37, 37, 0.3);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Override any Bootstrap input-group styling that might interfere */
+.newsletter-input-group .form-control,
+.newsletter-input-group .btn {
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.newsletter-input-group .form-control:focus {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Ensure proper button styling overrides Bootstrap */
+.newsletter-btn.btn {
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.newsletter-btn.btn:hover,
+.newsletter-btn.btn:focus,
+.newsletter-btn.btn:active {
+  border: none !important;
+}
+
+/* Ensure the form works in both light and dark contexts */
+body .newsletter-form .newsletter-input-group {
+  display: flex;
+  align-items: stretch;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: white;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+body .newsletter-form .newsletter-input {
+  flex: 1;
+  border: none;
+  padding: 16px 20px;
+  font-size: 1rem;
+  background: transparent;
+  color: #333;
+  outline: none;
+}
+
+body .newsletter-form .newsletter-btn {
+  border: none;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #DA2525 0%, #B31E1E 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
 }

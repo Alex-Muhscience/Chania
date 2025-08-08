@@ -119,12 +119,12 @@ class Program {
                   (title, slug, description, short_description, category, duration, 
                    difficulty_level, fee, max_participants, start_date, end_date, 
                    image_path, instructor_name, location, is_featured, is_active, 
-                   is_published, is_online, created_at, updated_at)
+                   is_online, created_by, created_at, updated_at)
                   VALUES 
                   (:title, :slug, :description, :short_description, :category, :duration,
                    :difficulty_level, :fee, :max_participants, :start_date, :end_date,
                    :image_path, :instructor_name, :location, :is_featured, :is_active,
-                   :is_published, :is_online, NOW(), NOW())";
+                   :is_online, :created_by, NOW(), NOW())";
         
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':title', $data['title']);
@@ -135,16 +135,27 @@ class Program {
         $stmt->bindParam(':duration', $data['duration']);
         $stmt->bindParam(':difficulty_level', $data['difficulty_level']);
         $stmt->bindParam(':fee', $data['fee']);
-        $stmt->bindParam(':max_participants', $data['max_participants']);
-        $stmt->bindParam(':start_date', $data['start_date']);
-        $stmt->bindParam(':end_date', $data['end_date']);
-        $stmt->bindParam(':image_path', $data['image_path']);
-        $stmt->bindParam(':instructor_name', $data['instructor_name']);
-        $stmt->bindParam(':location', $data['location']);
-        $stmt->bindParam(':is_featured', $data['is_featured']);
+        
+        $max_participants = $data['max_participants'] ?? null;
+        $start_date = $data['start_date'] ?? null;
+        $end_date = $data['end_date'] ?? null;
+        $image_path = $data['image_path'] ?? null;
+        $instructor_name = $data['instructor_name'] ?? null;
+        $location = $data['location'] ?? null;
+        $is_featured = $data['is_featured'] ?? 0;
+        $is_online = $data['is_online'] ?? 0;
+        $created_by = $data['created_by'] ?? ($_SESSION['user_id'] ?? 1);
+        
+        $stmt->bindParam(':max_participants', $max_participants);
+        $stmt->bindParam(':start_date', $start_date);
+        $stmt->bindParam(':end_date', $end_date);
+        $stmt->bindParam(':image_path', $image_path);
+        $stmt->bindParam(':instructor_name', $instructor_name);
+        $stmt->bindParam(':location', $location);
+        $stmt->bindParam(':is_featured', $is_featured);
         $stmt->bindParam(':is_active', $data['is_active']);
-        $stmt->bindParam(':is_published', $data['is_published']);
-        $stmt->bindParam(':is_online', $data['is_online']);
+        $stmt->bindParam(':is_online', $is_online);
+        $stmt->bindParam(':created_by', $created_by);
 
         if ($stmt->execute()) {
             return $this->conn->lastInsertId();
@@ -162,8 +173,7 @@ class Program {
                       start_date = :start_date, end_date = :end_date,
                       image_path = :image_path, instructor_name = :instructor_name,
                       location = :location, is_featured = :is_featured,
-                      is_active = :is_active, is_published = :is_published,
-                      is_online = :is_online, updated_at = NOW()
+                      is_active = :is_active, is_online = :is_online, updated_at = NOW()
                   WHERE id = :id";
         
         $stmt = $this->conn->prepare($query);
@@ -176,16 +186,25 @@ class Program {
         $stmt->bindParam(':duration', $data['duration']);
         $stmt->bindParam(':difficulty_level', $data['difficulty_level']);
         $stmt->bindParam(':fee', $data['fee']);
-        $stmt->bindParam(':max_participants', $data['max_participants']);
-        $stmt->bindParam(':start_date', $data['start_date']);
-        $stmt->bindParam(':end_date', $data['end_date']);
-        $stmt->bindParam(':image_path', $data['image_path']);
-        $stmt->bindParam(':instructor_name', $data['instructor_name']);
-        $stmt->bindParam(':location', $data['location']);
-        $stmt->bindParam(':is_featured', $data['is_featured']);
+        
+        $max_participants = $data['max_participants'] ?? null;
+        $start_date = $data['start_date'] ?? null;
+        $end_date = $data['end_date'] ?? null;
+        $image_path = $data['image_path'] ?? null;
+        $instructor_name = $data['instructor_name'] ?? null;
+        $location = $data['location'] ?? null;
+        $is_featured = $data['is_featured'] ?? 0;
+        $is_online = $data['is_online'] ?? 0;
+        
+        $stmt->bindParam(':max_participants', $max_participants);
+        $stmt->bindParam(':start_date', $start_date);
+        $stmt->bindParam(':end_date', $end_date);
+        $stmt->bindParam(':image_path', $image_path);
+        $stmt->bindParam(':instructor_name', $instructor_name);
+        $stmt->bindParam(':location', $location);
+        $stmt->bindParam(':is_featured', $is_featured);
         $stmt->bindParam(':is_active', $data['is_active']);
-        $stmt->bindParam(':is_published', $data['is_published']);
-        $stmt->bindParam(':is_online', $data['is_online']);
+        $stmt->bindParam(':is_online', $is_online);
 
         return $stmt->execute();
     }

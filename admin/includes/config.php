@@ -1,6 +1,6 @@
 <?php
 // Admin Panel Configuration
-define('ADMIN_TITLE', 'Chania Skills for Africa - Admin');
+define('ADMIN_TITLE', 'Euroafrique Corporate Skills - Admin');
 define('ADMIN_VERSION', '2.0.0');
 define('BASE_URL', 'http://localhost/chania/');
 define('ADMIN_URL', BASE_URL . '/admin');
@@ -33,8 +33,8 @@ define('SMTP_HOST', 'smtp.gmail.com');
 define('SMTP_PORT', 587);
 define('SMTP_USERNAME', 'your-email@gmail.com');
 define('SMTP_PASSWORD', 'your-app-password');
-define('SMTP_FROM_EMAIL', 'noreply@skillsforafrica.org');
-define('SMTP_FROM_NAME', 'Chania Skills for Africa');
+define('SMTP_FROM_EMAIL', 'noreply@euroafriquecorporateskills.com');
+define('SMTP_FROM_NAME', 'Euroafrique Corporate Skills');
 
 // Application Settings
 define('ITEMS_PER_PAGE', 20);

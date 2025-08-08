@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3>Manage Schedules: <?= htmlspecialchars($program['title']) ?></h3>
-            <a href="<?= BASE_URL ?>/admin/enhanced_programs.php" class="btn btn-secondary">
+            <a href="<?= BASE_URL ?>/admin/public/programs.php" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Programs
             </a>
         </div>
@@ -10,9 +10,26 @@
         <!-- Add New Schedule Form -->
         <div class="card mb-4">
             <div class="card-header">
-                <h5>Add New Schedule</h5>
+<h5>Add New Schedule</h5>
+                <div class="alert alert-info">
+                    <small><strong>🔄 View Updated:</strong> 2025-08-07 16:23:26 - If you still see the old form layout below, please clear your browser cache (Ctrl+F5).</small>
+                </div>
             </div>
             <div class="card-body">
+<?php
+                // Updated: 2025-08-07 16:22:56 - Cache busting comment
+                /**
+                 * Safely retrieves form data for schedule form fields
+                 * Prioritizes POST data to preserve user input on validation errors
+                 * @param string $key - The form field name
+                 * @param string $default - Default value if key is not found
+                 * @return string - Escaped and safe value for form rendering
+                 */
+                function getPostValue($key, $default = '') {
+                    return htmlspecialchars($_POST[$key] ?? $default, ENT_QUOTES, 'UTF-8');
+                }
+                ?>
+
                 <?php if (!empty($this->errors)): ?>
                     <div class="alert alert-danger">
                         <ul class="mb-0">
@@ -31,7 +48,8 @@
                             <div class="mb-3">
                                 <label for="title" class="form-label">Schedule Title *</label>
                                 <input type="text" class="form-control" id="title" name="title" 
-                                       placeholder="e.g., March 2025 Online Cohort" required>
+                                       placeholder="e.g., March 2025 Online Cohort" required
+                                       value="<?= getPostValue('title') ?>" maxlength="255">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -39,8 +57,8 @@
                                 <label for="delivery_mode" class="form-label">Delivery Mode *</label>
                                 <select class="form-control" id="delivery_mode" name="delivery_mode" required>
                                     <option value="">Select Mode</option>
-                                    <option value="online">Online</option>
-                                    <option value="physical">Physical</option>
+                                    <option value="online" <?= getPostValue('delivery_mode') === 'online' ? 'selected' : '' ?>>Online</option>
+                                    <option value="physical" <?= getPostValue('delivery_mode') === 'physical' ? 'selected' : '' ?>>Physical</option>
                                 </select>
                             </div>
                         </div>
@@ -48,33 +66,37 @@
                     
                     <div class="mb-3">
                         <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="2"
-                                  placeholder="Brief description of this specific schedule"></textarea>
+                        <textarea class="form-control auto-resize" id="description" name="description" rows="2"
+                                  placeholder="Brief description of this specific schedule"><?= getPostValue('description') ?></textarea>
                     </div>
 
                     <div class="row">
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="start_date" class="form-label">Start Date *</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required
+                                       value="<?= getPostValue('start_date') ?>">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="end_date" class="form-label">End Date *</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                <input type="date" class="form-control" id="end_date" name="end_date" required
+                                       value="<?= getPostValue('end_date') ?>">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="start_time" class="form-label">Start Time</label>
-                                <input type="time" class="form-control" id="start_time" name="start_time" value="09:00">
+                                <input type="time" class="form-control" id="start_time" name="start_time" 
+                                       value="<?= getPostValue('start_time', '09:00') ?>">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="end_time" class="form-label">End Time</label>
-                                <input type="time" class="form-control" id="end_time" name="end_time" value="17:00">
+                                <input type="time" class="form-control" id="end_time" name="end_time" 
+                                       value="<?= getPostValue('end_time', '17:00') ?>">
                             </div>
                         </div>
                     </div>
@@ -84,33 +106,35 @@
                             <div class="mb-3">
                                 <label for="location" class="form-label">Location</label>
                                 <input type="text" class="form-control" id="location" name="location"
-                                       placeholder="e.g., Nairobi Campus, Zoom, etc.">
+                                       placeholder="e.g., Nairobi Campus, Zoom, etc." maxlength="255"
+                                       value="<?= getPostValue('location') ?>">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="timezone" class="form-label">Timezone</label>
                                 <select class="form-control" id="timezone" name="timezone">
-                                    <option value="UTC">UTC</option>
-                                    <option value="Africa/Nairobi" selected>Africa/Nairobi (EAT)</option>
-                                    <option value="Africa/Johannesburg">Africa/Johannesburg (SAST)</option>
-                                    <option value="America/New_York">America/New_York (EST)</option>
-                                    <option value="Europe/London">Europe/London (GMT)</option>
+                                    <option value="UTC" <?= getPostValue('timezone', 'Africa/Nairobi') === 'UTC' ? 'selected' : '' ?>>UTC</option>
+                                    <option value="Africa/Nairobi" <?= getPostValue('timezone', 'Africa/Nairobi') === 'Africa/Nairobi' ? 'selected' : '' ?>>Africa/Nairobi (EAT)</option>
+                                    <option value="Africa/Johannesburg" <?= getPostValue('timezone', 'Africa/Nairobi') === 'Africa/Johannesburg' ? 'selected' : '' ?>>Africa/Johannesburg (SAST)</option>
+                                    <option value="America/New_York" <?= getPostValue('timezone', 'Africa/Nairobi') === 'America/New_York' ? 'selected' : '' ?>>America/New_York (EST)</option>
+                                    <option value="Europe/London" <?= getPostValue('timezone', 'Africa/Nairobi') === 'Europe/London' ? 'selected' : '' ?>>Europe/London (GMT)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="max_participants" class="form-label">Max Participants</label>
-                                <input type="number" class="form-control" id="max_participants" name="max_participants" min="1">
+                                <input type="number" class="form-control" id="max_participants" name="max_participants" min="1"
+                                       value="<?= getPostValue('max_participants') ?>">
                             </div>
                         </div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="venue_details" class="form-label">Venue Details</label>
-                        <textarea class="form-control" id="venue_details" name="venue_details" rows="2"
-                                  placeholder="Additional venue information, directions, or online meeting details"></textarea>
+                        <textarea class="form-control auto-resize" id="venue_details" name="venue_details" rows="2"
+                                  placeholder="Additional venue information, directions, or online meeting details"><?= getPostValue('venue_details') ?></textarea>
                     </div>
 
                     <div class="row">
@@ -118,7 +142,8 @@
                             <div class="mb-3">
                                 <label for="online_fee" class="form-label">Online Fee *</label>
                                 <input type="number" class="form-control" id="online_fee" name="online_fee" 
-                                       min="0.01" step="0.01" required>
+                                       min="0.01" step="0.01" required
+                                       value="<?= getPostValue('online_fee') ?>">
                                 <small class="form-text text-muted">All courses must be available online</small>
                             </div>
                         </div>
@@ -126,7 +151,8 @@
                             <div class="mb-3">
                                 <label for="physical_fee" class="form-label">Physical Fee *</label>
                                 <input type="number" class="form-control" id="physical_fee" name="physical_fee" 
-                                       min="0.01" step="0.01" required>
+                                       min="0.01" step="0.01" required
+                                       value="<?= getPostValue('physical_fee') ?>">
                                 <small class="form-text text-muted">All courses must be available physically</small>
                             </div>
                         </div>
@@ -134,17 +160,18 @@
                             <div class="mb-3">
                                 <label for="currency" class="form-label">Currency</label>
                                 <select class="form-control" id="currency" name="currency">
-                                    <option value="USD">USD</option>
-                                    <option value="KES" selected>KES</option>
-                                    <option value="EUR">EUR</option>
-                                    <option value="GBP">GBP</option>
+                                    <option value="USD" <?= getPostValue('currency', 'KES') === 'USD' ? 'selected' : '' ?>>USD</option>
+                                    <option value="KES" <?= getPostValue('currency', 'KES') === 'KES' ? 'selected' : '' ?>>KES</option>
+                                    <option value="EUR" <?= getPostValue('currency', 'KES') === 'EUR' ? 'selected' : '' ?>>EUR</option>
+                                    <option value="GBP" <?= getPostValue('currency', 'KES') === 'GBP' ? 'selected' : '' ?>>GBP</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
                                 <label for="registration_deadline" class="form-label">Registration Deadline</label>
-                                <input type="date" class="form-control" id="registration_deadline" name="registration_deadline">
+                                <input type="date" class="form-control" id="registration_deadline" name="registration_deadline"
+                                       value="<?= getPostValue('registration_deadline') ?>">
                             </div>
                         </div>
                     </div>
@@ -153,13 +180,15 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="instructor_name" class="form-label">Instructor Name</label>
-                                <input type="text" class="form-control" id="instructor_name" name="instructor_name">
+                                <input type="text" class="form-control" id="instructor_name" name="instructor_name" maxlength="255"
+                                       value="<?= getPostValue('instructor_name') ?>">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="instructor_email" class="form-label">Instructor Email</label>
-                                <input type="email" class="form-control" id="instructor_email" name="instructor_email">
+                                <input type="email" class="form-control" id="instructor_email" name="instructor_email" maxlength="255"
+                                       value="<?= getPostValue('instructor_email') ?>">
                             </div>
                         </div>
                     </div>
@@ -169,13 +198,15 @@
                             <div class="mb-3">
                                 <label for="meeting_link" class="form-label">Meeting Link (for online)</label>
                                 <input type="url" class="form-control" id="meeting_link" name="meeting_link"
-                                       placeholder="https://zoom.us/j/...">
+                                       placeholder="https://zoom.us/j/..." maxlength="500"
+                                       value="<?= getPostValue('meeting_link') ?>">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="meeting_password" class="form-label">Meeting Password</label>
-                                <input type="text" class="form-control" id="meeting_password" name="meeting_password">
+                                <input type="text" class="form-control" id="meeting_password" name="meeting_password" maxlength="255"
+                                       value="<?= getPostValue('meeting_password') ?>">
                             </div>
                         </div>
                     </div>
@@ -184,15 +215,15 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="requirements" class="form-label">Requirements</label>
-                                <textarea class="form-control" id="requirements" name="requirements" rows="2"
-                                          placeholder="Specific requirements for this schedule"></textarea>
+                                <textarea class="form-control auto-resize" id="requirements" name="requirements" rows="2"
+                                          placeholder="Specific requirements for this schedule"><?= getPostValue('requirements') ?></textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="materials_included" class="form-label">Materials Included</label>
-                                <textarea class="form-control" id="materials_included" name="materials_included" rows="2"
-                                          placeholder="What materials or resources are included"></textarea>
+                                <textarea class="form-control auto-resize" id="materials_included" name="materials_included" rows="2"
+                                          placeholder="What materials or resources are included"><?= getPostValue('materials_included') ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -304,6 +335,23 @@ document.addEventListener('DOMContentLoaded', function() {
             startDate.setDate(startDate.getDate() - 1);
             deadlineInput.value = startDate.toISOString().slice(0, 16);
         }
+    });
+
+    // Auto-resize textareas
+    function autoResizeTextarea(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight + 2) + 'px';
+    }
+
+    // Apply auto-resize to all textareas with the auto-resize class
+    document.querySelectorAll('textarea.auto-resize').forEach(function(textarea) {
+        // Set initial height
+        autoResizeTextarea(textarea);
+        
+        // Add event listener for input changes
+        textarea.addEventListener('input', function() {
+            autoResizeTextarea(this);
+        });
     });
 });
 </script>

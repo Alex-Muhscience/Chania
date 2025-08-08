@@ -5,7 +5,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-graduation-cap"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">Chania Admin</div>
+        <div class="sidebar-brand-text mx-3">Euroafrique Admin</div>
     </a>
 
     <!-- Divider -->
@@ -47,7 +47,7 @@
                 <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'programs.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/programs.php">
                     <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>All Programs
                 </a>
-                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'program_add.php' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/program_add.php">
+                <a class="collapse-item <?= basename($_SERVER['PHP_SELF']) === 'programs.php' && ($_GET['action'] ?? '') === 'add' ? 'active' : '' ?>" href="<?= BASE_URL ?>/admin/public/programs.php?action=add">
                     <i class="fas fa-plus fa-sm fa-fw mr-2 text-gray-400"></i>Add New Program
                 </a>
                 <div class="collapse-divider"></div>

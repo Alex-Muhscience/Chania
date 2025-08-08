@@ -62,6 +62,15 @@
                             <a href="mailto:<?php echo CONTACT_EMAIL; ?>"><?php echo CONTACT_EMAIL; ?></a>
                         </div>
                         <div class="contact-item mb-3">
+                            <i class="fas fa-graduation-cap text-primary me-2"></i>
+                            <a href="mailto:training@euroafriquecorporateskills.com">training@euroafriquecorporateskills.com</a>
+                        </div>
+                        <div class="contact-item mb-3">
+                            <i class="fab fa-whatsapp text-success me-2"></i>
+                            <a href="https://wa.me/254724213764?text=Hello%20Euroafrique%20Corporate%20Skills!%20I%20found%20you%20through%20your%20website." 
+                               target="_blank" class="text-success">WhatsApp: +254724213764</a>
+                        </div>
+                        <div class="contact-item mb-3">
                             <i class="fas fa-clock text-primary me-2"></i>
                             <span>Mon - Fri: 8:00 AM - 5:00 PM</span>
                         </div>
@@ -77,10 +86,11 @@
                 </div>
                 <div class="col-lg-4 col-md-5">
                     <form id="newsletter-form" class="newsletter-form">
-                        <div class="input-group">
-                            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
-                            <button class="btn btn-primary" type="submit">
+                        <div class="newsletter-input-group">
+                            <input type="email" name="email" class="newsletter-input" placeholder="Enter your email address" required>
+                            <button class="newsletter-btn" type="submit" title="Subscribe">
                                 <i class="fas fa-paper-plane"></i>
+                                <span class="d-none d-sm-inline ms-1">Subscribe</span>
                             </button>
                         </div>
                     </form>
@@ -107,6 +117,11 @@
         </div>
     </footer>
 
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/254724213764?text=Hello%20Euroafrique%20Corporate%20Skills!%20I%20would%20like%20to%20get%20in%20touch." 
+       target="_blank" class="whatsapp-float" title="Chat with us on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -138,6 +153,18 @@
                 spinner.style.display = 'none';
             }
         });
+        
+        // WhatsApp Float Button Animation
+        const whatsappFloat = document.querySelector('.whatsapp-float');
+        if (whatsappFloat) {
+            // Add pulse animation every 5 seconds
+            setInterval(function() {
+                whatsappFloat.style.animation = 'pulse 1s ease-in-out';
+                setTimeout(function() {
+                    whatsappFloat.style.animation = '';
+                }, 1000);
+            }, 5000);
+        }
     </script>
 </body>
 </html>

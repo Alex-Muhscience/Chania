@@ -127,7 +127,7 @@ class EnhancedProgramsController extends BaseController {
 
         $programId = intval($_GET['id'] ?? 0);
         if (!$programId) {
-            $this->redirect(BASE_URL . '/admin/programs.php', 'Invalid program ID.');
+            $this->redirect(BASE_URL . '/admin/public/programs.php', 'Invalid program ID.');
         }
 
         $this->setPageTitle('Edit Enhanced Program');
@@ -146,13 +146,13 @@ class EnhancedProgramsController extends BaseController {
             $programData = $this->getProgramWithDetails($programId);
             
             if (!$programData['program']) {
-                $this->redirect(BASE_URL . '/admin/programs.php', 'Program not found.');
+                $this->redirect(BASE_URL . '/admin/public/programs.php', 'Program not found.');
             }
 
             $this->renderView(__DIR__ . '/../views/enhanced_programs/edit.php', $programData);
 
         } catch (Exception $e) {
-            $this->redirect(BASE_URL . '/admin/programs.php', 'Error loading program: ' . $e->getMessage());
+            $this->redirect(BASE_URL . '/admin/public/programs.php', 'Error loading program: ' . $e->getMessage());
         }
     }
 
@@ -178,7 +178,7 @@ class EnhancedProgramsController extends BaseController {
         $schedules = $stmt->fetchAll();
 
         // Get program curriculum
-        $stmt = $this->db->prepare("SELECT * FROM program_curriculum WHERE program_id = ? ORDER BY day_number ASC, session_order ASC");
+        $stmt = $this->db->prepare("SELECT * FROM program_curriculum WHERE program_id = ? ORDER BY module_order ASC");
         $stmt->execute([$programId]);
         $curriculum = $stmt->fetchAll();
 
@@ -214,9 +214,35 @@ class EnhancedProgramsController extends BaseController {
 
                 case 'toggle_status':
                     if ($programId) {
-                        $stmt = $this->db->prepare("UPDATE programs SET is_active = NOT is_active WHERE id = ?");
-                        $stmt->execute([$programId]);
-                        $this->setSuccess("Program status updated successfully.");
+                        // Check if this is an AJAX request
+                        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                            $stmt = $this->db->prepare("SELECT is_active FROM programs WHERE id = ?");
+                            $stmt->execute([$programId]);
+                            $currentStatus = $stmt->fetchColumn();
+                            
+                            $stmt = $this->db->prepare("UPDATE programs SET is_active = NOT is_active WHERE id = ?");
+                            $result = $stmt->execute([$programId]);
+                            
+                            header('Content-Type: application/json');
+                            if ($result) {
+                                $newStatus = $currentStatus ? 0 : 1;
+                                echo json_encode([
+                                    'success' => true, 
+                                    'message' => 'Program status updated successfully',
+                                    'newStatus' => $newStatus,
+                                    'statusText' => $newStatus ? 'Active' : 'Inactive',
+                                    'buttonClass' => $newStatus ? 'btn-success' : 'btn-secondary'
+                                ]);
+                            } else {
+                                echo json_encode(['success' => false, 'error' => 'Failed to update status']);
+                            }
+                            exit;
+                        } else {
+                            // Fallback for non-AJAX requests
+                            $stmt = $this->db->prepare("UPDATE programs SET is_active = NOT is_active WHERE id = ?");
+                            $stmt->execute([$programId]);
+                            $this->setSuccess("Program status updated successfully.");
+                        }
                     }
                     break;
                     
@@ -337,7 +363,7 @@ class EnhancedProgramsController extends BaseController {
                 $this->db->commit();
                 
                 if ($result) {
-                    $this->redirect(BASE_URL . '/admin/programs.php', 'Program created successfully.');
+                    $this->redirect(BASE_URL . '/admin/public/programs.php', 'Program created successfully.');
                 } else {
                     $this->addError('Failed to create program.');
                 }
@@ -510,7 +536,7 @@ class EnhancedProgramsController extends BaseController {
                 $this->db->commit();
                 
                 if ($result) {
-                    $this->redirect(BASE_URL . '/admin/programs.php', 'Program updated successfully.');
+                    $this->redirect(BASE_URL . '/admin/public/programs.php', 'Program updated successfully.');
                 } else {
                     $this->addError('Failed to update program.');
                 }
@@ -526,7 +552,7 @@ class EnhancedProgramsController extends BaseController {
     public function schedules() {
         $programId = intval($_GET['program_id'] ?? 0);
         if (!$programId) {
-            $this->redirect(BASE_URL . '/admin/programs.php', 'Invalid program ID.');
+            $this->redirect(BASE_URL . '/admin/public/programs.php', 'Invalid program ID.');
         }
 
         // Check permissions
@@ -549,7 +575,7 @@ class EnhancedProgramsController extends BaseController {
             $program = $stmt->fetch();
 
             if (!$program) {
-                $this->redirect(BASE_URL . '/admin/programs.php', 'Program not found.');
+                $this->redirect(BASE_URL . '/admin/public/programs.php', 'Program not found.');
             }
 
             // Get schedules
@@ -557,14 +583,14 @@ class EnhancedProgramsController extends BaseController {
             $stmt->execute([$programId]);
             $schedules = $stmt->fetchAll();
 
-            $this->renderView(__DIR__ . '/../views/enhanced_programs/schedules.php', [
+            $this->render('enhanced_programs/schedules_new', [
                 'program' => $program,
                 'program_id' => $programId,
                 'schedules' => $schedules
             ]);
 
         } catch (Exception $e) {
-            $this->redirect(BASE_URL . '/admin/programs.php', 'Error loading schedules: ' . $e->getMessage());
+            $this->redirect(BASE_URL . '/admin/public/programs.php', 'Error loading schedules: ' . $e->getMessage());
         }
     }
 

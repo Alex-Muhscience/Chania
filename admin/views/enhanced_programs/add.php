@@ -1,4 +1,18 @@
 <?php
+/**
+ * Enhanced Programs Add View - Clean Implementation
+ * Safely handles all form data and displays with proper error handling
+ */
+
+// Safe value retrieval function for form fields
+function getPostValue($key, $default = '') {
+    if (isset($_POST[$key])) {
+        $value = $_POST[$key];
+        return is_string($value) ? trim($value) : $value;
+    }
+    return $default;
+}
+
 // Include header
 require_once __DIR__ . '/../../includes/header.php';
 ?>
@@ -7,7 +21,7 @@ require_once __DIR__ . '/../../includes/header.php';
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Add New Enhanced Program</h1>
     <div class="d-none d-sm-inline-block">
-        <a href="<?= BASE_URL ?>../../public/programs.php" class="btn btn-sm btn-secondary shadow-sm">
+        <a href="<?= BASE_URL ?>/admin/public/programs.php" class="btn btn-sm btn-secondary shadow-sm">
             <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Programs
         </a>
     </div>
@@ -39,22 +53,12 @@ require_once __DIR__ . '/../../includes/header.php';
 
 <div class="row justify-content-center">
     <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Add New Enhanced Program</h5>
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h5 class="m-0 font-weight-bold text-primary">Add New Enhanced Program</h5>
             </div>
             <div class="card-body">
-                <?php if (!empty($this->errors)): ?>
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            <?php foreach ($this->errors as $error): ?>
-                                <li><?= htmlspecialchars($error) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" enctype="multipart/form-data" id="addProgramForm">
                     <!-- Basic Program Information -->
                     <div class="row">
                         <div class="col-md-8">
@@ -290,7 +294,7 @@ require_once __DIR__ . '/../../includes/header.php';
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="<?= BASE_URL ?>/admin/enhanced_programs.php" class="btn btn-secondary">
+                        <a href="<?= BASE_URL ?>/admin/public/programs.php" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Back to Programs
                         </a>
                         <button type="submit" class="btn btn-primary">

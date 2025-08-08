@@ -7,8 +7,42 @@ AddDefaultCharset UTF-8
 # Prevent directory listing
 Options -Indexes
 
-# Custom 404 error page
-ErrorDocument 404 /chania/404.php
+# Custom error pages
+ErrorDocument 404 /404.php
+ErrorDocument 403 /404.php
+ErrorDocument 500 /404.php
+
+# Production Security Headers
+<IfModule mod_headers.c>
+    # Security headers
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options SAMEORIGIN
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    
+    # HSTS (HTTP Strict Transport Security) - Uncomment for HTTPS
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    
+    # Remove server information
+    Header unset Server
+    Header unset X-Powered-By
+</IfModule>
+
+# Block suspicious requests
+<IfModule mod_rewrite.c>
+    # Block common attack patterns
+    RewriteCond %{QUERY_STRING} (union|select|insert|delete|drop|create|alter|exec|script) [NC,OR]
+    RewriteCond %{QUERY_STRING} (\.\./|\.\.\\) [NC,OR]
+    RewriteCond %{QUERY_STRING} (null|localhost|loopback|127\.0\.0\.1) [NC,OR]
+    RewriteCond %{QUERY_STRING} (<script|<iframe|<object) [NC]
+    RewriteRule .* - [F,L]
+    
+    # Block suspicious user agents
+    RewriteCond %{HTTP_USER_AGENT} (bot|crawl|spider|scan|wget|curl|nikto|sqlmap|nmap) [NC]
+    RewriteCond %{REQUEST_URI} !(robots\.txt|sitemap\.xml) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
 
 # Simple approach: rewrite everything to client/public/
 # Root access goes to client/public/index.php

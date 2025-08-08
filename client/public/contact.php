@@ -2,8 +2,8 @@
 require_once '../includes/config.php';
 
 $page_title = lang('contact_us');
-$page_description = 'Get in touch with Chania Skills for Africa. Contact us for inquiries about our programs, partnerships, or general information.';
-$page_keywords = 'contact, inquiries, support, location, phone, email, office, Chania Skills for Africa';
+$page_description = 'Get in touch with Euroafrique Corporate Skills. Contact us for inquiries about our programs, partnerships, or general information.';
+$page_keywords = 'contact, inquiries, support, location, phone, email, office, Euroafrique Corporate Skills';
 
 // Handle form submission
 $form_submitted = false;
@@ -116,12 +116,18 @@ include '../includes/header.php';
                         <h5 class="card-title">Call Us</h5>
                         <p class="card-text text-muted">
                             Main Office: <?php echo CONTACT_PHONE; ?><br>
-                            WhatsApp: +254 700 000 001<br>
+                            WhatsApp: +254724213764<br>
                             <small class="text-success">Available 8 AM - 6 PM EAT</small>
                         </p>
-                        <a href="tel:<?php echo str_replace(' ', '', CONTACT_PHONE); ?>" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-phone me-1"></i>Call Now
-                        </a>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="tel:<?php echo str_replace(' ', '', CONTACT_PHONE); ?>" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-phone me-1"></i>Call Now
+                            </a>
+                            <a href="https://wa.me/254724213764?text=Hello%20Euroafrique%20Corporate%20Skills!%20I%20would%20like%20to%20inquire%20about%20your%20programs." 
+                               target="_blank" class="btn btn-success btn-sm whatsapp-btn">
+                                <i class="fab fa-whatsapp me-1"></i>WhatsApp
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -135,7 +141,7 @@ include '../includes/header.php';
                         <h5 class="card-title">Email Us</h5>
                         <p class="card-text text-muted">
                             General: <?php echo CONTACT_EMAIL; ?><br>
-                            Admissions: admissions@skillsforafrica.org<br>
+                            Training: training@euroafriquecorporateskills.com<br>
                             <small class="text-success">We reply within 24 hours</small>
                         </p>
                         <a href="mailto:<?php echo CONTACT_EMAIL; ?>" class="btn btn-outline-primary btn-sm">
@@ -157,6 +163,18 @@ include '../includes/header.php';
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-5">
                         <h3 class="mb-4">Send Us a Message</h3>
+                        
+                        <!-- Quick Contact Options -->
+                        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+                            <i class="fas fa-info-circle me-3"></i>
+                            <div class="flex-grow-1">
+                                <strong>Need immediate assistance?</strong> 
+                                <a href="https://wa.me/254724213764?text=Hello%20Euroafrique%20Corporate%20Skills!%20I%20need%20immediate%20assistance." 
+                                   target="_blank" class="btn btn-success btn-sm ms-2 whatsapp-btn">
+                                    <i class="fab fa-whatsapp me-1"></i>Chat on WhatsApp
+                                </a>
+                            </div>
+                        </div>
                         
                         <?php if ($form_submitted): ?>
                             <?php if ($form_success): ?>
@@ -194,7 +212,7 @@ include '../includes/header.php';
                                     <label for="phone" class="form-label">Phone Number</label>
                                     <input type="tel" class="form-control" id="phone" name="phone" 
                                            value="<?php echo htmlspecialchars($phone ?? ''); ?>" 
-                                           placeholder="+254 700 000 000">
+                                           placeholder="+254 724 213 764">
                                 </div>
                                 <div class="col-md-6">
                                     <label for="inquiry_type" class="form-label">Inquiry Type</label>
@@ -277,7 +295,11 @@ include '../includes/header.php';
                                 <h6 class="mb-1">Student Support</h6>
                                 <p class="text-muted mb-0 small">
                                     24/7 online support portal<br>
-                                    Live chat during office hours
+                                    Live chat during office hours<br>
+                                    <a href="https://wa.me/254724213764?text=Hello%20Euroafrique%20Corporate%20Skills!%20I%20need%20student%20support." 
+                                       target="_blank" class="text-success whatsapp-link">
+                                        <i class="fab fa-whatsapp me-1"></i>WhatsApp Support
+                                    </a>
                                 </p>
                             </div>
                         </div>
@@ -441,6 +463,11 @@ include '../includes/header.php';
                     <i class="fas fa-phone me-2"></i><?php echo CONTACT_PHONE; ?>
                     <span class="mx-3">|</span>
                     <i class="fas fa-envelope me-2"></i><?php echo CONTACT_EMAIL; ?>
+                    <span class="mx-3">|</span>
+                    <a href="https://wa.me/254724213764?text=Hello%20Euroafrique%20Corporate%20Skills!%20I%20found%20you%20through%20your%20website." 
+                       target="_blank" class="text-white text-decoration-none whatsapp-footer">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp: +254724213764
+                    </a>
                 </p>
             </div>
         </div>
@@ -477,5 +504,81 @@ include '../includes/header.php';
 .accordion-button:not(.collapsed) {
     background-color: rgba(25, 27, 223, 0.1);
     color: var(--primary-color);
+}
+
+/* WhatsApp Styling */
+.whatsapp-btn {
+    background-color: #25d366 !important;
+    border-color: #25d366 !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.whatsapp-btn:hover {
+    background-color: #128c7e !important;
+    border-color: #128c7e !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-link {
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+}
+
+.whatsapp-link:hover {
+    color: #128c7e !important;
+    transform: translateX(3px);
+}
+
+.whatsapp-footer {
+    transition: all 0.3s ease;
+}
+
+.whatsapp-footer:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+/* Floating WhatsApp Button */
+.whatsapp-float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 40px;
+    right: 40px;
+    background-color: #25d366;
+    color: white;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 24px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.whatsapp-float:hover {
+    background-color: #128c7e;
+    transform: scale(1.1);
+    color: white;
+    text-decoration: none;
+}
+
+.whatsapp-float i {
+    margin: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .whatsapp-float {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 20px;
+    }
 }
 </style>
